@@ -1,9 +1,10 @@
-# SopiaTech Eats-Team-23-24 #template
+# SopiaTech Eats-Team-24-25 #template
 _Template for classroom SI4-COO_
 
 >. CETTE PAGE DOIT ETRE MISE A JOUR POUR CORRESPONDRE A VOTRE PROJET.  
 >. C'est seulement un modèle !!
 >. Vous l'organisez comme bon vous semble, mais comme un vrai projet.
+> **Il ne reste donc à la fin aucun commentaire présent ici pour vous guider !! **
 
 
 ## TEAM
@@ -12,18 +13,19 @@ Présentez vous!
 
 ## doc
 Contient vos rapports et les documents qui présentent votre projet.
+Précisez le chemin dans votre structure.
 
 
 ## .github
    1. Contient sous workflows/maven.yml, une version d'un fichier d'actions qui est déclenché dès que vous poussez du code. 
 Sur cette version initiale seule un test Junit5 est déclenché pour vérifier que tout fonctionne.
-       - Github Actions (See in .github/workflows) to simply make a maven+test compilation
+
   2. Contient sous ISSUE_TEMPLATE, les modèles pour les issues user_story et bug. Vous pouvez le compléter à votre guise.
 
 ## src
  - pom.xml :  
        - Cucumber 7 et JUnit 5  
-       - JDK 17   
+       - JDK 17 ou supérieur   
        - Etc.  
    Ce pom.xml sera mis à jour avec la démonstration qui vous sera donnée ultérieurement.
 
