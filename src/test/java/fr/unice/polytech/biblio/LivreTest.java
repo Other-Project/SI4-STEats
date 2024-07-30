@@ -19,7 +19,6 @@ public class LivreTest { // Just pour vérifier que JUnit 5 est bien configuré
 
     @Test
     public void EtudiantCreated() {
-
         assertEquals(false, livre.getEmprunte());
     }
 
