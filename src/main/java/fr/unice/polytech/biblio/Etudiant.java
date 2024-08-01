@@ -1,22 +1,17 @@
 package fr.unice.polytech.biblio;
 
-import java.time.LocalDate;
 import java.util.*;
 
 /**
  * Ph. Collet
+ * modifié par M. Blay-Fornarino
  */
 public class Etudiant {
 
 	private String nom;
 	private int noEtudiant;
-	Bibliotheque bibliotheque;
-	Collection<Emprunt> emprunts;
-
-	public Etudiant(Bibliotheque biblio) {
-		this.bibliotheque = biblio;
-		emprunts = new ArrayList<>();
-	}
+	// Les emprunts courants
+	private Collection<Emprunt> emprunts = new ArrayList<>();
 
 	public String getNom() {
 		return this.nom;
@@ -34,30 +29,24 @@ public class Etudiant {
 		this.noEtudiant = noEtudiant;
 	}
 
-	public Collection<Emprunt> getEmprunt() {
-		return emprunts;
+	public Collection<Emprunt> getEmprunts() {
+		return Collections.unmodifiableCollection(emprunts);
 	}
 
-	public int getNombreDEmprunt() {
+	public int getNombreDEmprunts() {
 		return emprunts.size();
 	}
-
-	public void emprunte(Livre livre) {
-		Emprunt e = new Emprunt(LocalDate.now().plusDays(15), this, livre);
-		livre.setEmprunte(true);
-		emprunts.add(e);
+	public void addEmprunt(Emprunt emprunt) {
+		emprunts.add(emprunt);
 	}
 
-	public void rendre(String titreLivre) {
-		List<Collection<Emprunt>> empruntsLoop = List.of(emprunts);
-		Emprunt toRemove = null;
-		for (Emprunt e : emprunts) {
-			if (e.getLivreEmprunte().equals(titreLivre)){
-				toRemove = e;
-				e.getLivreEmprunte().setEmprunte(false);
-				break;
-			}
-		}
-		emprunts.remove(toRemove);
+	public void removeEmprunt(Emprunt emprunt) {
+		emprunts.remove(emprunt);
 	}
+
+	//On considére qu'un seul exemplaire d'un livre peut etre emprunté par un étudiant
+	public Emprunt getEmpruntFor(String livreTitre){
+		return emprunts.stream().filter(e -> e.getLivreEmprunte().getTitre().equals(livreTitre)).findFirst().orElse(null);
+	}
+
 }
