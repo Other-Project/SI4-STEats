@@ -25,12 +25,12 @@ Sur cette version initiale seule un test Junit5 est déclenché pour vérifier q
 ## src
  - pom.xml :  
        - Cucumber 7 et JUnit 5  
-       - JDK 17 ou supérieur   
+       - JDK 21
        - Etc.  
    Ce pom.xml sera mis à jour avec la démonstration qui vous sera donnée ultérieurement.
 
-Lorsque vous passerez en développement, les codes donnés peuvent être éliminés.   
-De nouveaux exemples vous seront donnés.   
+Lorsque vous passerez en développement, les codes donnés ici peuvent être éliminés.   
+
 Nous les laissons cependant pour votre permettre de vérifier que vous n'avez pas de problème d'intégration continue.
 
 

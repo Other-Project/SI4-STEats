@@ -68,15 +68,25 @@ public class BookRentalStepdefs {
     @Given("{string} has rent the book {string}")
     public void hasRentTheBook(String studentName, String bookTitle) {
         Etudiant e = biblio.getEtudiantByName(studentName);
-        Livre l = biblio.getLivreDisponibleByTitle(bookTitle).get();
-        biblio.emprunte(e,l);
+        Livre book = biblio.getLivreDisponibleByTitle(bookTitle).orElse(null);
+        if (book == null) {
+            throw new IllegalStateException("Book not available" + bookTitle);
+        }
+        biblio.emprunte(e,book);
     }
 
     @When("{string} returns the book {string}")
     public void returnsTheBook(String studentName, String bookTitle) {
        Etudiant e = biblio.getEtudiantByName(studentName);
-       Livre livre = e.getEmpruntFor(bookTitle).getLivreEmprunte();
-       biblio.rend(livre);
+       if (e == null) {
+           throw new IllegalStateException("Student not found" + studentName);
+       }
+       var emprunt = e.getEmpruntFor(bookTitle);
+       if (emprunt == null) {
+              throw new IllegalStateException("No rental found for " + bookTitle + " for " + studentName);
+       }
+       Livre book = emprunt.getLivreEmprunte();
+       biblio.rend(book);
     }
 
     @And("The book {string} is available")

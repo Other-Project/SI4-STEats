@@ -6,7 +6,6 @@ import java.util.*;
 /**
  * Ph. Collet
  * modifié par M. Blay-Fornarino
- * Cette classe joue le rôle de Facade
  */
 public class Bibliotheque {
 

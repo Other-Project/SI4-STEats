@@ -24,11 +24,11 @@ class LivreTest { // Just pour vérifier que JUnit 5 est bien configuré
 
     @Test
     void testConstructorAndEquals() {
-        Livre livre = new Livre("titre");
-        assertEquals("titre", livre.getTitre());
+        Livre book = new Livre("titre");
+        assertEquals("titre", book.getTitre());
         Livre livre2 = new Livre("titre");
         assertEquals("titre", livre2.getTitre());
-        assertNotEquals(livre, livre2);
+        assertNotEquals(book, livre2);
     }
 
 }
