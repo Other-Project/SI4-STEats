@@ -94,10 +94,11 @@ UC2 <. UC3 : extends
 
 # Class Diagram
 
-```plantuml
-@startuml
+```mermaid
+classDiagram
 
-enum Role {
+class Role {
+    <<Enumeration>>
     CAMPUS_USER
     RESTAURANT_STAFF
     RESTAURANT_MANAGER
@@ -115,7 +116,7 @@ class User {
 class Restaurant {
     name : String
 }
-class Schedule{
+class Schedule {
     start : Time
     end : Time
     nb_person : int
@@ -145,7 +146,8 @@ class Address {
     additional_adress : String
 }
 
-enum Status {
+class Status {
+    <<Enumeration>>
     INITIALISED
     COMPLETING
     FINALISING
@@ -155,14 +157,12 @@ enum Status {
     DELIVERED
 }
 
-Restaurant "1 restaurant    " --- " * schedules " Schedule
-Restaurant "   1 restaurant" --- "1..* menu" MenuItem
-User " * " x---> "role 1 " Role
-User "1 user " --- " * orders" Order
-Order " * " x--> "1 status" Status
+Restaurant "1 restaurant    " -- " * schedules " Schedule
+Restaurant "   1 restaurant" -- "1..* menu" MenuItem
+User " * " --> "role 1 " Role
+User "1 user " -- " * orders" Order
+Order " * " --> "1 status" Status
 Order " * orders" -- " 1..* items" MenuItem
-Order " * orders" --- "1 address" Address
+Order " * orders" -- "1 address" Address
 Order " * " -- " * " GroupOrder 
-
-@enduml
 ```
