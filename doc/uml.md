@@ -2,95 +2,66 @@
 
 ## Actors
 
-User : Person that uses our system 
-Guest : Unregistered User
-Client : Registered User that is not working as restaurant Staff nor delivery person
-Restaurant Staff : A person employed by the restaurant to prepare meal
-Restaurant Manager : A restaurant staff that can update menus offering and opening hours
-Delivery Person : Person in charge of the delivery of the meal
+User : Person that uses our system  
+Guest : Unregistered User  
+Client : Registered User that is not working as restaurant Staff nor delivery person  
+Restaurant Staff : A person employed by the restaurant to prepare meal  
+Restaurant Manager : A restaurant staff that can update menus offering and opening hours  
+Delivery Person : Person in charge of the delivery of the meal  
 Administrators : Person that have control over restaurant partnerships and delivery services.
 
 # Use-Case Diagram
 
-## Browse restaurants or menus
-
 ```plantuml
 @startuml
 left to right direction
-actor "{Abstract}\n     User" as user
-actor "Guest" as guest
-actor "Client" as client
-actor "Restaurant manager" as manager
+actor "Restaurant Manager" as manager
 actor "Restaurant Staff" as restaurant
+actor "Client" as client
 actor "Delivery Person" as delivery
+actor "    {Abstract}\nRegistered User" as registered_user
+actor "Guest" as guest
+actor "{Abstract}\n     User" as user
 rectangle {
   usecase "Browse restaurants" as UC1
   usecase "Browse menu" as UC2
-}
-guest --|> user
-client --|> user
-restaurant --|> user
-delivery --|> user
-manager --|> user
-user --> UC1
-UC1 <. UC2 : extends
-@enduml
-```
-
-## Order and track 
-
-```plantuml
-@startuml
-left to right direction
-actor "    {Abstract}\nRegistered User" as user
-actor "Client" as client
-actor "Restaurant Staff" as restaurant
-actor "Delivery Person" as delivery
-actor "Restaurant Manager" as manager
-rectangle {
-  usecase "Browse restaurant" as UC1
-  usecase "Payment step" as UC2
+  usecase "Update opening hours" as UC10
+  usecase "Update menus offerings" as UC20
+  usecase "Set preparation times" as UC30
+  usecase "Manage orders" as UC40
   usecase "Place order" as UC3
   usecase "Create group order" as UC4
   usecase "Validate group order" as UC5
   usecase "Browse historic" as UC6
+  usecase "Payment step" as UC7
 }
 actor "Payment system" as payment_system
-manager --|> user
-client --|> user
-restaurant --|> user
-delivery --|> user
+guest ---|> user
+client ---|> registered_user
+manager ---|> restaurant
+delivery --|> registered_user
+restaurant ---|> registered_user
+registered_user ---|> user
+
+user ---> UC1
+UC1 <. UC2 : extends
+ 
 UC3 --> UC1 : includes
-user --> UC4 
-user --> UC6
+registered_user ---> UC4 
+registered_user ---> UC6
 UC4 --> UC3 : includes
-UC4 --> UC2
-UC2 <. UC5 : extends
-UC2 <--- payment_system
+UC4 --> UC7
+UC7 <. UC5 : extends
+UC7 <--- payment_system
+
+restaurant --> UC40
+manager ---> UC10
+manager ---> UC20
+UC20 <. UC30 : extends
+
 @enduml
 ```
-
-
-## Manage store
-
-```plantuml
-@startuml
-left to right direction
-actor "Restaurant Managers" as user
-actor "Restaurant Staff" as staff
-rectangle {
-    usecase "Update opening hours" as UC1
-    usecase "Update menus offerings" as UC2
-    usecase "Set preparation times" as UC3
-    usecase "Manage orders" as UC4
-}
-user --> UC1
-user --> UC2
-staff --> UC4
-user --|> staff
-UC2 <. UC3 : extends
-@enduml
-```
+![Plant UML preview](https://ptuml.hackmd.io/svg/TPJTQkCm48NlzHH3xhEqITf0AQ6xAVHgeRHahmf5jSUEm9RCIDvjQFlkgrzR3cx0yVZCfwEnPl2TDfnCtpQimSg0KK2YFXee1M5XX9AC5qOHB9xGaZrnQU0tbxn6MW3Nq8PuXdeslAeyGuEOi7qZK1gVB7oO4lVOYBz89tX4qafweenQOi3-Fdw-QKDM-7gHJrWBRP2mX8EEPT6WlVPwBE-XjwLue7PHadCtvpxw-CNk9BYi6uGF1augk4PO_2Brpzx7jzD-oM5_EKErAFkONkNfGrToWw0wb4BMS5Gz3JONCw3pqQ2g2ido2LrDq6Sqq15sdBZh81ZHOYBN4p9q4XILE6oxcH2F3IyYa1poz9xGLLMJwhi9jScfFxmHvJntDNDMHziwHQA8oFMa7dwoHs30DhUB-ItxOhwTi5mkFtUXPs6ied8-3N5eX-mmdcdKO7RP27xZU_QSryEIiFC3OY-u_U4w1pU0xmPbgHbOUGqHiRgGHTENgETy7RE1xpBNp6L3lCwTHdbhusseuIghmOlM1RfmqA_wPFrRDdtvNPYJx1ntOM3F53kNxYziixx8zc5tzkO-E_y1)
 
 # Class Diagram
 
