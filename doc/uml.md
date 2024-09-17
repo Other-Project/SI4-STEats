@@ -130,7 +130,7 @@ class Status {
 
 Restaurant "1 restaurant    " -- " * schedules " Schedule
 Restaurant "   1 restaurant" -- "1..* menu" MenuItem
-User " * " --> "role 1 " Role
+User " * " --> "1 role" Role
 User "1 user " -- " * orders" Order
 Order " * " --> "1 status" Status
 Order " * orders" -- " 1..* items" MenuItem
