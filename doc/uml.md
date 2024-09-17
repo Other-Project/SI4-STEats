@@ -2,15 +2,17 @@
 
 ## Actors
 
-User : Person that uses our system  
-Guest : Unregistered User  
-Client : Registered User that is not working as restaurant Staff nor delivery person  
-Restaurant Staff : A person employed by the restaurant to prepare meal  
-Restaurant Manager : A restaurant staff that can update menus offering and opening hours  
-Delivery Person : Person in charge of the delivery of the meal  
-Administrators : Person that have control over restaurant partnerships and delivery services.
+**User :** Person that uses our system  
+**Guest :** Unregistered User  
+**Client :** Registered User that is not working as restaurant Staff nor delivery person  
+**Restaurant Staff :** A person employed by the restaurant to prepare meal  
+**Restaurant Manager :** A restaurant staff that can update menus offering and opening hours  
+**Delivery Person :** Person in charge of the delivery of the meal  
+**Administrators :** Person that have control over restaurant partnerships and delivery services.
 
 # Use-Case Diagram
+
+![Plant UML preview](https://www.plantuml.com/plantuml/svg/TPFHQzim4CRVzLSSUU_8bhI5CKgt3FOq22tPqw1ezjaHs98vdRQ5Bl_x94kAvU0AdCZVzzEdYtGHZvObiUixqM73m0P8jKU6MX5Mh8mMic93i7f2JpgIck6xrB95Me6qqCVv0lNCicb6XYvYndQTGisZMVdfP7p5Jlr6Ei4UoHez4dNICWD-l7x-PPcySFwfdx1Lbf6mXeDDPT55Ut5sAk-RGnktRSCiosKQ-37bb8ltyjIZPh0ddzoFzX2bboY9S6HIjnt2gu2mjf8MOVM5p1-BnJ7OSV5Xztw1ydaksHzA-p3KaX7CW5hf5ex6qILclG2670kcQP0yRtFa37r6Xe5ma2J3LGEh7ZEvcP7noi5GZPI9xOpOTx9AG4uexHrXgAebuuOPjIsf7x9JzJ9tkt1MHsNPaAeISbSWqsqn3ic_5sSntZlStFnxY7SRsoyArqsJUZkQHHFdXbnUDO7B_jLxKKjw3UDXx0x_mATtuThW8-1VHbrR0LxUG4AyhdJLkHhjGl38RE4jvqu4DyutPT8atml_n1fkfngYw5Ek_m3bZq-xh_Cnvf9dGcp9y14tsQoBNSIZ_t9zzny0)
 
 ```plantuml
 @startuml
@@ -60,7 +62,6 @@ UC20 <. UC30 : extends
 
 @enduml
 ```
-![Plant UML preview](https://www.plantuml.com/plantuml/svg/TPFHQzim4CRVzLSSUU_8bhI5CKgt3FOq22tPqw1ezjaHs98vdRQ5Bl_x94kAvU0AdCZVzzEdYtGHZvObiUixqM73m0P8jKU6MX5Mh8mMic93i7f2JpgIck6xrB95Me6qqCVv0lNCicb6XYvYndQTGisZMVdfP7p5Jlr6Ei4UoHez4dNICWD-l7x-PPcySFwfdx1Lbf6mXeDDPT55Ut5sAk-RGnktRSCiosKQ-37bb8ltyjIZPh0ddzoFzX2bboY9S6HIjnt2gu2mjf8MOVM5p1-BnJ7OSV5Xztw1ydaksHzA-p3KaX7CW5hf5ex6qILclG2670kcQP0yRtFa37r6Xe5ma2J3LGEh7ZEvcP7noi5GZPI9xOpOTx9AG4uexHrXgAebuuOPjIsf7x9JzJ9tkt1MHsNPaAeISbSWqsqn3ic_5sSntZlStFnxY7SRsoyArqsJUZkQHHFdXbnUDO7B_jLxKKjw3UDXx0x_mATtuThW8-1VHbrR0LxUG4AyhdJLkHhjGl38RE4jvqu4DyutPT8atml_n1fkfngYw5Ek_m3bZq-xh_Cnvf9dGcp9y14tsQoBNSIZ_t9zzny0)
 
 # Class Diagram
 
