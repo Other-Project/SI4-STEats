@@ -22,6 +22,7 @@ actor "Delivery Person" as delivery
 actor "    {Abstract}\nRegistered User" as registered_user
 actor "Guest" as guest
 actor "{Abstract}\n     User" as user
+actor "Payment system" as payment_system
 rectangle {
   usecase "Browse restaurants" as UC1
   usecase "Browse menu" as UC2
@@ -35,15 +36,13 @@ rectangle {
   usecase "Browse historic" as UC6
   usecase "Payment step" as UC7
 }
-actor "Payment system" as payment_system
-guest ---|> user
-client ---|> registered_user
-manager ---|> restaurant
+guest --|> user
+client --|> registered_user
+manager --|> restaurant
 delivery --|> registered_user
-restaurant ---|> registered_user
-registered_user ---|> user
-
-user ---> UC1
+restaurant --|> registered_user
+registered_user --|> user
+user ------> UC1
 UC1 <. UC2 : extends
  
 UC3 --> UC1 : includes
@@ -55,13 +54,13 @@ UC7 <. UC5 : extends
 UC7 <--- payment_system
 
 restaurant --> UC40
-manager ---> UC10
-manager ---> UC20
+manager --> UC10
+manager --> UC20
 UC20 <. UC30 : extends
 
 @enduml
 ```
-![Plant UML preview](https://ptuml.hackmd.io/svg/TPJTQkCm48NlzHH3xhEqITf0AQ6xAVHgeRHahmf5jSUEm9RCIDvjQFlkgrzR3cx0yVZCfwEnPl2TDfnCtpQimSg0KK2YFXee1M5XX9AC5qOHB9xGaZrnQU0tbxn6MW3Nq8PuXdeslAeyGuEOi7qZK1gVB7oO4lVOYBz89tX4qafweenQOi3-Fdw-QKDM-7gHJrWBRP2mX8EEPT6WlVPwBE-XjwLue7PHadCtvpxw-CNk9BYi6uGF1augk4PO_2Brpzx7jzD-oM5_EKErAFkONkNfGrToWw0wb4BMS5Gz3JONCw3pqQ2g2ido2LrDq6Sqq15sdBZh81ZHOYBN4p9q4XILE6oxcH2F3IyYa1poz9xGLLMJwhi9jScfFxmHvJntDNDMHziwHQA8oFMa7dwoHs30DhUB-ItxOhwTi5mkFtUXPs6ied8-3N5eX-mmdcdKO7RP27xZU_QSryEIiFC3OY-u_U4w1pU0xmPbgHbOUGqHiRgGHTENgETy7RE1xpBNp6L3lCwTHdbhusseuIghmOlM1RfmqA_wPFrRDdtvNPYJx1ntOM3F53kNxYziixx8zc5tzkO-E_y1)
+![Plant UML preview](https://www.plantuml.com/plantuml/svg/TPFHQzim4CRVzLSSUU_8bhI5CKgt3FOq22tPqw1ezjaHs98vdRQ5Bl_x94kAvU0AdCZVzzEdYtGHZvObiUixqM73m0P8jKU6MX5Mh8mMic93i7f2JpgIck6xrB95Me6qqCVv0lNCicb6XYvYndQTGisZMVdfP7p5Jlr6Ei4UoHez4dNICWD-l7x-PPcySFwfdx1Lbf6mXeDDPT55Ut5sAk-RGnktRSCiosKQ-37bb8ltyjIZPh0ddzoFzX2bboY9S6HIjnt2gu2mjf8MOVM5p1-BnJ7OSV5Xztw1ydaksHzA-p3KaX7CW5hf5ex6qILclG2670kcQP0yRtFa37r6Xe5ma2J3LGEh7ZEvcP7noi5GZPI9xOpOTx9AG4uexHrXgAebuuOPjIsf7x9JzJ9tkt1MHsNPaAeISbSWqsqn3ic_5sSntZlStFnxY7SRsoyArqsJUZkQHHFdXbnUDO7B_jLxKKjw3UDXx0x_mATtuThW8-1VHbrR0LxUG4AyhdJLkHhjGl38RE4jvqu4DyutPT8atml_n1fkfngYw5Ek_m3bZq-xh_Cnvf9dGcp9y14tsQoBNSIZ_t9zzny0)
 
 # Class Diagram
 
