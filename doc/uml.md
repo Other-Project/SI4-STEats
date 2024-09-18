@@ -106,6 +106,7 @@ class Order {
 }
 
 class GroupOrder {
+    group_code : String
     delivery_time : DateTime
 }
 
@@ -127,15 +128,16 @@ class Status {
     DELIVERED
 }
 
-Restaurant "1 restaurant    " -- " * schedules " Schedule
+
+Order "* orders " -- "1 group " GroupOrder
 Restaurant "1 restaurant" -- "1..* menu" MenuItem
-Restaurant -- Order
-Order "* orders" -- "1..* items" MenuItem
-Role "1 role" <-- "* " User
-User "1 user " -- "* orders" Order
-Order "* orders" -- "1 address" Address
-Order "* orders " -- "1 group " GroupOrder 
+MenuItem "1..* items"  --  "* orders" Order
+Restaurant "1 restaurant" -- "* orders" Order
 Status "1 status" <-- "* " Order
+Restaurant "1 restaurant" -- " * schedules" Schedule
+Role "1 role" <-- "* " User
+Order"* orders" -- "1 user " User
+Address "1 address" -- "* orders" Order
 
 ```
 
@@ -143,15 +145,21 @@ Status "1 status" <-- "* " Order
 
 ```mermaid
 sequenceDiagram
-    Alice->>Bob:a
-    Bob->>Alice: a
-    create participant Carl
-    Alice->>Carl: a
-    create actor D as D
-    Carl->>D: Give me ropes please  !
-    destroy Carl
-    Alice-xCarl: We are too many
-    destroy Bob
-    Bob->>Alice: I agree
-    D->>Alice: a
+    actor User
+    activate STEats
+    activate Order
+    User->>STEats:Choose restaurant
+    STEats->>Restaurant: getMenu()
+    activate Restaurant
+    Restaurant-->>STEats: MenuItem[]
+    note right of STEats : Returns only menu items that can be delivered in time
+    deactivate Restaurant
+    STEats-->>STEats: DisplayMenu()
+    loop
+        User->>STEats:Choose menuItem
+        STEats->>Order:addMenuItem()
+    end
+    User->>STEats:Validate order
+    deactivate Order
+    deactivate STEats
 ```
