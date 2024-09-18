@@ -87,6 +87,7 @@ class User {
 class Restaurant {
     name : String
 }
+
 class Schedule {
     start : Time
     end : Time
@@ -102,11 +103,9 @@ class MenuItem {
 class Order {
     delivery_time: DateTime
     price : double
-    discount : int
 }
 
 class GroupOrder {
-    id: String
     delivery_time : DateTime
 }
 
@@ -128,12 +127,31 @@ class Status {
     DELIVERED
 }
 
-User " * " --> "1 role" Role
 Restaurant "1 restaurant    " -- " * schedules " Schedule
-Restaurant "   1 restaurant" -- "1..* menu" MenuItem
-Order " * orders" -- " 1..* items" MenuItem
-User "1 user " -- " * orders" Order
-Order " * orders" -- "1 address" Address
-Order " * " -- " * " GroupOrder 
-Order " * " --> "1 status" Status
+Restaurant "1 restaurant" -- "1..* menu" MenuItem
+Restaurant -- Order
+Order "* orders" -- "1..* items" MenuItem
+Role "1 role" <-- "* " User
+User "1 user " -- "* orders" Order
+Order "* orders" -- "1 address" Address
+Order "* orders " -- "1 group " GroupOrder 
+Status "1 status" <-- "* " Order
+
+```
+
+# Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    Alice->>Bob:a
+    Bob->>Alice: a
+    create participant Carl
+    Alice->>Carl: a
+    create actor D as D
+    Carl->>D: Give me ropes please  !
+    destroy Carl
+    Alice-xCarl: We are too many
+    destroy Bob
+    Bob->>Alice: I agree
+    D->>Alice: a
 ```
