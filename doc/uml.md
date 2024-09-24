@@ -1,14 +1,27 @@
+# Group members
+
+* **Falcoz** Alban (SA)
+* **Galli** Evan (QA)
+* **Gripari** Alexandre (Ops)
+* **Lassauniere** Theo (PO)
+
+
+# Hypothesis and limits found
+
+* Orders within a group order can only be placed at the same restaurant
+* We try to prepare the menu item during the schedule (30 min for example) before the delivery time. If the item can't be prepared because the schedule is too tight, we try to prepare it during the previous schedule, up until 2 hours before. If it can't be prepared during any of the schedules 2 hours before then the item is not available.
+
 # Glossary
 
-## Actors
+* **Guest :** A person browsing the platform without being authenticated
+* **Registered User :** Any registered member of the campus (students, staff, ...)
+* **Restaurant Staff :** A person employed by the restaurant to prepare meal
+* **Restaurant Manager :** A restaurant staff that can update menus offering and opening hours
 
-**User :** Person that uses our system  
-**Guest :** Unregistered User  
-**Client :** Registered User that is not working as restaurant Staff nor delivery person  
-**Restaurant Staff :** A person employed by the restaurant to prepare meal  
-**Restaurant Manager :** A restaurant staff that can update menus offering and opening hours  
-**Delivery Person :** Person in charge of the delivery of the meal  
-**Administrators :** Person that have control over restaurant partnerships and delivery services.
+---
+
+* **Menu:** All the menu items propose by a restaurant
+* **MenuItem:** A item propose by a restaurant (ex : ice-cream, fries, burger, soda, ...) 
 
 # Use-Case Diagram
 
@@ -63,6 +76,7 @@ UC20 <. UC30 : extends
 classDiagram
 class Restaurant {
     name : String
+    getMenu(Time delivery_time) MenuItem[]
 }
 
 class Schedule {
@@ -88,18 +102,27 @@ class TypeOfFood {
 class Order {
     delivery_time : DateTime
     user_id : String
+    addMenuItem(MenuItem item) void
+    getTotalPrice() double
+    pay()
+    useDiscount()
+    checkIfDiscount()
+    addDiscountToUser()
 }
 
 class GroupOrder {
     group_code : String
     delivery_time : DateTime
+    createOrder(String userId) Order
+    getMenu() MenuItem[]
+    closeGroupOrder() void
 }
 
 class Address {
+    additional_adress : String
     street : String
     city : String
     postal_code : String
-    additional_adress : String
 }
 
 class Status {
@@ -113,7 +136,6 @@ class Status {
     DELIVERED
 }
 
-
 Order "* orders " -- "1 group " GroupOrder
 Restaurant "1 restaurant" -- "1..* menu" MenuItem
 MenuItem "1..* items"  --  "* orders" Order
@@ -121,19 +143,19 @@ Restaurant "1 restaurant" -- "* orders" Order
 Status "1 status" <-- "* " Order
 Restaurant "1 restaurant" -- " * schedules" Schedule
 Address "1 address" -- "* orders" Order
-TypeOfFood "1 type_of_food" <-- "*" Restaurant 
-
+TypeOfFood "1 type_of_food" <-- "*" Restaurant
 ```
 
 # Sequence Diagram
 
-## Group order
+## Individual order inside a group order
+
 ```mermaid
 sequenceDiagram
     actor User
     activate STEats
     activate GroupOrder
-    STEats->>GroupOrder : createOrder()
+    STEats->>GroupOrder : createOrder(userId)
     create participant Order
     GroupOrder-->>Order: <<create>>
     activate Order
@@ -143,16 +165,12 @@ sequenceDiagram
     activate Restaurant
     activate Schedule
     loop
-        Restaurant->>Schedule : getNbPerson()
-        Schedule-->>Restaurant: menuItem
-        Restaurant->>Schedule : getstart()
-        Schedule-->>Restaurant: menuItem
-        Restaurant->>Schedule : getend()
-        Schedule-->>Restaurant: menuItem
-    end
-    loop
         Restaurant->>MenuItem : getPreparationTime()
         MenuItem -->> Restaurant : Time
+        loop
+            Restaurant->>Schedule : canCook(time)
+            Schedule-->>Restaurant: bool
+        end
     end
     Restaurant-->>GroupOrder: MenuItem[]
     deactivate Restaurant
@@ -163,11 +181,21 @@ sequenceDiagram
         STEats->>Order:addMenuItem(menuItem)
     end
     User->>STEats:Proceed to payment
+    opt
+        User->>STEats: Use discount
+        STEats->>Order: useDiscount()
+    end
     STEats->>Order: getTotalPrice()
     Order-->>STEats: price
+    STEats->>Order: pay()
+    Order->>PaymentSystem: pay()
+    PaymentSystem-->>Order: PaymentStatus
+    Order->>Order:checkIfDiscount()
+    alt hasDiscount
+        Order->>Order: addDiscountToUser()
+    end
+    Order-->>STEats: PaymentStatus
     deactivate Order
-    STEats->>PaymentSystem: pay()
-    PaymentSystem-->>STEats: PaymentStatus
     opt
         User->>STEats: Validate Group Order
         STEats->>GroupOrder: closeGroupOrder()
@@ -195,3 +223,7 @@ sequenceDiagram
     deactivate Restaurant
     deactivate STEats
 ```
+
+# Mockup
+
+![Mockup](https://github.com/user-attachments/assets/f9f8f4e3-4bdd-4d76-9c05-0c31f14a9d02)
