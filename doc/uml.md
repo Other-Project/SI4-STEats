@@ -226,4 +226,4 @@ sequenceDiagram
 
 # Mockup
 
-![Mockup](https://github.com/user-attachments/assets/f9f8f4e3-4bdd-4d76-9c05-0c31f14a9d02)
+![Mockup](https://github.com/user-attachments/assets/bcb43945-4bc5-4c89-8ac2-69bbf8f75c29)
