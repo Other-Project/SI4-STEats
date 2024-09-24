@@ -12,18 +12,15 @@
 
 # Use-Case Diagram
 
-![Plant UML preview](https://www.plantuml.com/plantuml/svg/TPFHQzim4CRVzLSSUU_8bhI5CKgt3FOq22tPqw1ezjaHs98vdRQ5Bl_x94kAvU0AdCZVzzEdYtGHZvObiUixqM73m0P8jKU6MX5Mh8mMic93i7f2JpgIck6xrB95Me6qqCVv0lNCicb6XYvYndQTGisZMVdfP7p5Jlr6Ei4UoHez4dNICWD-l7x-PPcySFwfdx1Lbf6mXeDDPT55Ut5sAk-RGnktRSCiosKQ-37bb8ltyjIZPh0ddzoFzX2bboY9S6HIjnt2gu2mjf8MOVM5p1-BnJ7OSV5Xztw1ydaksHzA-p3KaX7CW5hf5ex6qILclG2670kcQP0yRtFa37r6Xe5ma2J3LGEh7ZEvcP7noi5GZPI9xOpOTx9AG4uexHrXgAebuuOPjIsf7x9JzJ9tkt1MHsNPaAeISbSWqsqn3ic_5sSntZlStFnxY7SRsoyArqsJUZkQHHFdXbnUDO7B_jLxKKjw3UDXx0x_mATtuThW8-1VHbrR0LxUG4AyhdJLkHhjGl38RE4jvqu4DyutPT8atml_n1fkfngYw5Ek_m3bZq-xh_Cnvf9dGcp9y14tsQoBNSIZ_t9zzny0)
+![Plant UML preview](https://www.plantuml.com/plantuml/svg/TPFVQuCm4CVVyrSSVU_eQd_065BMXpqDoahtMeAUDg29N29RsVQ_xsAqQd45zVpU9zzSB-VEEackBWjHOER06I2LNnoaYZ1nocWX4sS8Pk_8P4rIEtYJMkP8Cv0MoX1FK4SdiwnXw2RsMAwiGy8KJhPrefjshctl-5hpwWR8VTJ91tajaNUnLrvJDlagIESW2L-_r7c1y2q0s3AH5c7sGkQJdtrDjbbysZzEKEnNj-dbC7sgKkaGJ8LQwHmkfgQRpM82z3uMJ9OXCT-Xon5wH0SLOIL9-hw3KoLsP3GYG__1K8gtRLSZub38f0KwXs5wJ-YhoidKrOXQ3QaFMQXqcbjFzEh2fsT89IsocRHgpwXbjk9Nj0C4y_bFF9oKFknIu_6uUmzG697cpeB_nSt9yWNF3xxby0JuvL2dLW3B4RG8wqedHPsYdR1kc1Nybza8dmrnD7JgDzXol0qrh0SrD2Axt0_l-E_7uO3xLiLXqCO2ZvE_XKsYnM0NiUE7_yR_0000)
 
 ```plantuml
 @startuml
 left to right direction
 actor "Restaurant Manager" as manager
 actor "Restaurant Staff" as restaurant
-actor "Client" as client
-actor "Delivery Person" as delivery
-actor "    {Abstract}\nRegistered User" as registered_user
+actor "Registered User" as registered_user
 actor "Guest" as guest
-actor "{Abstract}\n     User" as user
 actor "Payment system" as payment_system
 rectangle {
   usecase "Browse restaurants" as UC1
@@ -36,22 +33,19 @@ rectangle {
   usecase "Create group order" as UC4
   usecase "Validate group order" as UC5
   usecase "Browse historic" as UC6
-  usecase "Payment step" as UC7
+  usecase "Validate payment" as UC7
 }
-guest --|> user
-client --|> registered_user
 manager --|> restaurant
-delivery --|> registered_user
 restaurant --|> registered_user
-registered_user --|> user
-user ------> UC1
+registered_user --|> guest
+guest ------> UC1
 UC1 <. UC2 : extends
  
 UC3 --> UC1 : includes
 registered_user ---> UC4 
 registered_user ---> UC6
 UC4 --> UC3 : includes
-UC4 --> UC7
+UC3 --> UC7
 UC7 <. UC5 : extends
 UC7 <--- payment_system
 
@@ -67,23 +61,6 @@ UC20 <. UC30 : extends
 
 ```mermaid
 classDiagram
-
-class Role {
-    <<Enumeration>>
-    CAMPUS_USER
-    RESTAURANT_STAFF
-    RESTAURANT_MANAGER
-    DELIVERY_PERSON
-    CAMPUS_ADMIN
-}
-
-class User {
-    last_name : String
-    first_name : String
-    email : String
-    password : String
-}
-
 class Restaurant {
     name : String
 }
@@ -97,12 +74,20 @@ class Schedule {
 class MenuItem {
     name : String
     price : double
-    preparation : Time
+    preparation_time : Time
+}
+
+class TypeOfFood {
+    <<Enumeration>>
+    FAST_FOOD
+    DRINKS
+    SNACKS
+    DESERTS
 }
 
 class Order {
-    delivery_time: DateTime
-    price : double
+    delivery_time : DateTime
+    user_id : String
 }
 
 class GroupOrder {
@@ -135,31 +120,78 @@ MenuItem "1..* items"  --  "* orders" Order
 Restaurant "1 restaurant" -- "* orders" Order
 Status "1 status" <-- "* " Order
 Restaurant "1 restaurant" -- " * schedules" Schedule
-Role "1 role" <-- "* " User
-Order"* orders" -- "1 user " User
 Address "1 address" -- "* orders" Order
+TypeOfFood "1 type_of_food" <-- "*" Restaurant 
 
 ```
 
 # Sequence Diagram
 
+## Group order
 ```mermaid
 sequenceDiagram
     actor User
     activate STEats
+    activate GroupOrder
+    STEats->>GroupOrder : createOrder()
+    create participant Order
+    GroupOrder-->>Order: <<create>>
     activate Order
-    User->>STEats:Choose restaurant
-    STEats->>Restaurant: getMenu()
+    GroupOrder-->>STEats: Order
+    STEats->>GroupOrder: getMenu()
+    GroupOrder->>Restaurant: getMenu(time)
     activate Restaurant
-    Restaurant-->>STEats: MenuItem[]
-    note right of STEats : Returns only menu items that can be delivered in time
-    deactivate Restaurant
-    STEats-->>STEats: DisplayMenu()
+    activate Schedule
     loop
-        User->>STEats:Choose menuItem
-        STEats->>Order:addMenuItem()
+        Restaurant->>Schedule : getNbPerson()
+        Schedule-->>Restaurant: menuItem
+        Restaurant->>Schedule : getstart()
+        Schedule-->>Restaurant: menuItem
+        Restaurant->>Schedule : getend()
+        Schedule-->>Restaurant: menuItem
     end
-    User->>STEats:Validate order
+    loop
+        Restaurant->>MenuItem : getPreparationTime()
+        MenuItem -->> Restaurant : Time
+    end
+    Restaurant-->>GroupOrder: MenuItem[]
+    deactivate Restaurant
+    note right of GroupOrder : Returns only menu items that can be delivered in time
+    GroupOrder-->>STEats: MenuItem[]
+    loop
+        User->>STEats:Choose menu item
+        STEats->>Order:addMenuItem(menuItem)
+    end
+    User->>STEats:Proceed to payment
+    STEats->>Order: getTotalPrice()
+    Order-->>STEats: price
     deactivate Order
+    STEats->>PaymentSystem: pay()
+    PaymentSystem-->>STEats: PaymentStatus
+    opt
+        User->>STEats: Validate Group Order
+        STEats->>GroupOrder: closeGroupOrder()
+    end
+    deactivate GroupOrder
+    deactivate STEats
+```
+
+## Search for a meal
+
+```mermaid
+sequenceDiagram
+    actor User
+    activate STEats
+    opt 
+        User ->> STEats : Select type of food
+    end
+    opt 
+        User ->> STEats : Enter a restaurant
+    end
+    User->> STEats : Choose a restaurant
+    STEats->>Restaurant : getMenuItems()
+    activate Restaurant
+    Restaurant-->>STEats : MenuItem[]
+    deactivate Restaurant
     deactivate STEats
 ```
