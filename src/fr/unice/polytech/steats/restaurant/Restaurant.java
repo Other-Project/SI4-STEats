@@ -4,34 +4,19 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Restaurant {
-    private final String name;
-    private List<MenuItem> menu;
-    private final List<TypeOfFood> typeOfFood;
+public record Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood) {
 
     public Restaurant(String name) {
-        this(name, List.of(TypeOfFood.SNACKS, TypeOfFood.DESERTS, TypeOfFood.DRINKS));
+        this(name, new ArrayList<>(), TypeOfFood.CLASSIC);
     }
 
-    public Restaurant(String name, List<TypeOfFood> typeOfFood) {
+    public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood) {
         this.name = name;
-        this.menu = new ArrayList<>();
+        this.menu = menu;
         this.typeOfFood = typeOfFood;
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    public List<MenuItem> getMenu() {
+    public List<MenuItem> getAvailableMenu(LocalTime deliveryTime) {
         return this.menu;
-    }
-
-    public List<MenuItem> getMenu(LocalTime deliveryTime) {
-        return this.menu;
-    }
-
-    public List<TypeOfFood> getTypeOfFood() {
-        return this.typeOfFood;
     }
 }

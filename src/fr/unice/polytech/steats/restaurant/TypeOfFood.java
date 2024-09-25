@@ -4,5 +4,7 @@ public enum TypeOfFood {
     FAST_FOOD,
     DRINKS,
     SNACKS,
-    DESERTS
+    DESERTS,
+    GOURMET,
+    CLASSIC
 }
