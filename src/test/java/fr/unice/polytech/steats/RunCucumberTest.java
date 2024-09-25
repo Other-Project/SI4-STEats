@@ -13,7 +13,7 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @IncludeEngines("cucumber")
 
 //Specifies the location of the feature files. The feature files are stored in the "features/steats" directory within the classpath.
-@SelectClasspathResource("features/steats")
+@SelectClasspathResource("features.steats")
 
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "fr.unice.polytech.steats")
