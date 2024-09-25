@@ -1,13 +1,13 @@
 package fr.unice.polytech.steats.restaurant;
 
-import java.sql.Time;
+import java.time.LocalTime;
 
 public class MenuItem {
     private final String name;
     private double price;
-    private Time preparationTime;
+    private LocalTime preparationTime;
 
-    public MenuItem(String name, double price, Time preparationTime) {
+    public MenuItem(String name, double price, LocalTime preparationTime) {
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
@@ -21,7 +21,7 @@ public class MenuItem {
         return this.price;
     }
 
-    public Time getPreparationTime() {
+    public LocalTime getPreparationTime() {
         return this.preparationTime;
     }
 }
