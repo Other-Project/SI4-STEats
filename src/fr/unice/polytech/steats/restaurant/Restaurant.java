@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.restaurant;
 
-import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class Restaurant {
         return this.menu;
     }
 
-    public List<MenuItem> getMenu(Time deliveryTime) {
+    public List<MenuItem> getMenu(LocalTime deliveryTime) {
         return this.menu;
     }
 
