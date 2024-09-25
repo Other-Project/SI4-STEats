@@ -1,47 +1,79 @@
 package fr.unice.polytech.steats.order;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupOrder implements Order, Saleable{
-    private final LocalTime delivery_time;
-    private final String group_code;
+/**
+ * A group order is an order that contains multiples single order, each from a different user.
+ * Each user must process the payment step to validate their order.
+ * Once all the users have paid for their order, one user must validate the group order for it to be delivered.
+ *
+ * @author Team C
+ */
+public class GroupOrder implements Order {
+    private final LocalDateTime deliveryTime;
+    private final String groupCode;
     private final List<Order> orders = new ArrayList<>();
+    private final Address address;
+    private Status status = Status.INITIALISED;
 
-    public GroupOrder(String group_code, LocalTime delivery_time){
-        this.delivery_time = delivery_time;
-        this.group_code = group_code;
+    /**
+     * @param groupCode    The invitation code for the group order
+     * @param deliveryTime The time the group order must be delivered
+     * @param address      The address where the group order must be delivered
+     */
+    public GroupOrder(String groupCode, LocalDateTime deliveryTime, Address address) {
+        this.deliveryTime = deliveryTime;
+        this.groupCode = groupCode;
+        this.address = address;
     }
 
     @Override
-    public LocalTime getDeliveryTime() {
-        return null;
+    public Status getStatus() {
+        return status;
+    }
+
+    @Override
+    public LocalDateTime getDeliveryTime() {
+        return deliveryTime;
     }
 
     @Override
     public Address getAddress() {
-        return null;
+        return address;
     }
 
+    /**
+     * @implNote Returns the sum of the price of the all the {@link SingleOrder} it contains.
+     */
     @Override
     public double getPrice() {
-        return 0;
+        return orders.stream().mapToDouble(Order::getPrice).sum();
     }
 
-    public LocalTime getDelivery_time() {
-        return delivery_time;
+    /**
+     * @return The invitation code for the group order
+     */
+    public String getGroupCode() {
+        return groupCode;
     }
 
-    public String getGroup_code() {
-        return group_code;
+    /**
+     * @param userId The ID of the user that joined the group order
+     * @return The order created with the user ID, and with the delivery time and the address of the group order.
+     */
+    public Order createOrder(String userId) {
+        if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
+        return new SingleOrder(userId, deliveryTime, address);
     }
 
-    public Order createOrder(String userId){
-        return new SingleOrder(userId, delivery_time);
-    }
-
+    /**
+     * Close the group order.
+     * No more single order can be added.
+     * Changes it's status to {@link Status#PAID}.
+     */
     public void closeGroupOrder() {
-
+        status = Status.PAID;
     }
 }

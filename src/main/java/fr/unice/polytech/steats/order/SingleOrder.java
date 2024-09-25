@@ -2,44 +2,55 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SingleOrder implements Order, Saleable{
-    private final String user_id;
-    private final LocalTime delivery_time;
-    private final List<MenuItem> menu = new ArrayList<>();
+/**
+ *
+ */
+public class SingleOrder implements Order {
+    private final String userId;
+    private final LocalDateTime deliveryTime;
+    private final List<MenuItem> items = new ArrayList<>();
+    private final Address address;
+    private Status status = Status.INITIALISED;
 
-    public SingleOrder(String user_id, LocalTime delivery_time){
-        this.user_id = user_id;
-        this.delivery_time = delivery_time;
+    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address) {
+        this.userId = userId;
+        this.deliveryTime = deliveryTime;
+        this.address = address;
     }
 
     @Override
-    public LocalTime getDeliveryTime() {
-        return null;
+    public Status getStatus() {
+        return status;
+    }
+
+    @Override
+    public LocalDateTime getDeliveryTime() {
+        return deliveryTime;
     }
 
     @Override
     public Address getAddress() {
-        return null;
+        return address;
     }
 
     @Override
     public double getPrice() {
-        return 0;
+        return items.stream().mapToDouble(MenuItem::getPrice).sum();
     }
 
-    public String getUser_id() {
-        return user_id;
+    public String getUserId() {
+        return userId;
     }
 
-    public LocalTime getDelivery_time() {
-        return delivery_time;
+    public void addMenuItem(MenuItem item) {
+        items.add(item);
     }
 
-    public void addMenuItem(MenuItem item){
-        menu.add(item);
+    public List<MenuItem> getItems() {
+        return new ArrayList<>(items);
     }
 }
