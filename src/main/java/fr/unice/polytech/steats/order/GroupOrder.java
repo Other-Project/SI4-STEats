@@ -1,19 +1,17 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.restaurant.MenuItem;
-
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SingleOrder implements Order, Saleable{
-    private final String user_id;
+public class GroupOrder implements Order, Saleable{
     private final LocalTime delivery_time;
-    private final List<MenuItem> menu = new ArrayList<>();
+    private final String group_code;
+    private final List<Order> orders = new ArrayList<>();
 
-    public SingleOrder(String user_id, LocalTime delivery_time){
-        this.user_id = user_id;
+    public GroupOrder(String group_code, LocalTime delivery_time){
         this.delivery_time = delivery_time;
+        this.group_code = group_code;
     }
 
     @Override
@@ -31,15 +29,19 @@ public class SingleOrder implements Order, Saleable{
         return 0;
     }
 
-    public String getUser_id() {
-        return user_id;
-    }
-
     public LocalTime getDelivery_time() {
         return delivery_time;
     }
 
-    public void addMenuItem(MenuItem item){
-        menu.add(item);
+    public String getGroup_code() {
+        return group_code;
+    }
+
+    public Order createOrder(String userId){
+        return new SingleOrder(userId, delivery_time);
+    }
+
+    public void closeGroupOrder() {
+
     }
 }
