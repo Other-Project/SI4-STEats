@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.restaurant;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ public record Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood
         this.typeOfFood = typeOfFood;
     }
 
-    public List<MenuItem> getAvailableMenu(LocalTime deliveryTime) {
+    public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTime) {
         return this.menu;
     }
 }
