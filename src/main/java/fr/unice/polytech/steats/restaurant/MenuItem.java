@@ -1,8 +1,10 @@
 package fr.unice.polytech.steats.restaurant;
 
+import fr.unice.polytech.steats.order.Saleable;
+
 import java.time.LocalTime;
 
-public class MenuItem {
+public class MenuItem implements Saleable {
     private final String name;
     private double price;
     private LocalTime preparationTime;
@@ -17,6 +19,10 @@ public class MenuItem {
         return this.name;
     }
 
+    /**
+     * @implNote Returns the price of the menu item.
+     */
+    @Override
     public double getPrice() {
         return this.price;
     }
