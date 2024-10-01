@@ -10,12 +10,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * It is the entry point of the application.
- *
+ * Represents the entry point of the application.
+ * This class is responsible for managing the order of the user.
  * @author Team C
  */
 public class STEats {
-
     private GroupOrder groupOrder;
     private SingleOrder order;
     private List<MenuItem> fullMenu;
@@ -55,7 +54,7 @@ public class STEats {
      * @param address The address where the group order must be delivered
      */
     public void createGroupOrder(String userID, String groupCode, LocalDateTime deliveryTime, Address address) {
-        groupOrder =  new GroupOrder(groupCode, deliveryTime, address);
+        groupOrder = new GroupOrder(groupCode, deliveryTime, address);
         groupOrder.createOrder(userID);
     }
 
@@ -98,8 +97,4 @@ public class STEats {
     public void getTotalPrice() {
         totalPrice = order.getPrice();
     }
-
-
-
-
 }

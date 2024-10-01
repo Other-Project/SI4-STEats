@@ -69,6 +69,14 @@ public class SingleOrder implements Order {
     }
 
     /**
+     * Remove a menu item from the items of the order
+     * @param item A menu item the user chose to remove from the order
+     */
+    public void removeMenuItem(MenuItem item) {
+        items.remove(item);
+    }
+
+    /**
      * @return A copy of the items of the order
      */
     public List<MenuItem> getItems() {

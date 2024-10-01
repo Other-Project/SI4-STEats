@@ -19,4 +19,8 @@ public record Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood
     public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTime) {
         return this.menu;
     }
+
+    public List<MenuItem> getFullMenu() {
+        return this.menu;
+    }
 }
