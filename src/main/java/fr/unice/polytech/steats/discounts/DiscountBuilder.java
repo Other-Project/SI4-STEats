@@ -10,20 +10,46 @@ import java.time.LocalDateTime;
  * @author Team C
  */
 public class DiscountBuilder {
-    // Options
-    private boolean appliesAfterOrder;
-    private LocalDateTime expirationDate;
 
-    // Criteriums
-    private int ordersAmount = 0;
-    private int currentOrderItemsAmount = 0;
-    private int itemsAmount = 0;
-    // TODO: Client's role
+    // Options
+    static class Options {
+        boolean appliesAfterOrder;
+        LocalDateTime expirationDate;
+    }
+
+    private final Options options = new Options();
+
+    Options getOptions() {
+        return options;
+    }
+
+    // Criteria
+    static class Criteria {
+        int ordersAmount = 0;
+        int currentOrderItemsAmount = 0;
+        int itemsAmount = 0;
+        // TODO: Client's role
+    }
+
+    private final Criteria criteria = new Criteria();
+
+    Criteria getCriteria() {
+        return criteria;
+    }
+
 
     // Discounts
-    private double orderDiscount = 0;
-    private double orderCredit = 0;
-    private MenuItem[] freeItems;
+    static class Discounts {
+        double orderDiscount = 0;
+        double orderCredit = 0;
+        MenuItem[] freeItems;
+    }
+
+    private final Discounts discounts = new Discounts();
+
+    Discounts getDiscounts() {
+        return discounts;
+    }
 
     //region Options
 
@@ -31,7 +57,7 @@ public class DiscountBuilder {
      * The discount can't be applied to the current order and will take effect at the next order
      */
     public DiscountBuilder appliesAfterOrder() {
-        appliesAfterOrder = true;
+        options.appliesAfterOrder = true;
         return this;
     }
 
@@ -39,7 +65,7 @@ public class DiscountBuilder {
      * The discount can be applied to the current order
      */
     public DiscountBuilder appliesDuringOrder() {
-        appliesAfterOrder = false;
+        options.appliesAfterOrder = false;
         return this;
     }
 
@@ -47,16 +73,17 @@ public class DiscountBuilder {
      * This discount won't be available a second time
      */
     public DiscountBuilder oneTimeOffer() {
-        expirationDate = null;
+        options.expirationDate = null;
         return this;
     }
 
     /**
      * This discount can be used (only once) in any order before the specified date
+     *
      * @param expirationDate The discount expiration date
      */
     public DiscountBuilder expiresAt(LocalDateTime expirationDate) {
-        this.expirationDate = expirationDate;
+        options.expirationDate = expirationDate;
         return this;
     }
 
@@ -64,13 +91,13 @@ public class DiscountBuilder {
      * This discount can be used (only once) in any order
      */
     public DiscountBuilder neverExpires() {
-        this.expirationDate = LocalDateTime.MAX;
+        options.expirationDate = LocalDateTime.MAX;
         return this;
     }
 
     //endregion
 
-    //region Criteriums
+    //region Criteria
 
     /**
      * The quantity of orders needed to trigger the discount
@@ -78,7 +105,7 @@ public class DiscountBuilder {
      * @param ordersAmount Quantity of orders since the last trigger of this discount
      */
     public DiscountBuilder setOrdersAmount(int ordersAmount) {
-        this.ordersAmount = ordersAmount;
+        criteria.ordersAmount = ordersAmount;
         return this;
     }
 
@@ -88,7 +115,7 @@ public class DiscountBuilder {
      * @param itemsAmount Quantity of items to order
      */
     public DiscountBuilder setCurrentOrderItemsAmount(int itemsAmount) {
-        this.currentOrderItemsAmount = itemsAmount;
+        criteria.currentOrderItemsAmount = itemsAmount;
         return this;
     }
 
@@ -98,7 +125,7 @@ public class DiscountBuilder {
      * @param itemsAmount Quantity of items to order
      */
     public DiscountBuilder setItemsAmount(int itemsAmount) {
-        this.itemsAmount = itemsAmount;
+        criteria.itemsAmount = itemsAmount;
         return this;
     }
 
@@ -112,7 +139,7 @@ public class DiscountBuilder {
      * @param orderDiscount The discount percentage
      */
     public DiscountBuilder setOrderDiscount(double orderDiscount) {
-        this.orderDiscount = orderDiscount;
+        discounts.orderDiscount = orderDiscount;
         return this;
     }
 
@@ -122,7 +149,7 @@ public class DiscountBuilder {
      * @param orderCredit Amount of money to be credited
      */
     public DiscountBuilder setOrderCredit(double orderCredit) {
-        this.orderCredit = orderCredit;
+        discounts.orderCredit = orderCredit;
         return this;
     }
 
@@ -132,7 +159,7 @@ public class DiscountBuilder {
      * @param freeItems The products to be gifted
      */
     public DiscountBuilder setFreeItems(MenuItem... freeItems) {
-        this.freeItems = freeItems;
+        discounts.freeItems = freeItems;
         return this;
     }
 
@@ -142,6 +169,6 @@ public class DiscountBuilder {
      * Creates a discount
      */
     public Discount build() {
-        return null;
+        return new Discount(this);
     }
 }

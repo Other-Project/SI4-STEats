@@ -1,7 +1,10 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.restaurant.MenuItem;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -50,6 +53,11 @@ public class GroupOrder implements Order {
     @Override
     public double getPrice() {
         return orders.stream().mapToDouble(Order::getPrice).sum();
+    }
+
+    @Override
+    public List<MenuItem> getItems() {
+        return orders.stream().map(Order::getItems).flatMap(Collection::stream).toList();
     }
 
     /**
