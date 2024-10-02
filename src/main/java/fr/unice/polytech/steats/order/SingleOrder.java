@@ -53,6 +53,11 @@ public class SingleOrder implements Order {
         return items.stream().mapToDouble(MenuItem::getPrice).sum();
     }
 
+     @Override
+    public List<MenuItem> getItems() {
+        return new ArrayList<>(items);
+    }
+
     /**
      * @return The user id of the user that initialized the order
      */
@@ -66,12 +71,5 @@ public class SingleOrder implements Order {
      */
     public void addMenuItem(MenuItem item) {
         items.add(item);
-    }
-
-    /**
-     * @return A copy of the items of the order
-     */
-    public List<MenuItem> getItems() {
-        return new ArrayList<>(items);
     }
 }
