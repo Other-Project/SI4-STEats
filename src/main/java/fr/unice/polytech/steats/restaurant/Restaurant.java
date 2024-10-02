@@ -28,4 +28,8 @@ public record Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood
     public void addMenuItem(MenuItem menuItem) {
         this.menu.add(menuItem);
     }
+
+    public void removeMenuItem(MenuItem menuItem) {
+
+    }
 }

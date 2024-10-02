@@ -4,5 +4,6 @@ Feature: Restaurant
     Given A restaurant named "Restaurant"
 
   Scenario: Add a new menu item
-    When "Restaurant" add a new menu item
-    Then the menu item is added to the menu
+    Given a menuItem named "Boeuf Bourguignon" with a price of 25
+    When "Restaurant" add "Boeuf Bourguignon"
+    Then "Boeuf Bourguignon" is added to the menu

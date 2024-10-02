@@ -12,25 +12,31 @@ import static org.junit.Assert.assertTrue;
 
 public class RestaurantStepDefs {
 
-    Restaurant restaurant = new Restaurant("Restaurant");
+    Restaurant restaurant;
+    MenuItem menuItem;
 
     public RestaurantStepDefs() {
     }
 
     @Given("A restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
-        // Instanced above
+        restaurant = new Restaurant(restaurantName);
     }
 
-    @When("{string} add a new menu item")
-    public void whenRestaurantAddMenuItem(String restaurantName) {
-        LocalTime preparationTime = LocalTime.of(0, 20, 0);
-        MenuItem boeufBourguignon = new MenuItem("Boeuf Bourguignon", 25, preparationTime);
-        restaurant.addMenuItem(boeufBourguignon);
+    @Given("a menuItem named {string} with a price of {int}")
+    public void givenARestaurantNamed(String menuItemName, Integer price) {
+        menuItem = new MenuItem(menuItemName, price, LocalTime.of(0, 20, 0));
     }
 
-    @Then("the menu item is added to the menu")
-    public void thenTheMenuItemIsAddedToTheMenu() {
-        assertTrue(restaurant.getMenu().stream().anyMatch(menuItem -> menuItem.getName().equals("Boeuf Bourguignon")));
+    @When("{string} add {string}")
+    public void whenRestaurantAddMenuItem(String restaurantName, String menuItemName) {
+        if (restaurant.name().equals(restaurantName) && menuItem.getName().equals(menuItemName)) {
+            restaurant.addMenuItem(menuItem);
+        }
+    }
+
+    @Then("{string} is added to the menu")
+    public void thenTheMenuItemIsAddedToTheMenu(String menuItemName) {
+        assertTrue(restaurant.getMenu().stream().anyMatch(menuItem -> menuItem.getName().equals(menuItemName)));
     }
 }
