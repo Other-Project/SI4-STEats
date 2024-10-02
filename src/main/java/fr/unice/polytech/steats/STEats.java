@@ -66,7 +66,6 @@ public class STEats {
      * Get all the menu items available at the time of the delivery.
      */
     public List<MenuItem> getAvailableMenu() {
-
         return order.getRestaurant().getAvailableMenu(order.getDeliveryTime());
     }
 
