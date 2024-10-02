@@ -1,8 +1,10 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Represents an order taken by a registered user
@@ -29,4 +31,9 @@ public interface Order extends Saleable {
      * @return The restaurant in which the order is made
      */
     Restaurant getRestaurant();
+
+    /**
+     * @return A copy of the items of the order
+     */
+    List<MenuItem> getItems();
 }
