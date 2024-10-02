@@ -20,7 +20,6 @@ public class STEats {
     private GroupOrder groupOrder;
     private SingleOrder order;
     private List<MenuItem> fullMenu;
-    private double totalPrice;
     private User user;
 
     /**
@@ -31,37 +30,35 @@ public class STEats {
     }
 
     /**
-     * @implNote The constructor for a unregistered user
+     * @implNote The constructor for an unregistered user
      */
     public STEats(){}
 
-    private void updateFullMenu(Order order){
+    private void updateFullMenu(Order order) {
         this.fullMenu = order.getRestaurant().getFullMenu();
     }
 
     /**
      * Create a single order.
-     * @param userId The user id of the user that initialized the order
      * @param deliveryTime The time the user wants the order to be delivered
      * @param address The address the user wants the order to be delivered
      */
-    public void createOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
-        if (order == null) throw new IllegalStateException();
-        order = new SingleOrder(userId, deliveryTime, address, restaurant);
+    public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
+        if (order != null) throw new IllegalStateException();
+        order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
         updateFullMenu(order);
     }
 
     /**
      * Create a group order.
-     * @param userID The user id of the user that initialized the order
      * @param groupCode The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
      * @param address The address where the group order must be delivered
      */
-    public void createGroupOrder(String userID, String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
-        if (groupOrder == null || order == null) throw new IllegalStateException();
+    public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
+        if (groupOrder != null || order != null) throw new IllegalStateException();
         groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
-        order = groupOrder.createOrder(userID);
+        order = groupOrder.createOrder(user.getUserId());
         updateFullMenu(order);
     }
 
@@ -69,6 +66,7 @@ public class STEats {
      * Get all the menu items available at the time of the delivery.
      */
     public List<MenuItem> getAvailableMenu() {
+
         return order.getRestaurant().getAvailableMenu(order.getDeliveryTime());
     }
 
@@ -85,7 +83,6 @@ public class STEats {
      */
     public void addMenuItem(MenuItem menuItem) {
         order.addMenuItem(menuItem);
-        totalPrice += menuItem.getPrice();
     }
 
     /**
@@ -94,13 +91,26 @@ public class STEats {
      */
     public void removeMenuItem(MenuItem menuItem) {
         order.removeMenuItem(menuItem);
-        totalPrice -= menuItem.getPrice();
     }
 
     /**
      * Get the total price of the order.
      */
     public double getTotalPrice() {
-        return totalPrice;
+        return order.getPrice();
+    }
+
+    /**
+     * Get all the item that the user wants to order
+     */
+    public List<MenuItem> getCart() {
+        return order.getItems();
+    }
+
+    /**
+     * Get the user making an order
+     */
+    public User getUser() {
+        return user;
     }
 }
