@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.restaurant.Restaurant;
+
 import java.time.LocalDateTime;
 
 /**
@@ -22,4 +24,9 @@ public interface Order extends Saleable {
      * @return The address where the order must be delivered
      */
     Address getAddress();
+
+    /**
+     * @return The restaurant in which the order is made
+     */
+    Restaurant getRestaurant();
 }

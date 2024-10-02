@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.Restaurant;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class SingleOrder implements Order {
     private final List<MenuItem> items = new ArrayList<>();
     private final Address address;
     private Status status = Status.INITIALISED;
+    private Restaurant restaurant;
 
     /**
      *
@@ -24,10 +26,11 @@ public class SingleOrder implements Order {
      * @param deliveryTime The time the client wants the order to be delivered
      * @param address The address the client wants the order to be delivered
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address) {
+    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
         this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.address = address;
+        this.restaurant = restaurant;
     }
 
     @Override
@@ -43,6 +46,11 @@ public class SingleOrder implements Order {
     @Override
     public Address getAddress() {
         return address;
+    }
+
+    @Override
+    public Restaurant getRestaurant() {
+        return restaurant;
     }
 
     /**
