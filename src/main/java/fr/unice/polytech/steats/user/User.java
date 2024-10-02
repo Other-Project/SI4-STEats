@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The user that is currently using the system
+ * The person that is currently using the system
  *
  * @author Team C
  */
@@ -28,7 +28,7 @@ public class User {
     }
 
     /**
-     * Add the order to the history of the user once it has been delivered
+     * Add the order to the history of the user once it has been paid
      *
      * @param order The order that has been delivered to the user
      */
