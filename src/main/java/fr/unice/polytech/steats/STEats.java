@@ -23,7 +23,7 @@ public class STEats {
     private User user;
 
     /**
-     * @param user the person using the application (browsing or/and ordering)
+     * @param user The person using the application (browsing or/and ordering)
      */
     public STEats(User user) {
         this.user = user;
@@ -42,9 +42,10 @@ public class STEats {
      * Create a single order.
      * @param deliveryTime The time the user wants the order to be delivered
      * @param address The address the user wants the order to be delivered
+     * @param restaurant The restaurant in which the order is made
      */
     public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
-        if (order != null) throw new IllegalStateException();
+        if (order != null) throw new IllegalStateException("An order is already in progress.");
         order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
         updateFullMenu(order);
     }
@@ -54,9 +55,10 @@ public class STEats {
      * @param groupCode The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
      * @param address The address where the group order must be delivered
+     * @param restaurant The restaurant in which the group order is made
      */
     public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
-        if (groupOrder != null || order != null) throw new IllegalStateException();
+        if (groupOrder != null || order != null) throw new IllegalStateException("An order is already in progress.");
         groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
         order = groupOrder.createOrder(user.getUserId());
         updateFullMenu(order);
@@ -66,7 +68,7 @@ public class STEats {
      * Get all the menu items available at the time of the delivery.
      */
     public List<MenuItem> getAvailableMenu() {
-        return order.getRestaurant().getAvailableMenu(order.getDeliveryTime());
+        return order.getAvailableMenu(order.getDeliveryTime());
     }
 
     /**
@@ -100,14 +102,14 @@ public class STEats {
     }
 
     /**
-     * Get all the item that the user wants to order
+     * Get all the item that the user wants to order.
      */
     public List<MenuItem> getCart() {
         return order.getItems();
     }
 
     /**
-     * Get the user making an order
+     * Get the user making an order.
      */
     public User getUser() {
         return user;

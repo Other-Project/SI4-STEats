@@ -66,6 +66,11 @@ public class SingleOrder implements Order {
         return new ArrayList<>(items);
     }
 
+    @Override
+    public List<MenuItem> getAvailableMenu(LocalDateTime time) {
+        return restaurant.getFullMenu();
+    }
+
     /**
      * @return The user id of the user that initialized the order
      */

@@ -36,4 +36,6 @@ public interface Order extends Saleable {
      * @return A copy of the items of the order
      */
     List<MenuItem> getItems();
+
+    List<MenuItem> getAvailableMenu(LocalDateTime time);
 }
