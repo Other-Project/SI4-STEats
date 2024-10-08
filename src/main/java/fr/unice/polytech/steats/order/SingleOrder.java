@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.Restaurant;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,17 +18,20 @@ public class SingleOrder implements Order {
     private final List<MenuItem> items = new ArrayList<>();
     private final Address address;
     private Status status = Status.INITIALISED;
+    private Restaurant restaurant;
 
     /**
      *
      * @param userId The user's ID that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param address The address the client wants the order to be delivered
+     * @param restaurant The restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address) {
+    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
         this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.address = address;
+        this.restaurant = restaurant;
     }
 
     @Override
@@ -45,6 +49,11 @@ public class SingleOrder implements Order {
         return address;
     }
 
+    @Override
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
     /**
      * @implNote Returns the sum of the price of all the {@link fr.unice.polytech.steats.restaurant.MenuItem MenuItem} it contains.
      */
@@ -56,6 +65,11 @@ public class SingleOrder implements Order {
      @Override
     public List<MenuItem> getItems() {
         return new ArrayList<>(items);
+    }
+
+    @Override
+    public List<MenuItem> getAvailableMenu(LocalDateTime time) {
+        return restaurant.getFullMenu();
     }
 
     /**
@@ -71,5 +85,13 @@ public class SingleOrder implements Order {
      */
     public void addMenuItem(MenuItem item) {
         items.add(item);
+    }
+
+    /**
+     * Remove a menu item from the items of the order
+     * @param item A menu item the user chose to remove from the order
+     */
+    public void removeMenuItem(MenuItem item) {
+        items.remove(item);
     }
 }

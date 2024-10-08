@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.Restaurant;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,16 +21,19 @@ public class GroupOrder implements Order {
     private final List<Order> orders = new ArrayList<>();
     private final Address address;
     private Status status = Status.INITIALISED;
+    private Restaurant restaurant;
 
     /**
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
      * @param address      The address where the group order must be delivered
+     * @param restaurant   The restaurant in which the group order is made
      */
-    public GroupOrder(String groupCode, LocalDateTime deliveryTime, Address address) {
+    public GroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.address = address;
+        this.restaurant = restaurant;
     }
 
     @Override
@@ -47,6 +51,11 @@ public class GroupOrder implements Order {
         return address;
     }
 
+    @Override
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
     /**
      * @implNote Returns the sum of the price of the all the {@link SingleOrder} it contains.
      */
@@ -60,6 +69,11 @@ public class GroupOrder implements Order {
         return orders.stream().map(Order::getItems).flatMap(Collection::stream).toList();
     }
 
+    @Override
+    public List<MenuItem> getAvailableMenu(LocalDateTime time) {
+        return restaurant.getFullMenu();
+    }
+
     /**
      * @return The invitation code for the group order
      */
@@ -71,9 +85,9 @@ public class GroupOrder implements Order {
      * @param userId The ID of the user that joined the group order
      * @return The order created with the user ID, and with the delivery time and the address of the group order.
      */
-    public Order createOrder(String userId) {
+    public SingleOrder createOrder(String userId) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        Order order = new SingleOrder(userId, deliveryTime, address);
+        SingleOrder order = new SingleOrder(userId, deliveryTime, address, restaurant);
         orders.add(order);
         return order;
     }

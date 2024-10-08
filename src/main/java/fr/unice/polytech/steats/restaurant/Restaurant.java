@@ -32,4 +32,8 @@ public record Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood
     public void removeMenuItem(MenuItem menuItem) {
 
     }
+
+    public List<MenuItem> getFullMenu() {
+        return this.menu;
+    }
 }
