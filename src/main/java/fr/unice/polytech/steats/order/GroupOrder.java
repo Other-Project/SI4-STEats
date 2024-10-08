@@ -27,6 +27,7 @@ public class GroupOrder implements Order {
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
      * @param address      The address where the group order must be delivered
+     * @param restaurant   The restaurant in which the group order is made
      */
     public GroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
         this.deliveryTime = deliveryTime;
