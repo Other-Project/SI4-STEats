@@ -8,6 +8,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A restaurant that serves food
+ *
+ * @author Team C
+ */
 public final class Restaurant {
     private final String name;
     private final List<MenuItem> menu;
@@ -25,22 +30,39 @@ public final class Restaurant {
         this(name, new ArrayList<>(), TypeOfFood.CLASSIC, new ArrayList<>());
     }
 
+    /**
+     * Name of the restaurant
+     */
     public String name() {
         return name;
     }
 
+    /**
+     * The full menu of the restaurant
+     */
     public List<MenuItem> getFullMenu() {
         return Collections.unmodifiableList(menu);
     }
 
+    /**
+     * The type of food the restaurant serves
+     */
     public TypeOfFood typeOfFood() {
         return typeOfFood;
     }
 
+    /**
+     * All the discounts the restaurant proposes
+     */
     public List<Discount> discounts() {
         return Collections.unmodifiableList(discounts);
     }
 
+    /**
+     * The part of the menu that can be prepared and delivered in time
+     *
+     * @param deliveryTime Wanted time of delivery
+     */
     public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTime) {
         return this.menu;
     }
