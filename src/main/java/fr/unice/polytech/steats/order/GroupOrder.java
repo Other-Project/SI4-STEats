@@ -100,4 +100,11 @@ public class GroupOrder implements Order {
     public void closeGroupOrder() {
         status = Status.PAID;
     }
+
+    /**
+     * @return The list of single orders in the group order
+     */
+    public List<Order> getOrders() {
+        return new ArrayList<>(orders);
+    }
 }
