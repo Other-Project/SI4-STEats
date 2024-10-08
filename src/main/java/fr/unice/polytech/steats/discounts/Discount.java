@@ -1,9 +1,11 @@
 package fr.unice.polytech.steats.discounts;
 
+import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,5 +38,15 @@ public class Discount {
                 && (criteria.ordersAmount <= 0 || order.getUser().getOrders().size() % criteria.ordersAmount == 0)
                 && (criteria.itemsAmount <= 0 || order.getUser().getOrders().stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
                 && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
+    }
+
+    public boolean isStackable() {
+        return options.stackable;
+    }
+
+    public double value(Order order) {
+        return discounts.orderCredit
+                + Arrays.stream(discounts.freeItems).mapToDouble(MenuItem::getPrice).sum()
+                + order.getPrice() * discounts.orderDiscount;
     }
 }
