@@ -59,9 +59,9 @@ public class User {
     }
 
     /**
-     * All the orders the user passed
+     * Gets all the orders of the user
      */
     public List<Order> getOrders() {
-        return Collections.emptyList();
+        return Collections.unmodifiableList(ordersHistory);
     }
 }
