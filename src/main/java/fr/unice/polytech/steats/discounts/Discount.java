@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.discounts;
 
-import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 
@@ -35,7 +34,7 @@ public class Discount {
         return options.expirationDate.isAfter(LocalDateTime.now())
                 && items.size() >= criteria.currentOrderItemsAmount
                 && (criteria.ordersAmount <= 0 || order.getUser().getOrders().size() % criteria.ordersAmount == 0)
-                && (criteria.itemsAmount <= 0 || order.getUser().getOrders().stream().map(Order::getItems).count() % criteria.itemsAmount == 0)
+                && (criteria.itemsAmount <= 0 || order.getUser().getOrders().stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
                 && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
     }
 }
