@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.discounts;
 
-import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 
@@ -40,13 +39,38 @@ public class Discount {
                 && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
     }
 
+    /**
+     * Can the discount be cumulated with other discounts
+     */
     public boolean isStackable() {
         return options.stackable;
     }
 
-    public double value(Order order) {
+    /**
+     * Can the discount be applied to order that triggered it
+     */
+    public boolean canBeAppliedDirectly() {
+        return options.appliesAfterOrder;
+    }
+
+    /**
+     * Gets the "value" of the discount (how much the user gains)
+     *
+     * @param price The sub price of the order
+     * @implNote Used to compare discounts
+     */
+    public double value(double price) {
         return discounts.orderCredit
                 + Arrays.stream(discounts.freeItems).mapToDouble(MenuItem::getPrice).sum()
-                + order.getPrice() * discounts.orderDiscount;
+                + price * discounts.orderDiscount;
+    }
+
+    /**
+     * Gets the price of the order once the discount has been applied
+     *
+     * @param price The price of the order
+     */
+    public double getNewPrice(double price) {
+        return (price - discounts.orderCredit) * (1 - discounts.orderDiscount);
     }
 }
