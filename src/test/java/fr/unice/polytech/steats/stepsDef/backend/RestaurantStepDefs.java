@@ -8,6 +8,7 @@ import io.cucumber.java.en.When;
 
 import java.time.LocalTime;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class RestaurantStepDefs {
@@ -30,7 +31,7 @@ public class RestaurantStepDefs {
 
     @When("{string} add {string}")
     public void whenRestaurantAddMenuItem(String restaurantName, String menuItemName) {
-        if (restaurant.name().equals(restaurantName) && menuItem.getName().equals(menuItemName)) {
+        if (restaurant.getName().equals(restaurantName) && menuItem.getName().equals(menuItemName)) {
             restaurant.addMenuItem(menuItem);
         }
     }
@@ -38,5 +39,17 @@ public class RestaurantStepDefs {
     @Then("{string} is added to the menu")
     public void thenTheMenuItemIsAddedToTheMenu(String menuItemName) {
         assertTrue(restaurant.getMenu().stream().anyMatch(menuItem -> menuItem.getName().equals(menuItemName)));
+    }
+
+    @When("{string} remove {string}")
+    public void whenRestaurantRemoveMenuItem(String restaurantName, String menuItemName) {
+        if (restaurant.getName().equals(restaurantName) && menuItem.getName().equals(menuItemName)) {
+            restaurant.removeMenuItem(menuItem);
+        }
+    }
+
+    @Then("{string} is removed from the menu")
+    public void thenTheMenuItemIsRemovedFromTheMenu(String menuItemName) {
+        assertFalse(restaurant.getMenu().stream().anyMatch(menuItem -> menuItem.getName().equals(menuItemName)));
     }
 }
