@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.discounts;
 
 import fr.unice.polytech.steats.order.Order;
+import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 
 import java.time.LocalDateTime;
@@ -25,13 +26,16 @@ public class Discount {
 
     /**
      * Checks if the criteria are met
+     *
      * @param order The current order
      * @return True if the discount can be applied to the order
      */
-    public boolean isApplicable(Order order) {
+    public boolean isApplicable(SingleOrder order) {
         List<MenuItem> items = order.getItems();
-        // TODO: Other criteria need the User class
         return options.expirationDate.isAfter(LocalDateTime.now())
-                && items.size() >= criteria.currentOrderItemsAmount;
+                && items.size() >= criteria.currentOrderItemsAmount
+                && (criteria.ordersAmount <= 0 || order.getUser().getOrders().size() % criteria.ordersAmount == 0)
+                && (criteria.itemsAmount <= 0 || order.getUser().getOrders().stream().map(Order::getItems).count() % criteria.itemsAmount == 0)
+                && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
     }
 }

@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
  * @author Team C
  */
 public class SingleOrder implements Order {
-    private final String userId;
+    private final User user;
     private final LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final Address address;
@@ -22,13 +23,13 @@ public class SingleOrder implements Order {
 
     /**
      *
-     * @param userId The user's ID that initialized the order
+     * @param user The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param address The address the client wants the order to be delivered
      * @param restaurant The restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
-        this.userId = userId;
+    public SingleOrder(User user, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+        this.user = user;
         this.deliveryTime = deliveryTime;
         this.address = address;
         this.restaurant = restaurant;
@@ -73,10 +74,10 @@ public class SingleOrder implements Order {
     }
 
     /**
-     * @return The user id of the user that initialized the order
+     * @return The user that initialized the order
      */
-    public String getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
     /**

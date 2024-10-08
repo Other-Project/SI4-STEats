@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.user;
 import fr.unice.polytech.steats.order.Order;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -55,5 +56,12 @@ public class User {
      */
     public String getUserId() {
         return userId;
+    }
+
+    /**
+     * All the orders the user passed
+     */
+    public List<Order> getOrders() {
+        return Collections.emptyList();
     }
 }
