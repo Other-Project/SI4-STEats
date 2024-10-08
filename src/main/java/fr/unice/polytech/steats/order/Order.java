@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.Restaurant;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +28,18 @@ public interface Order extends Saleable {
     Address getAddress();
 
     /**
+     * @return The restaurant in which the order is made
+     */
+    Restaurant getRestaurant();
+
+    /**
      * @return A copy of the items of the order
      */
     List<MenuItem> getItems();
+
+    /**
+     * @param time The time at which the menu must be available
+     * @return The menu that can be ordered at the given time
+     */
+    List<MenuItem> getAvailableMenu(LocalDateTime time);
 }
