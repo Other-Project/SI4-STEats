@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class GroupOrder implements Order {
     private final List<Order> orders = new ArrayList<>();
     private final Address address;
     private Status status = Status.INITIALISED;
-    private Restaurant restaurant;
+    private final Restaurant restaurant;
 
     /**
      * @param groupCode    The invitation code for the group order
@@ -82,12 +83,12 @@ public class GroupOrder implements Order {
     }
 
     /**
-     * @param userId The ID of the user that joined the group order
+     * @param user The user that joined the group order
      * @return The order created with the user ID, and with the delivery time and the address of the group order.
      */
-    public SingleOrder createOrder(String userId) {
+    public SingleOrder createOrder(User user) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        SingleOrder order = new SingleOrder(userId, deliveryTime, address, restaurant);
+        SingleOrder order = new SingleOrder(user, deliveryTime, address, restaurant);
         orders.add(order);
         return order;
     }
