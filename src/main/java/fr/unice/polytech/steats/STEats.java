@@ -47,6 +47,7 @@ public class STEats {
     public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException("An order is already in progress.");
         order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
+        restaurant.addOrder(order);
         updateFullMenu(order);
     }
 
