@@ -53,6 +53,10 @@ public class Discount {
         return options.appliesAfterOrder;
     }
 
+    public List<MenuItem> freeItems() {
+        return List.of(discounts.freeItems);
+    }
+
     /**
      * Gets the "value" of the discount (how much the user gains)
      *

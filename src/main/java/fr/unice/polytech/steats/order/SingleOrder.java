@@ -77,7 +77,9 @@ public class SingleOrder implements Order {
 
     @Override
     public List<MenuItem> getItems() {
-        return new ArrayList<>(items);
+        List<MenuItem> res = new ArrayList<>(items);
+        res.addAll(appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly).map(Discount::freeItems).flatMap(List::stream).toList());
+        return res;
     }
 
     @Override
