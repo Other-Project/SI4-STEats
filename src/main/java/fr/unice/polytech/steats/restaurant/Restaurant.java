@@ -1,19 +1,17 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.order.SingleOrder;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A restaurant that serves food
  *
  * @author Team C
  */
-public final class Restaurant {
+public class Restaurant {
     private final String name;
     private final List<MenuItem> menu;
     private final TypeOfFood typeOfFood;
@@ -56,6 +54,21 @@ public final class Restaurant {
      */
     public List<Discount> discounts() {
         return Collections.unmodifiableList(discounts);
+    }
+
+    /**
+     * The discounts that can be applied to an order
+     *
+     * @param order The order to check
+     */
+    public List<Discount> availableDiscounts(SingleOrder order) {
+        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
+        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
+        applicableDiscounts.stream()
+                .filter(discount -> !discount.isStackable())
+                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
+                .ifPresent(res::add);
+        return res;
     }
 
     /**

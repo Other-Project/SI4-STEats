@@ -7,7 +7,6 @@ import fr.unice.polytech.steats.user.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -71,10 +70,9 @@ public class SingleOrder implements Order {
     @Override
     public double getPrice() {
         return Stream.concat(
-                        appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
-                        user.getDiscountsToApplyNext().stream()
-                )
-                .reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
+                appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
+                user.getDiscountsToApplyNext().stream()
+        ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
     }
 
     @Override
@@ -115,12 +113,8 @@ public class SingleOrder implements Order {
     }
 
     private void updateDiscounts() {
-        List<Discount> applicableDiscounts = restaurant.discounts().stream().filter(discount -> discount.isApplicable(this)).toList();
         appliedDiscounts.clear();
-        appliedDiscounts.addAll(applicableDiscounts.stream().filter(Discount::isStackable).toList());
-        applicableDiscounts.stream().filter(discount -> !discount.isStackable())
-                .max(Comparator.comparingDouble(discount -> discount.value(getSubPrice())))
-                .ifPresent(appliedDiscounts::add);
+        appliedDiscounts.addAll(restaurant.availableDiscounts(this));
     }
 
     /**
