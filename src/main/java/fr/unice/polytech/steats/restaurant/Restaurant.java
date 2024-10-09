@@ -91,16 +91,30 @@ public class Restaurant {
         return new ArrayList<>(this.menu);
     }
 
-    public List<MenuItem> getMenu() {
-        return new ArrayList<>(this.menu);
-    }
-
+    /**
+     * Add a menu item to the restaurant
+     *
+     * @param menuItem The menu item
+     */
     public void addMenuItem(MenuItem menuItem) {
         this.menu.add(menuItem);
     }
 
+    /**
+     * Remove a menu item to the restaurant
+     * @param menuItem The menu item
+     */
     public void removeMenuItem(MenuItem menuItem) {
         this.menu.remove(menuItem);
+    }
+
+    /**
+     * Add an order for the restaurant
+     *
+     * @param order the order to add
+     */
+    public void addOrder(Order order) {
+        this.orders.add(order);
     }
 
     @Override
@@ -122,15 +136,5 @@ public class Restaurant {
     @Override
     public String toString() {
         return name + " [" + typeOfFood + "]";
-    }
-
-
-    /**
-     * Add an order for the restaurant
-     *
-     * @param order the order to add
-     */
-    public void addOrder(Order order) {
-        this.orders.add(order);
     }
 }
