@@ -47,7 +47,6 @@ public class STEats {
     public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException("An order is already in progress.");
         order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
-        restaurant.addOrder(order);
         updateFullMenu(order);
     }
 
@@ -69,7 +68,7 @@ public class STEats {
      * Get all the menu items available at the time of the delivery.
      */
     public List<MenuItem> getAvailableMenu() {
-        return order.getAvailableMenu(order.getDeliveryTime());
+        return order.getRestaurant().getAvailableMenu(order.getDeliveryTime());
     }
 
     /**
@@ -114,5 +113,19 @@ public class STEats {
      */
     public User getUser() {
         return user;
+    }
+
+    public void payOrder() {
+        user.pay(getTotalPrice());
+        sendOrderToRestaurant(order.getRestaurant());
+    }
+
+    /**
+     * Send an order to a restaurant
+     *
+     * @param restaurant the restaurant where to send the order
+     */
+    public void sendOrderToRestaurant(Restaurant restaurant) {
+        restaurant.addOrder(order);
     }
 }

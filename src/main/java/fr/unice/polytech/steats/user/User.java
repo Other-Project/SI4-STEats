@@ -56,4 +56,9 @@ public class User {
     public String getUserId() {
         return userId;
     }
+
+    // TODO : implement this method
+    public void pay(double totalPrice) {
+        System.out.println("Vous devez payer : " + totalPrice + "€");
+    }
 }

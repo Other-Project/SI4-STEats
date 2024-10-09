@@ -6,9 +6,7 @@ Feature: Order
 
   Scenario: Creating an order
     When "Alban" creates an order and specifies a date, an address and a restaurant
-    Then A new order is created
-
-  Scenario: Can only order available menu items
+    Then "Alban" can order
 
 
 
