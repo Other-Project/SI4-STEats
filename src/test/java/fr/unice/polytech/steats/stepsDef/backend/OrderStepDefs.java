@@ -23,9 +23,6 @@ public class OrderStepDefs {
     Address address;
     STEats stEats;
 
-    public OrderStepDefs() {
-    }
-
     @Given("an user of name {string} and with userId {string}")
     public void givenAnUser(String userName, String userId) {
         user = new User(userName, userId, Role.STUDENT);
@@ -39,20 +36,15 @@ public class OrderStepDefs {
         restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, LocalTime.of(0, 20, 0)));
     }
 
-    @When("{string} creates an order and specifies a date, an address and a restaurant")
-    public void whenCreatesOrder(String userName) {
+    @When("the user creates an order and specifies a date, an address and a restaurant")
+    public void whenCreatesOrder() {
         deliveryTime = LocalDateTime.now();
         address = new Address("ch de Carel", "Auribeau", "06810", "");
         stEats.createOrder(deliveryTime, address, restaurant);
     }
 
-    @Then("{string} can order")
-    public void thenUserCanOrder(String userName) {
+    @Then("the user can order")
+    public void thenUserCanOrder() {
         assertFalse(stEats.getAvailableMenu().isEmpty());
-    }
-
-    @Given("an order")
-    public void givenAnOrder() {
-
     }
 }

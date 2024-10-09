@@ -16,9 +16,6 @@ public class RestaurantStepDefs {
     Restaurant restaurant;
     MenuItem menuItem;
 
-    public RestaurantStepDefs() {
-    }
-
     @Given("A restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
         restaurant = new Restaurant(restaurantName);

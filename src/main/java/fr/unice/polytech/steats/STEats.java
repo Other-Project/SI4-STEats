@@ -68,7 +68,7 @@ public class STEats {
      * Get all the menu items available at the time of the delivery.
      */
     public List<MenuItem> getAvailableMenu() {
-        return order.getRestaurant().getAvailableMenu(order.getDeliveryTime());
+        return order.getAvailableMenu(order.getDeliveryTime());
     }
 
     /**
@@ -125,7 +125,7 @@ public class STEats {
      *
      * @param restaurant the restaurant where to send the order
      */
-    public void sendOrderToRestaurant(Restaurant restaurant) {
+    private void sendOrderToRestaurant(Restaurant restaurant) {
         restaurant.addOrder(order);
     }
 }
