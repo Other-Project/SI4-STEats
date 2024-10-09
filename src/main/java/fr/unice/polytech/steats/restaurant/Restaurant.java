@@ -17,7 +17,7 @@ public class Restaurant {
     private final List<MenuItem> menu;
     private final TypeOfFood typeOfFood;
     private final List<Discount> discounts;
-    private List<Order> orders;
+    private final List<Order> orders;
 
     public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts) {
         this.name = name;
