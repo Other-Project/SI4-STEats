@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.User;
@@ -7,6 +8,7 @@ import fr.unice.polytech.steats.user.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Represents a single order taken by a client.
@@ -14,22 +16,23 @@ import java.util.List;
  * @author Team C
  */
 public class SingleOrder implements Order {
-    private final String userId;
+    private final User user;
     private final LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final Address address;
+    private final Restaurant restaurant;
+
     private Status status = Status.INITIALISED;
-    private Restaurant restaurant;
+    private final List<Discount> appliedDiscounts = new ArrayList<>();
 
     /**
-     *
-     * @param userId The user's ID that initialized the order
+     * @param user         The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
-     * @param address The address the client wants the order to be delivered
-     * @param restaurant The restaurant in which the order is made
+     * @param address      The address the client wants the order to be delivered
+     * @param restaurant   The restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
-        this.userId = userId;
+    public SingleOrder(User user, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+        this.user = user;
         this.deliveryTime = deliveryTime;
         this.address = address;
         this.restaurant = restaurant;
@@ -56,21 +59,32 @@ public class SingleOrder implements Order {
     }
 
     /**
+     * The price without discounts
+     *
      * @implNote Returns the sum of the price of all the {@link fr.unice.polytech.steats.restaurant.MenuItem MenuItem} it contains.
      */
-    @Override
-    public double getPrice() {
+    public double getSubPrice() {
         return items.stream().mapToDouble(MenuItem::getPrice).sum();
     }
 
-     @Override
+    @Override
+    public double getPrice() {
+        return Stream.concat(
+                appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
+                user.getDiscountsToApplyNext().stream()
+        ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
+    }
+
+    @Override
     public List<MenuItem> getItems() {
-        return new ArrayList<>(items);
+        List<MenuItem> res = new ArrayList<>(items);
+        res.addAll(appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly).map(Discount::freeItems).flatMap(List::stream).toList());
+        return res;
     }
 
     @Override
     public List<MenuItem> getAvailableMenu(LocalDateTime time) {
-        return restaurant.getFullMenu();
+        return restaurant.getAvailableMenu(time);
     }
 
     @Override
@@ -86,25 +100,41 @@ public class SingleOrder implements Order {
     }
 
     /**
-     * @return The user id of the user that initialized the order
+     * @return The user that initialized the order
      */
-    public String getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
     /**
      * Add a menu item to the items of the order
+     *
      * @param item A menu item the user chose to order
      */
     public void addMenuItem(MenuItem item) {
         items.add(item);
+        updateDiscounts();
     }
 
     /**
      * Remove a menu item from the items of the order
+     *
      * @param item A menu item the user chose to remove from the order
      */
     public void removeMenuItem(MenuItem item) {
         items.remove(item);
+        updateDiscounts();
+    }
+
+    private void updateDiscounts() {
+        appliedDiscounts.clear();
+        appliedDiscounts.addAll(restaurant.availableDiscounts(this));
+    }
+
+    /**
+     * Get the discounts to apply to the next order
+     */
+    public List<Discount> getDiscountsToApplyNext() {
+        return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly()).toList();
     }
 }

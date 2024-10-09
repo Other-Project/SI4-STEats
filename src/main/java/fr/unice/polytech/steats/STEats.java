@@ -30,8 +30,7 @@ public class STEats {
     /**
      * @implNote The constructor for an unregistered user
      */
-    public STEats() {
-    }
+    public STEats() {}
 
     private void updateFullMenu(Order order) {
         this.fullMenu = order.getRestaurant().getFullMenu();
@@ -125,5 +124,22 @@ public class STEats {
      */
     public User getUser() {
         return user;
+    }
+
+    /**
+     * The user wants to proceed to the payment of the order
+     */
+    public void payOrder() {
+        user.pay(getTotalPrice());
+        sendOrderToRestaurant(order.getRestaurant());
+    }
+
+    /**
+     * Send an order to a restaurant
+     *
+     * @param restaurant the restaurant where to send the order
+     */
+    private void sendOrderToRestaurant(Restaurant restaurant) {
+        restaurant.addOrder(order);
     }
 }

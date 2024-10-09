@@ -21,9 +21,9 @@ jobs:
         setup-command: ''
         command: mvn test
         timeout: 10
-    - name: Autograding Reporter
-      uses: classroom-resources/autograding-grading-reporter@v1
-      env:
-        MAVEN-INITIAL-TEST_RESULTS: "${{steps.maven-initial-test.outputs.result}}"
-      with:
-        runners: maven-initial-test
+#    - name: Autograding Reporter
+#      uses: classroom-resources/autograding-grading-reporter@v1
+#      env:
+#        MAVEN-INITIAL-TEST_RESULTS: "${{steps.maven-initial-test.outputs.result}}"
+#      with:
+#        runners: maven-initial-test

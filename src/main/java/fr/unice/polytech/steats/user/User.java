@@ -1,8 +1,11 @@
 package fr.unice.polytech.steats.user;
 
+import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
+import fr.unice.polytech.steats.order.SingleOrder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,7 +17,7 @@ public class User {
     private final String name;
     private final String userId;
     private final Role role;
-    private final List<Order> ordersHistory = new ArrayList<>();
+    private final List<SingleOrder> ordersHistory = new ArrayList<>();
 
     /**
      * @param name   The name of the user
@@ -32,7 +35,7 @@ public class User {
      *
      * @param order The order that has been delivered to the user
      */
-    public void addOrderToHistory(Order order) {
+    public void addOrderToHistory(SingleOrder order) {
         ordersHistory.add(order);
     }
 
@@ -55,5 +58,24 @@ public class User {
      */
     public String getUserId() {
         return userId;
+    }
+
+    // TODO : implement this method
+    public void pay(double totalPrice) {
+        System.out.println("Vous devez payer : " + totalPrice + "€");
+    }
+
+    /**
+     * Gets all the orders of the user
+     */
+    public List<Order> getOrders() {
+        return Collections.unmodifiableList(ordersHistory);
+    }
+
+    /**
+     * Get the discounts to apply to the next order
+     */
+    public List<Discount> getDiscountsToApplyNext() {
+        return ordersHistory.isEmpty() ? Collections.emptyList() : ordersHistory.getLast().getDiscountsToApplyNext();
     }
 }
