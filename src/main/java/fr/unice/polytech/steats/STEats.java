@@ -115,6 +115,9 @@ public class STEats {
         return user;
     }
 
+    /**
+     * The user wants to proceed to the payment of the order
+     */
     public void payOrder() {
         user.pay(getTotalPrice());
         sendOrderToRestaurant(order.getRestaurant());
