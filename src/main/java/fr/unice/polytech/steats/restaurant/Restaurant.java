@@ -18,6 +18,7 @@ public class Restaurant {
     private final TypeOfFood typeOfFood;
     private final List<Discount> discounts;
     private final List<Order> orders;
+    private final List<Schedule> schedules = new ArrayList<>();
 
     public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts) {
         this.name = name;
@@ -87,7 +88,12 @@ public class Restaurant {
      * @param deliveryTime Wanted time of delivery
      */
     public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTime) {
-        // TODO : filter the menu according to deliveryTime
+        Optional<Schedule> scheduleOptional = schedules.stream().filter(schedule -> schedule.contains(deliveryTime)).findFirst();
+        if (scheduleOptional.isEmpty())
+            throw new IllegalArgumentException("This restaurant can't deliver at this time");
+        Schedule schedule = scheduleOptional.get();
+        List<Order> ordersTakenAccountSchedule = orders.stream().filter(order -> schedule.contains(order.getDeliveryTime())).toList();
+
         return new ArrayList<>(this.menu);
     }
 
@@ -102,6 +108,7 @@ public class Restaurant {
 
     /**
      * Remove a menu item to the restaurant
+     *
      * @param menuItem The menu item
      */
     public void removeMenuItem(MenuItem menuItem) {
@@ -136,5 +143,9 @@ public class Restaurant {
     @Override
     public String toString() {
         return name + " [" + typeOfFood + "]";
+    }
+
+    public void addSchedule(Schedule schedule) {
+        schedules.add(schedule);
     }
 }

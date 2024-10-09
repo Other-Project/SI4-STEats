@@ -1,16 +1,22 @@
 package fr.unice.polytech.steats.restaurant;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 public class Schedule {
+    private DayOfWeek dayOfWeek;
     private LocalTime start;
     private LocalTime end;
-    private int nbPerson;
+    private Duration capacity;
 
-    public Schedule(LocalTime start, LocalTime end, int nbPerson) {
+    public Schedule(LocalTime start, LocalTime end, Duration capacity, DayOfWeek dayOfWeek) {
         this.start = start;
         this.end = end;
-        this.nbPerson = nbPerson;
+        this.capacity = capacity;
+        this.dayOfWeek = dayOfWeek;
     }
 
     public LocalTime getStart() {
@@ -21,7 +27,11 @@ public class Schedule {
         return this.end;
     }
 
-    public int getNbPerson() {
-        return this.nbPerson;
+    public Duration getCapacity() {
+        return this.capacity;
+    }
+
+    public Boolean contains(LocalDateTime deliveryTime) {
+        return deliveryTime.getDayOfWeek() == dayOfWeek && ChronoUnit.MINUTES.between(deliveryTime, start) < 3;
     }
 }

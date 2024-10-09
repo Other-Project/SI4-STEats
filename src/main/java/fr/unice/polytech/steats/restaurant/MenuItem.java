@@ -2,14 +2,14 @@ package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.order.Saleable;
 
-import java.time.LocalTime;
+import java.time.Duration;
 
 public class MenuItem implements Saleable {
     private final String name;
     private double price;
-    private LocalTime preparationTime;
+    private Duration preparationTime;
 
-    public MenuItem(String name, double price, LocalTime preparationTime) {
+    public MenuItem(String name, double price, Duration preparationTime) {
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
@@ -27,7 +27,7 @@ public class MenuItem implements Saleable {
         return this.price;
     }
 
-    public LocalTime getPreparationTime() {
+    public Duration getPreparationTime() {
         return this.preparationTime;
     }
 }
