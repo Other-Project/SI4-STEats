@@ -14,11 +14,17 @@ public class GroupOrderManager {
     private static final String GROUP_ORDER_DOES_NOT_EXIST = "The group order does not exist.";
 
     /**
+     * Private constructor to hide the implicit public one.
+     */
+    private GroupOrderManager() {
+    }
+
+    /**
      * Add a group order to the manager.
      *
      * @param groupOrder The group order to add
      */
-    public void addGroupOrder(GroupOrder groupOrder) throws IllegalArgumentException {
+    public static void addGroupOrder(GroupOrder groupOrder) throws IllegalArgumentException {
         if (groupOrders.containsKey(groupOrder.getGroupCode()))
             throw new IllegalArgumentException("A group order with the same group code already exists.");
         groupOrders.put(groupOrder.getGroupCode(), groupOrder);
@@ -29,7 +35,7 @@ public class GroupOrderManager {
      *
      * @param groupCode The group code of the group order to remove
      */
-    public void removeGroupOrder(String groupCode) {
+    public static void removeGroupOrder(String groupCode) {
         if (!groupOrders.containsKey(groupCode)) throw new IllegalArgumentException(GROUP_ORDER_DOES_NOT_EXIST);
         groupOrders.remove(groupCode);
     }
@@ -50,7 +56,7 @@ public class GroupOrderManager {
      *
      * @return The group orders
      */
-    public Map<String, GroupOrder> getGroupOrders() {
+    public static Map<String, GroupOrder> getGroupOrders() {
         return new HashMap<>(groupOrders);
     }
 }

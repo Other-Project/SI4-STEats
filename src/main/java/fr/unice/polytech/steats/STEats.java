@@ -18,24 +18,19 @@ public class STEats {
     private SingleOrder order;
     private List<MenuItem> fullMenu;
     private User user;
-    private final GroupOrderManager groupOrderManager;
     private static final String ORDER_ALREADY_IN_PROGRESS = "An order is already in progress.";
 
     /**
      * @param user The person using the application (browsing or/and ordering)
-     * @param groupOrderManager The manager of the group orders
      */
-    public STEats(User user, GroupOrderManager groupOrderManager) {
+    public STEats(User user) {
         this.user = user;
-        this.groupOrderManager = groupOrderManager;
     }
 
     /**
      * @implNote The constructor for an unregistered user
-     * @param groupOrderManager The manager of the group orders
      */
-    public STEats(GroupOrderManager groupOrderManager) {
-        this.groupOrderManager = groupOrderManager;
+    public STEats() {
     }
 
     private void updateFullMenu(Order order) {
@@ -65,7 +60,7 @@ public class STEats {
         if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
         order = groupOrder.createOrder(user.getUserId());
-        groupOrderManager.addGroupOrder(groupOrder);
+        GroupOrderManager.addGroupOrder(groupOrder);
         updateFullMenu(order);
     }
 

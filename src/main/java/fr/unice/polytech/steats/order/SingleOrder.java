@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,6 +71,18 @@ public class SingleOrder implements Order {
     @Override
     public List<MenuItem> getAvailableMenu(LocalDateTime time) {
         return restaurant.getFullMenu();
+    }
+
+    @Override
+    public List<User> getUsers() {
+        return List.of(getUser());
+    }
+
+    /**
+     * @return The user that initialized the order
+     */
+    public User getUser() {
+        return null; //so that the code compiles
     }
 
     /**
