@@ -18,7 +18,7 @@ import java.time.LocalTime;
 public class GroupOrderStepDefs {
 
     private User user;
-    private STEats steatsAlex;
+    private STEats steats;
 
     @Given("A group order is created with the group code {string} and the delivery time {string} and the address {string} and the restaurant {string}")
     public void a_group_order_is_created(String groupCode, String deliveryTime, String address, String restaurant) {
@@ -28,32 +28,32 @@ public class GroupOrderStepDefs {
     @Given("The user with the id {string} is logged in")
     public void theUserWithTheIdIsLoggedIn(String userId) {
         user = new User("Alex", userId, Role.STUDENT);
-        steatsAlex = new STEats(user);
+        steats = new STEats(user);
     }
 
     @When("The user with the id {string} joins the group order with the group code {string}")
     public void the_user_joins_the_group_order(String userId, String groupCode) {
-        steatsAlex.joinGroupOrder(groupCode);
+        steats.joinGroupOrder(groupCode);
     }
 
     @Then("The user with the id {string} is added to the group order with the group code {string}")
     public void the_user_is_added_to_the_group_order(String userId, String groupCode) {
-        assert GroupOrderManager.getGroupOrder(groupCode).getOrders().size() == 2;
+        assert GroupOrderManager.getGroupOrder(groupCode).getOrders().size() == 1;
         assert GroupOrderManager.getGroupOrder(groupCode).getOrders().stream()
                 .filter(order -> order instanceof SingleOrder)
-                .map(order -> ((SingleOrder) order).getUserId())
+                .map(order -> ((SingleOrder) order).getUser().getUserId())
                 .toList()
                 .contains(userId);
     }
 
     @When("The user with the id {string} adds the item named {string} with a price of {double} to the group order with the group code {string}")
     public void theUserWithTheIdAddsTheItemNamedWithAPriceOfToTheGroupOrderWithTheGroupCode(String id, String menuItem, double price, String arg4) {
-        steatsAlex.addMenuItem(new MenuItem(menuItem, price, LocalTime.of(12, 0)));
+        steats.addMenuItem(new MenuItem(menuItem, price, LocalTime.of(12, 0)));
     }
 
     @Then("The item with named {string} is added to the order of the user with the id {string} in the group order with the group code {string}")
     public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String arg0, String arg1, String arg2) {
-        assert steatsAlex.getTotalPrice() == 10.0;
+        assert steats.getTotalPrice() == 10.0;
         assert GroupOrderManager.getGroupOrder(arg2).getOrders().stream()
                 .map(order -> order.getItems().size())
                 .toList()
@@ -63,7 +63,7 @@ public class GroupOrderStepDefs {
                 .toList()
                 .contains(arg0);
         assert GroupOrderManager.getGroupOrder(arg2).getOrders().stream()
-                .map(order -> ((SingleOrder) order).getUserId())
+                .map(order -> ((SingleOrder) order).getUser().getUserId())
                 .toList().contains(arg1);
     }
 

@@ -44,7 +44,7 @@ public class STEats {
      */
     public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
+        order = new SingleOrder(user, deliveryTime, address, restaurant);
         updateFullMenu(order);
     }
 
@@ -58,7 +58,7 @@ public class STEats {
     public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
         if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
-        order = groupOrder.createOrder(user.getUserId());
+        order = groupOrder.createOrder(user);
         GroupOrderManager.addGroupOrder(groupOrder);
         updateFullMenu(order);
     }
@@ -71,7 +71,7 @@ public class STEats {
     public void joinGroupOrder(String groupCode) {
         if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         groupOrder = GroupOrderManager.getGroupOrder(groupCode);
-        order = groupOrder.createOrder(user.getUserId());
+        order = groupOrder.createOrder(user);
         updateFullMenu(order);
     }
 

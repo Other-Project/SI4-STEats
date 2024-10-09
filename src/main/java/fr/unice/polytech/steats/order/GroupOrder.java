@@ -7,6 +7,7 @@ import fr.unice.polytech.steats.user.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -111,6 +112,6 @@ public class GroupOrder implements Order {
      * @return The list of single orders in the group order
      */
     public List<Order> getOrders() {
-        return new ArrayList<>(orders);
+        return Collections.unmodifiableList(orders);
     }
 }

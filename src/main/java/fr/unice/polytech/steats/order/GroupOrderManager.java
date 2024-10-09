@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.order;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ public class GroupOrderManager {
      * @return The group orders
      */
     public static Map<String, GroupOrder> getGroupOrders() {
-        return new HashMap<>(groupOrders);
+        return Collections.unmodifiableMap(groupOrders);
     }
 }
 

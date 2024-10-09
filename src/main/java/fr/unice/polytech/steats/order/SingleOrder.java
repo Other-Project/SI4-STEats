@@ -96,13 +96,6 @@ public class SingleOrder implements Order {
      * @return The user that initialized the order
      */
     public User getUser() {
-        return null; //so that the code compiles
-    }
-
-    /**
-     * @return The user that initialized the order
-     */
-    public User getUser() {
         return user;
     }
 
