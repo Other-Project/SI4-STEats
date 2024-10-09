@@ -53,6 +53,9 @@ public class Discount {
         return options.appliesAfterOrder;
     }
 
+    /**
+     * Items given by the discount
+     */
     public List<MenuItem> freeItems() {
         return List.of(discounts.freeItems);
     }
