@@ -10,9 +10,9 @@ import java.util.List;
  *
  * @author Team C
  */
-public class User {
-    private final String name;
-    private final String userId;
+public class User implements UserInterface {
+    private String name;
+    private String userId;
     private final Role role;
     private final List<Order> ordersHistory = new ArrayList<>();
 
@@ -27,6 +27,31 @@ public class User {
         this.role = role;
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getUserId() {
+        return this.userId;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public Role getRole() {
+        return role;
+    }
+
     /**
      * Add the order to the history of the user once it has been paid
      *
@@ -34,27 +59,6 @@ public class User {
      */
     public void addOrderToHistory(Order order) {
         ordersHistory.add(order);
-    }
-
-    /**
-     * @return The name of the user
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return The role of the user
-     */
-    public Role getRole() {
-        return role;
-    }
-
-    /**
-     * @return The user's ID
-     */
-    public String getUserId() {
-        return userId;
     }
 
     // TODO : implement this method
