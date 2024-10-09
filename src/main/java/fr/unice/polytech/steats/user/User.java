@@ -60,6 +60,11 @@ public class User {
         return userId;
     }
 
+    // TODO : implement this method
+    public void pay(double totalPrice) {
+        System.out.println("Vous devez payer : " + totalPrice + "€");
+    }
+
     /**
      * Gets all the orders of the user
      */

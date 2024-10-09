@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 
 import java.time.LocalDateTime;
@@ -16,12 +17,14 @@ public class Restaurant {
     private final List<MenuItem> menu;
     private final TypeOfFood typeOfFood;
     private final List<Discount> discounts;
+    private List<Order> orders;
 
     public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts) {
         this.name = name;
         this.menu = menu;
         this.typeOfFood = typeOfFood;
         this.discounts = discounts;
+        this.orders = new ArrayList<>();
     }
 
     public Restaurant(String name) {
@@ -31,7 +34,7 @@ public class Restaurant {
     /**
      * Name of the restaurant
      */
-    public String name() {
+    public String getName() {
         return name;
     }
 
@@ -45,7 +48,7 @@ public class Restaurant {
     /**
      * The type of food the restaurant serves
      */
-    public TypeOfFood typeOfFood() {
+    public TypeOfFood getTypeOfFood() {
         return typeOfFood;
     }
 
@@ -54,6 +57,13 @@ public class Restaurant {
      */
     public List<Discount> discounts() {
         return Collections.unmodifiableList(discounts);
+    }
+
+    /**
+     * All the orders received by the restaurant
+     */
+    public List<Order> getOrders() {
+        return new ArrayList<>(orders);
     }
 
     /**
@@ -77,7 +87,20 @@ public class Restaurant {
      * @param deliveryTime Wanted time of delivery
      */
     public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTime) {
-        return this.menu;
+        // TODO : filter the menu according to deliveryTime
+        return new ArrayList<>(this.menu);
+    }
+
+    public List<MenuItem> getMenu() {
+        return new ArrayList<>(this.menu);
+    }
+
+    public void addMenuItem(MenuItem menuItem) {
+        this.menu.add(menuItem);
+    }
+
+    public void removeMenuItem(MenuItem menuItem) {
+        this.menu.remove(menuItem);
     }
 
     @Override
@@ -101,4 +124,13 @@ public class Restaurant {
         return name + " [" + typeOfFood + "]";
     }
 
+
+    /**
+     * Add an order for the restaurant
+     *
+     * @param order the order to add
+     */
+    public void addOrder(Order order) {
+        this.orders.add(order);
+    }
 }
