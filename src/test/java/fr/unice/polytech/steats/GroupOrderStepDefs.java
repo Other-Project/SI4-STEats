@@ -14,18 +14,16 @@ import java.time.LocalDateTime;
 
 public class GroupOrderStepDefs {
 
-    private final GroupOrderManager groupOrderManager = new GroupOrderManager();
-
     @Given("A group order is created with the group code {string} and the delivery time {string} and the address {string} and the restaurant {string}")
     public void a_group_order_is_created(String groupCode, String deliveryTime, String address, String restaurant) {
-        STEats steats = new STEats(new User("Alban", "69", Role.EXTERNAL), groupOrderManager);
+        STEats steats = new STEats(new User("Alban", "12345", Role.EXTERNAL));
         steats.createGroupOrder(groupCode, LocalDateTime.parse(deliveryTime), new Address(address, "Antibes", "06600", "villa_116"), new Restaurant(restaurant));
     }
 
     @When("The user with the id {string} joins the group order with the group code {string}")
     public void the_user_joins_the_group_order(String userId, String groupCode) {
         User user = new User("Alex", userId, Role.STUDENT);
-        STEats steats = new STEats(user, groupOrderManager);
+        STEats steats = new STEats(user);
         steats.joinGroupOrder(groupCode);
     }
 
