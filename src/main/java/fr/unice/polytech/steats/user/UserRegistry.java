@@ -21,8 +21,12 @@ public class UserRegistry implements UserManager, UserFinder<User> {
     public UserRegistry() {
         User User1 = new User("John Doe", "123456", Role.STUDENT);
         User User2 = new User("Jane Doe", "654321", Role.STUDENT);
+        User Alban = new User("Alban Falcoz", "140403", Role.STUDENT);
+        User Theo = new User("Théo Lassauniere", "141103", Role.STUDENT);
         users.put(User1.getUserId(), User1);
-        users.put("654321", User2);
+        users.put(User2.getUserId(), User2);
+        users.put(Alban.getUserId(), Alban);
+        users.put(Theo.getUserId(), Theo);
     }
 
     @Override
