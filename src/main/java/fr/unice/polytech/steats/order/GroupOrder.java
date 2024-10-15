@@ -4,6 +4,7 @@ import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.User;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,6 +74,14 @@ public class GroupOrder implements Order {
     @Override
     public List<MenuItem> getAvailableMenu(LocalDateTime time) {
         return restaurant.getFullMenu();
+    }
+
+    /**
+     * @return The total preparation time of all the single order in the group order
+     */
+    @Override
+    public Duration getPreparationTime() {
+        return orders.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
     /**

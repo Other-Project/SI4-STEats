@@ -4,6 +4,7 @@ import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -19,6 +20,7 @@ public class Restaurant {
     private final List<Discount> discounts;
     private final List<Order> orders;
     private final List<Schedule> schedules = new ArrayList<>();
+    private final Duration deliveryTimeRestaurant = Duration.ofMinutes(10);
 
     public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts) {
         this.name = name;
@@ -85,16 +87,17 @@ public class Restaurant {
     /**
      * The part of the menu that can be prepared and delivered in time
      *
-     * @param deliveryTime Wanted time of delivery
+     * @param deliveryTimeOrder Wanted time of delivery
      */
-    public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTime) {
-        Optional<Schedule> scheduleOptional = schedules.stream().filter(schedule -> schedule.contains(deliveryTime)).findFirst();
+    public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTimeOrder) {
+        Optional<Schedule> scheduleOptional = schedules.stream().filter(schedule -> schedule.contains(deliveryTimeOrder.minus(deliveryTimeRestaurant))).findFirst();
         if (scheduleOptional.isEmpty())
             throw new IllegalArgumentException("This restaurant can't deliver at this time");
         Schedule schedule = scheduleOptional.get();
         List<Order> ordersTakenAccountSchedule = orders.stream().filter(order -> schedule.contains(order.getDeliveryTime())).toList();
-
-        return new ArrayList<>(this.menu);
+        Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+        Duration capacityLeft = schedule.getCapacity().minus(totalPreparationTimeOrders);
+        return menu.stream().filter(menuItem -> !capacityLeft.minus(menuItem.getPreparationTime()).isNegative()).toList();
     }
 
     /**
@@ -145,6 +148,11 @@ public class Restaurant {
         return name + " [" + typeOfFood + "]";
     }
 
+    /**
+     * Add a schedule to the restaurant
+     *
+     * @param schedule The schedule to add
+     */
     public void addSchedule(Schedule schedule) {
         schedules.add(schedule);
     }

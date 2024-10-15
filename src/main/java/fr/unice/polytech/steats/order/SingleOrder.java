@@ -5,6 +5,7 @@ import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.User;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,5 +125,14 @@ public class SingleOrder implements Order {
      */
     public List<Discount> getDiscountsToApplyNext() {
         return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly()).toList();
+    }
+
+
+    /**
+     * @implNote The total preparation time of all the items in the order
+     */
+    @Override
+    public Duration getPreparationTime() {
+        return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 }
