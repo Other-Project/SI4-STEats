@@ -68,17 +68,36 @@ public class DiscountStepdefs {
     public void aDiscountOfEuroTheNextTimeIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
         restaurants.get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderCredit(moneyAmount)
-                .setItemsAmount(minItemAmount)
+                .setCurrentOrderItemsAmount(minItemAmount)
                 .appliesAfterOrder()
-                .stackable()
+                .unstackable()
                 .build());
     }
 
-    @Given("I am a client with the {string} role and {int} orders at {string}")
-    public void iAmAnExternalClientWithOrders(String role, int orders, String restaurant) {
+    @And("a discount of {double}€ if the order has more than {int} items")
+    public void aDiscountOfEuroIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
+        restaurants.get(restaurant).addDiscount(new DiscountBuilder()
+                .setOrderCredit(moneyAmount)
+                .setCurrentOrderItemsAmount(minItemAmount)
+                .appliesDuringOrder()
+                .unstackable()
+                .build());
+    }
+
+    @Given("I am a client with the {string} role and {int} orders at {string} of {int} items")
+    public void iAmAClientWithTheRole(String role, int orders, String restaurant, int items) {
+        iAmAClientWithTheRole(role);
+        for (int i = 0; i < orders; i++) {
+            SingleOrder singleOrder = new SingleOrder(user, null, null, restaurants.get(restaurant));
+            for (int j = 0; j < items; j++)
+                singleOrder.addMenuItem(new MenuItem("P1", 5, Duration.ofMinutes(1)));
+            user.addOrderToHistory(singleOrder);
+        }
+    }
+
+    @Given("I am a client with the {string} role")
+    public void iAmAClientWithTheRole(String role) {
         user = new User(role, role, Role.valueOf(role));
-        for (int i = 0; i < orders; i++)
-            user.addOrderToHistory(new SingleOrder(user, null, null, restaurants.get(restaurant)));
     }
 
     @When("I place an order at {string} with the following items:")
@@ -90,6 +109,11 @@ public class DiscountStepdefs {
     @Then("I should receive a {double}% discount")
     public void iShouldReceiveADiscount(double percent) {
         assertEquals(1 - percent / 100.0, order.getPrice() / order.getSubPrice(), 0.001);
+    }
+
+    @Then("I should receive a {double}€ discount")
+    public void iShouldReceiveAEuroDiscount(double amount) {
+        assertEquals(amount, order.getSubPrice() - order.getPrice());
     }
 
     @Then("My cart should contain the following items:")
