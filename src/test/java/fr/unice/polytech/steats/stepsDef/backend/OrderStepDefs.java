@@ -4,12 +4,14 @@ import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.Schedule;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -32,8 +34,10 @@ public class OrderStepDefs {
     @Given("a restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
         restaurant = new Restaurant(restaurantName);
-        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, LocalTime.of(0, 20, 0)));
-        restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, LocalTime.of(0, 20, 0)));
+        Schedule schedule = new Schedule(LocalTime.now(), Duration.ofMinutes(30), Duration.ofMinutes(30), LocalDateTime.now().getDayOfWeek());
+        restaurant.addSchedule(schedule);
+        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
+        restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));
     }
 
     @When("the user creates an order and specifies a date, an address and a restaurant")

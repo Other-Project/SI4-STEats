@@ -4,18 +4,20 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
+/**
+ * @author Team C
+ */
 public class Schedule {
     private DayOfWeek dayOfWeek;
     private LocalTime start;
-    private LocalTime end;
-    private Duration capacity;
+    private Duration scheduleDuration;
+    private Duration totalCapacity;
 
-    public Schedule(LocalTime start, LocalTime end, Duration capacity, DayOfWeek dayOfWeek) {
+    public Schedule(LocalTime start, Duration scheduleDuration, Duration capacity, DayOfWeek dayOfWeek) {
         this.start = start;
-        this.end = end;
-        this.capacity = capacity;
+        this.scheduleDuration = scheduleDuration;
+        this.totalCapacity = capacity;
         this.dayOfWeek = dayOfWeek;
     }
 
@@ -23,15 +25,15 @@ public class Schedule {
         return this.start;
     }
 
-    public LocalTime getEnd() {
-        return this.end;
+    public Duration getScheduleDuration() {
+        return this.scheduleDuration;
     }
 
-    public Duration getCapacity() {
-        return this.capacity;
+    public Duration getTotalCapacity() {
+        return this.totalCapacity;
     }
 
     public Boolean contains(LocalDateTime deliveryTime) {
-        return deliveryTime.getDayOfWeek() == dayOfWeek && ChronoUnit.MINUTES.between(deliveryTime, start) < ChronoUnit.MINUTES.between(end, start);
+        return deliveryTime.getDayOfWeek() == dayOfWeek && Duration.between(start, deliveryTime).dividedBy(2).compareTo(scheduleDuration) < 0;
     }
 }

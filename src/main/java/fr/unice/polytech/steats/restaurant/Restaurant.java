@@ -19,19 +19,21 @@ public class Restaurant {
     private final TypeOfFood typeOfFood;
     private final List<Discount> discounts;
     private final List<Order> orders;
+    private final Duration scheduleDuration;
     private final List<Schedule> schedules = new ArrayList<>();
     private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
-    public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts) {
+    public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts, Duration scheduleDuration) {
         this.name = name;
         this.menu = menu;
         this.typeOfFood = typeOfFood;
         this.discounts = discounts;
+        this.scheduleDuration = scheduleDuration;
         this.orders = new ArrayList<>();
     }
 
     public Restaurant(String name) {
-        this(name, new ArrayList<>(), TypeOfFood.CLASSIC, new ArrayList<>());
+        this(name, new ArrayList<>(), TypeOfFood.CLASSIC, new ArrayList<>(), Duration.ofMinutes(30));
     }
 
     /**
@@ -96,7 +98,7 @@ public class Restaurant {
         Schedule schedule = scheduleOptional.get();
         List<Order> ordersTakenAccountSchedule = orders.stream().filter(order -> schedule.contains(order.getDeliveryTime())).toList();
         Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
-        Duration capacityLeft = schedule.getCapacity().minus(totalPreparationTimeOrders);
+        Duration capacityLeft = schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
         return menu.stream().filter(menuItem -> !capacityLeft.minus(menuItem.getPreparationTime()).isNegative()).toList();
     }
 
@@ -154,6 +156,8 @@ public class Restaurant {
      * @param schedule The schedule to add
      */
     public void addSchedule(Schedule schedule) {
+        if (schedule.getScheduleDuration().compareTo(scheduleDuration) != 0)
+            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
         schedules.add(schedule);
     }
 }
