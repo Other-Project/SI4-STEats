@@ -6,8 +6,6 @@ import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.User;
-import fr.unice.polytech.steats.user.UserNotFoundException;
-import fr.unice.polytech.steats.user.UserRegistry;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -16,10 +14,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class OrderStepDefs {
 
-    UserRegistry userRegistry;
     User user;
     STEats stEats;
     STEatsController steatsController;
@@ -30,15 +29,13 @@ public class OrderStepDefs {
 
     @Given("an user of name {string}")
     public void givenAnUser(String userName) {
-        userRegistry = new UserRegistry();
-        user = userRegistry.findByName(userName).isPresent() ? userRegistry.findByName(userName).get() : null;
-        assert (user != null);
-        steatsController = new STEatsController(userRegistry);
-        try {
-            stEats = steatsController.logging(user);
-        } catch (UserNotFoundException e) {
-            exception = e;
-        }
+        steatsController = new STEatsController();
+        user = STEatsController.USER_REGISTRY.findByName(userName).isPresent()
+                ? STEatsController.USER_REGISTRY.findByName(userName).get() : null;
+        assertNotNull(user);
+        assertDoesNotThrow(() -> {
+            stEats = steatsController.logging(user.getName());
+        });
     }
 
     @Given("a restaurant named {string}")

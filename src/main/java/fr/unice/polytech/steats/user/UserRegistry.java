@@ -31,7 +31,7 @@ public class UserRegistry implements UserManager, UserFinder<User> {
 
     @Override
     public List<User> findAll() {
-        return List.of(users.values().toArray(new User[0]));
+        return List.of((User) users.values());
     }
 
     @Override
@@ -45,9 +45,8 @@ public class UserRegistry implements UserManager, UserFinder<User> {
     }
 
     @Override
-    public void addUser(String userId, String userName) {
-        User user = new User(userName, userId, Role.STUDENT);
-        users.put(userId, user);
+    public void addUser(String userId, String userName, Role role) {
+        users.computeIfAbsent(userId, k -> new User(userId, userName, role));
     }
 
     @Override
@@ -56,12 +55,9 @@ public class UserRegistry implements UserManager, UserFinder<User> {
     }
 
     @Override
-    public void updateUser(String userId, String userName) {
-        if (users.get(userId) != null)
-            users.get(userId).setName(userName);
-        else {
-            User user = new User(userName, userId, Role.STUDENT);
-            users.put(userId, user);
+    public void updateUser(String userId, User user) {
+        if (users.containsKey(userId)) {
+            users.get(userId).setName(user.getName());
         }
     }
 }
