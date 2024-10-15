@@ -49,7 +49,7 @@ panier.
 :star2: **Acceptance criteria**
 Précisez l'ensemble des conditions que la story doit satisfaire pour être considérée comme complète et terminée.
 
-Plus spécifiquement décrivez un ensemble de scénario qui deviendront des tests d'acceptation. 
+Plus spécifiquement, décrivez un ensemble de scénario qui deviendront des tests d'acceptation.
 Précisez bien les données associées comme vous le voyez dans les scénarios d'exemples données ci-dessous. 
 Vous pouvez faire référence ici aux tests Gherkins correspondant
 
@@ -57,18 +57,8 @@ Vous pouvez faire référence ici aux tests Gherkins correspondant
 **Given:** some context<br>
 **When:** some action is carried out<br>
 **Then:** a set of observable outcomes should occur <br>
-  
-_Voici quelques exemples_<br>
-_**Scénario:**_
-```
-     _Etant donné_ que je suis sur mon panier 
-     _Et que_ j'ai un produit d'id "1234" en quantité "1"
-     _Et que_ le stock restant sur ce produit est de "0"
-     _Quand_ j'ajoute "1" quantité sur mon produit
-     _Alors_ mon panier affichera une erreur
-```
 
-_**Scénario:**_<br>
+_**Scenario:**_
 ```
     Etant donné que je suis sur mon panier 
     Et que j'ai un produit d'id "1235" en quantité "1" <br>
