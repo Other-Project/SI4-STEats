@@ -20,7 +20,7 @@ public class Restaurant {
     private final List<Discount> discounts;
     private final List<Order> orders;
     private final List<Schedule> schedules = new ArrayList<>();
-    private final Duration deliveryTimeRestaurant = Duration.ofMinutes(10);
+    private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
     public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts) {
         this.name = name;
@@ -90,7 +90,7 @@ public class Restaurant {
      * @param deliveryTimeOrder Wanted time of delivery
      */
     public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTimeOrder) {
-        Optional<Schedule> scheduleOptional = schedules.stream().filter(schedule -> schedule.contains(deliveryTimeOrder.minus(deliveryTimeRestaurant))).findFirst();
+        Optional<Schedule> scheduleOptional = schedules.stream().filter(schedule -> schedule.contains(deliveryTimeOrder.minus(DELIVERY_TIME_RESTAURANT))).findFirst();
         if (scheduleOptional.isEmpty())
             throw new IllegalArgumentException("This restaurant can't deliver at this time");
         Schedule schedule = scheduleOptional.get();

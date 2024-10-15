@@ -32,6 +32,6 @@ public class Schedule {
     }
 
     public Boolean contains(LocalDateTime deliveryTime) {
-        return deliveryTime.getDayOfWeek() == dayOfWeek && ChronoUnit.MINUTES.between(deliveryTime, start) < 3;
+        return deliveryTime.getDayOfWeek() == dayOfWeek && ChronoUnit.MINUTES.between(deliveryTime, start) < ChronoUnit.MINUTES.between(end, start);
     }
 }
