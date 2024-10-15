@@ -156,7 +156,7 @@ public class Restaurant {
      * @param schedule The schedule to add
      */
     public void addSchedule(Schedule schedule) {
-        if (schedule.getScheduleDuration().compareTo(scheduleDuration) != 0)
+        if (schedule.getDuration().compareTo(scheduleDuration) != 0)
             throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
         if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
             throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
