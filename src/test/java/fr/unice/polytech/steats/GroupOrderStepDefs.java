@@ -21,7 +21,7 @@ public class GroupOrderStepDefs {
 
     @Given("A group order with the group code {string} from the restaurant {string} and to deliver for {string} at {string}")
     public void a_group_order_is_created(String groupCode, String restaurant, String deliveryTime, String address) {
-        GroupOrderManager.addGroupOrder(new GroupOrder(groupCode, LocalDateTime.parse(deliveryTime), new Address(address, "1", "1", "1"), new Restaurant(restaurant)));
+        GroupOrderManager.getInstance().add(groupCode, new GroupOrder(groupCode, LocalDateTime.parse(deliveryTime), new Address(address, "1", "1", "1"), new Restaurant(restaurant)));
     }
 
     @Given("The user named {string} with the id {string} is logged in")
@@ -37,8 +37,8 @@ public class GroupOrderStepDefs {
 
     @Then("The user with the id {string} is added to the group order with the group code {string}")
     public void the_user_is_added_to_the_group_order(String userId, String groupCode) {
-        assert GroupOrderManager.getGroupOrder(groupCode).getOrders().size() == 1;
-        assert GroupOrderManager.getGroupOrder(groupCode).getOrders().stream()
+        assert GroupOrderManager.getInstance().get(groupCode).getOrders().size() == 1;
+        assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .filter(order -> order instanceof SingleOrder)
                 .map(order -> ((SingleOrder) order).getUser().getUserId())
                 .toList()
@@ -53,15 +53,15 @@ public class GroupOrderStepDefs {
     @Then("The item with named {string} with a price of {double} is added to the order of the user with the id {string} in the group order with the group code {string}")
     public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, Double price, String userId, String groupCode) {
         assert steats.getTotalPrice() == price;
-        assert GroupOrderManager.getGroupOrder(groupCode).getOrders().stream()
+        assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .map(order -> order.getItems().size())
                 .toList()
                 .contains(1);
-        assert GroupOrderManager.getGroupOrder(groupCode).getOrders().stream()
+        assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .map(order -> order.getItems().getFirst().getName())
                 .toList()
                 .contains(menuItem);
-        assert GroupOrderManager.getGroupOrder(groupCode).getOrders().stream()
+        assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .map(order -> ((SingleOrder) order).getUser().getUserId())
                 .toList().contains(userId);
     }

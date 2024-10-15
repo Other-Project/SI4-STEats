@@ -59,7 +59,7 @@ public class STEats {
         if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
         order = groupOrder.createOrder(user);
-        GroupOrderManager.addGroupOrder(groupOrder);
+        GroupOrderManager.getInstance().add(groupCode, groupOrder);
         updateFullMenu(order);
     }
 
@@ -70,7 +70,7 @@ public class STEats {
      */
     public void joinGroupOrder(String groupCode) {
         if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        groupOrder = GroupOrderManager.getGroupOrder(groupCode);
+        groupOrder = GroupOrderManager.getInstance().get(groupCode);
         order = groupOrder.createOrder(user);
         updateFullMenu(order);
     }

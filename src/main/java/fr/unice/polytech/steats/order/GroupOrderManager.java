@@ -1,64 +1,25 @@
 package fr.unice.polytech.steats.order;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Will manage the group orders
+ * Will manage group orders
  * It will be able to create, delete, update, get and store group orders
  *
  * @author Team C
  */
-public class GroupOrderManager {
-    private static final Map<String, GroupOrder> groupOrders = new HashMap<>();
-    private static final String GROUP_ORDER_DOES_NOT_EXIST = "The group order does not exist.";
+public class GroupOrderManager extends AbstractManager<GroupOrder> {
+    private static final GroupOrderManager INSTANCE = new GroupOrderManager();
 
-    /**
-     * Private constructor to hide the implicit public one.
-     */
     private GroupOrderManager() {
+        super();
     }
 
     /**
-     * Add a group order to the manager.
+     * Get the instance of the GroupOrderManager
      *
-     * @param groupOrder The group order to add
+     * @return The instance of the GroupOrderManager
      */
-    public static void addGroupOrder(GroupOrder groupOrder) throws IllegalArgumentException {
-        if (groupOrders.containsKey(groupOrder.getGroupCode()))
-            throw new IllegalArgumentException("A group order with the same group code already exists.");
-        groupOrders.put(groupOrder.getGroupCode(), groupOrder);
-    }
-
-    /**
-     * Remove a group order from the manager.
-     *
-     * @param groupCode The group code of the group order to remove
-     */
-    public static void removeGroupOrder(String groupCode) {
-        if (!groupOrders.containsKey(groupCode)) throw new IllegalArgumentException(GROUP_ORDER_DOES_NOT_EXIST);
-        groupOrders.remove(groupCode);
-    }
-
-    /**
-     * Get a group order from the manager.
-     *
-     * @param groupCode The group code of the group order to get
-     * @return The group order
-     */
-    public static GroupOrder getGroupOrder(String groupCode) {
-        if (!groupOrders.containsKey(groupCode)) throw new IllegalArgumentException(GROUP_ORDER_DOES_NOT_EXIST);
-        return groupOrders.get(groupCode);
-    }
-
-    /**
-     * Get all the group orders from the manager.
-     *
-     * @return The group orders
-     */
-    public static Map<String, GroupOrder> getGroupOrders() {
-        return Collections.unmodifiableMap(groupOrders);
+    public static GroupOrderManager getInstance() {
+        return INSTANCE;
     }
 }
 
