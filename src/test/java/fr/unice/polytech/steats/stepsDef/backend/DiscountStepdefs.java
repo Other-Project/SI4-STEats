@@ -31,8 +31,8 @@ public class DiscountStepdefs {
         restaurant = restaurantName;
     }
 
-    @And("a discount of {int}% each {int} orders")
-    public void aDiscountOfEachOrders(int percent, int orderAmount) {
+    @And("a discount of {double}% each {int} orders")
+    public void aDiscountOfEachOrders(double percent, int orderAmount) {
         restaurants.get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderDiscount(percent / 100.0)
                 .setOrdersAmount(orderAmount)
@@ -40,8 +40,8 @@ public class DiscountStepdefs {
                 .build());
     }
 
-    @And("a discount of {int}% if the client has the {string} role")
-    public void aDiscountOfIfTheClientHasTheRole(int percent, String role) {
+    @And("a discount of {double}% if the client has the {string} role")
+    public void aDiscountOfIfTheClientHasTheRole(double percent, String role) {
         restaurants.get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderDiscount(percent / 100.0)
                 .setUserRoles(Role.valueOf(role))
@@ -64,6 +64,16 @@ public class DiscountStepdefs {
                 .build());
     }
 
+    @And("a discount of {double}€ the next time if the order has more than {int} items")
+    public void aDiscountOfEuroTheNextTimeIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
+        restaurants.get(restaurant).addDiscount(new DiscountBuilder()
+                .setOrderCredit(moneyAmount)
+                .setItemsAmount(minItemAmount)
+                .appliesAfterOrder()
+                .stackable()
+                .build());
+    }
+
     @Given("I am a client with the {string} role and {int} orders at {string}")
     public void iAmAnExternalClientWithOrders(String role, int orders, String restaurant) {
         user = new User(role, role, Role.valueOf(role));
@@ -77,14 +87,19 @@ public class DiscountStepdefs {
         items.forEach(item -> order.addMenuItem(new MenuItem(item.get("name"), 5, Duration.ofMinutes(1))));
     }
 
-    @Then("I should receive a {int}% discount")
-    public void iShouldReceiveADiscount(int percent) {
-        assertEquals(1 - percent / 100.0, order.getPrice() / order.getSubPrice());
+    @Then("I should receive a {double}% discount")
+    public void iShouldReceiveADiscount(double percent) {
+        assertEquals(1 - percent / 100.0, order.getPrice() / order.getSubPrice(), 0.001);
     }
 
     @Then("My cart should contain the following items:")
     public void myCartShouldContainTheFollowingItems(List<Map<String, String>> items) {
         List<MenuItem> orderItems = order.getItems();
         assertAll(items.stream().map(item -> () -> assertTrue(orderItems.stream().anyMatch(orderItem -> orderItem.getName().equals(item.get("name"))))));
+    }
+
+    @Then("I shouldn't receive a discount")
+    public void iShouldnTReceiveADiscount() {
+        assertEquals(0, order.getDiscounts().size());
     }
 }

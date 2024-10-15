@@ -7,6 +7,7 @@ import fr.unice.polytech.steats.user.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -124,5 +125,12 @@ public class SingleOrder implements Order {
      */
     public List<Discount> getDiscountsToApplyNext() {
         return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly() && !discount.isExpired()).toList();
+    }
+
+    /**
+     * Get the discounts triggered by the order
+     */
+    public List<Discount> getDiscounts() {
+        return Collections.unmodifiableList(appliedDiscounts);
     }
 }
