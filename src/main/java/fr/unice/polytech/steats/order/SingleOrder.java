@@ -72,7 +72,7 @@ public class SingleOrder implements Order {
     public double getPrice() {
         return Stream.concat(
                 appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
-                user.getDiscountsToApplyNext().stream()
+                user.getDiscountsToApplyNext(restaurant).stream()
         ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
     }
 

@@ -32,9 +32,10 @@ public class Discount {
      */
     public boolean isApplicable(SingleOrder order) {
         List<MenuItem> items = order.getItems();
+        List<SingleOrder> orders = order.getUser().getOrders(order.getRestaurant());
         return items.size() >= criteria.currentOrderItemsAmount
-                && (criteria.ordersAmount <= 0 || (order.getUser().getOrders().size() + 1) % criteria.ordersAmount == 0)
-                && (criteria.itemsAmount <= 0 || order.getUser().getOrders().stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
+                && (criteria.ordersAmount <= 0 || (orders.size() + 1) % criteria.ordersAmount == 0)
+                && (criteria.itemsAmount <= 0 || orders.stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
                 && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
     }
 
