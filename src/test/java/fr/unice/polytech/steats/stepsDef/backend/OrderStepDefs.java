@@ -29,7 +29,7 @@ public class OrderStepDefs {
     Exception exception;
 
     @Given("an user of name {string}")
-    public void givenAnUser(String userName) throws UserNotFoundException {
+    public void givenAnUser(String userName) {
         userRegistry = new UserRegistry();
         user = userRegistry.findByName(userName).isPresent() ? userRegistry.findByName(userName).get() : null;
         assert (user != null);
