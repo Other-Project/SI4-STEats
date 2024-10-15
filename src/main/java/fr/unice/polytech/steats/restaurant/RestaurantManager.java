@@ -20,7 +20,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      *
      * @return The instance of the RestaurantManager
      */
-    public static RestaurantManager get() {
+    public static RestaurantManager getInstance() {
         return INSTANCE;
     }
 }
