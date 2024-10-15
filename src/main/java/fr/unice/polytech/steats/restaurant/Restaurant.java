@@ -96,7 +96,7 @@ public class Restaurant {
         if (scheduleOptional.isEmpty())
             throw new IllegalArgumentException("This restaurant can't deliver at this time");
         Schedule schedule = scheduleOptional.get();
-        List<Order> ordersTakenAccountSchedule = orders.stream().filter(order -> schedule.contains(order.getDeliveryTime())).toList();
+        List<Order> ordersTakenAccountSchedule = orders.stream().filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear() && schedule.contains(order.getDeliveryTime())).toList();
         Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
         Duration capacityLeft = schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
         return menu.stream().filter(menuItem -> !capacityLeft.minus(menuItem.getPreparationTime()).isNegative()).toList();
@@ -158,6 +158,8 @@ public class Restaurant {
     public void addSchedule(Schedule schedule) {
         if (schedule.getScheduleDuration().compareTo(scheduleDuration) != 0)
             throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
+        if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
+            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
         schedules.add(schedule);
     }
 }

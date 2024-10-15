@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.chrono.ChronoLocalDateTime;
 
 /**
  * @author Team C
@@ -14,6 +15,12 @@ public class Schedule {
     private Duration scheduleDuration;
     private Duration totalCapacity;
 
+    /**
+     * @param start            The Localtime at which
+     * @param scheduleDuration
+     * @param capacity
+     * @param dayOfWeek
+     */
     public Schedule(LocalTime start, Duration scheduleDuration, Duration capacity, DayOfWeek dayOfWeek) {
         this.start = start;
         this.scheduleDuration = scheduleDuration;
@@ -34,6 +41,10 @@ public class Schedule {
     }
 
     public Boolean contains(LocalDateTime deliveryTime) {
-        return deliveryTime.getDayOfWeek() == dayOfWeek && Duration.between(start, deliveryTime).dividedBy(2).compareTo(scheduleDuration) < 0;
+        return deliveryTime.getDayOfWeek() == dayOfWeek && deliveryTime.isAfter(ChronoLocalDateTime.from(start)) && Duration.between(start, deliveryTime).compareTo(scheduleDuration.multipliedBy(2)) < 0 && Duration.between(start.plus(scheduleDuration), deliveryTime).compareTo(scheduleDuration) > 0;
+    }
+
+    public boolean overlap(Schedule other) {
+        return start.plus(scheduleDuration).isAfter(other.start) && start.plus(scheduleDuration).isBefore(other.start.plus(other.scheduleDuration)) && other.start.plus(scheduleDuration).isAfter(start) && other.start.plus(scheduleDuration).isBefore(other.start.plus(scheduleDuration));
     }
 }
