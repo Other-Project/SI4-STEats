@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.User;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -43,6 +44,11 @@ public interface Order extends Saleable {
      * @return The menu that can be ordered at the given time
      */
     List<MenuItem> getAvailableMenu(LocalDateTime time);
+
+    /**
+     * @return The List of users that have ordered
+     */
+    List<User> getUsers();
 
     /**
      * @return The time it takes to prepare the order
