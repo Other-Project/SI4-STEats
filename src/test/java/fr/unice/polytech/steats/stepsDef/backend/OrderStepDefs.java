@@ -1,11 +1,13 @@
 package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.STEats;
+import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserNotFoundException;
+import fr.unice.polytech.steats.user.UserRegistry;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -17,16 +19,26 @@ import static org.junit.Assert.assertFalse;
 
 public class OrderStepDefs {
 
+    UserRegistry userRegistry;
     User user;
+    STEats stEats;
+    STEatsController steatsController;
     Restaurant restaurant;
     LocalDateTime deliveryTime;
     Address address;
-    STEats stEats;
+    Exception exception;
 
-    @Given("an user of name {string} and with userId {string}")
-    public void givenAnUser(String userName, String userId) {
-        user = new User(userName, userId, Role.STUDENT);
-        stEats = new STEats(user); // Create the link between the user and the app
+    @Given("an user of name {string}")
+    public void givenAnUser(String userName) throws UserNotFoundException {
+        userRegistry = new UserRegistry();
+        user = userRegistry.findByName(userName).isPresent() ? userRegistry.findByName(userName).get() : null;
+        assert (user != null);
+        steatsController = new STEatsController(userRegistry);
+        try {
+            stEats = steatsController.logging(user);
+        } catch (UserNotFoundException e) {
+            exception = e;
+        }
     }
 
     @Given("a restaurant named {string}")
