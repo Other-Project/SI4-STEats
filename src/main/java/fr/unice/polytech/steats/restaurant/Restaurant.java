@@ -19,7 +19,7 @@ public class Restaurant {
     private final List<Discount> discounts;
     private final List<Order> orders;
 
-    public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts) {
+    public Restaurant(String name, TypeOfFood typeOfFood, List<MenuItem> menu, List<Discount> discounts) {
         this.name = name;
         this.menu = menu;
         this.typeOfFood = typeOfFood;
@@ -28,7 +28,11 @@ public class Restaurant {
     }
 
     public Restaurant(String name) {
-        this(name, new ArrayList<>(), TypeOfFood.CLASSIC, new ArrayList<>());
+        this(name, TypeOfFood.CLASSIC);
+    }
+
+    public Restaurant(String name, TypeOfFood typeOfFood) {
+        this(name, typeOfFood, new ArrayList<>(), new ArrayList<>());
     }
 
     /**
@@ -106,6 +110,24 @@ public class Restaurant {
      */
     public void removeMenuItem(MenuItem menuItem) {
         this.menu.remove(menuItem);
+    }
+
+    /**
+     * Add a discount to the restaurant
+     *
+     * @param discount The discount
+     */
+    public void addDiscount(Discount discount) {
+        this.discounts.add(discount);
+    }
+
+    /**
+     * Remove a discount of the restaurant
+     *
+     * @param discount The discount
+     */
+    public void removeDiscount(Discount discount) {
+        this.discounts.remove(discount);
     }
 
     /**

@@ -123,6 +123,6 @@ public class SingleOrder implements Order {
      * Get the discounts to apply to the next order
      */
     public List<Discount> getDiscountsToApplyNext() {
-        return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly()).toList();
+        return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly() && !discount.isExpired()).toList();
     }
 }

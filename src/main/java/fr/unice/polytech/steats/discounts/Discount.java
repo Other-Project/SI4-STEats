@@ -32,9 +32,8 @@ public class Discount {
      */
     public boolean isApplicable(SingleOrder order) {
         List<MenuItem> items = order.getItems();
-        return options.expirationDate.isAfter(LocalDateTime.now())
-                && items.size() >= criteria.currentOrderItemsAmount
-                && (criteria.ordersAmount <= 0 || order.getUser().getOrders().size() % criteria.ordersAmount == 0)
+        return items.size() >= criteria.currentOrderItemsAmount
+                && (criteria.ordersAmount <= 0 || (order.getUser().getOrders().size() + 1) % criteria.ordersAmount == 0)
                 && (criteria.itemsAmount <= 0 || order.getUser().getOrders().stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
                 && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
     }
@@ -50,7 +49,7 @@ public class Discount {
      * Can the discount be applied to order that triggered it
      */
     public boolean canBeAppliedDirectly() {
-        return options.appliesAfterOrder;
+        return !options.appliesAfterOrder;
     }
 
     /**
@@ -79,5 +78,12 @@ public class Discount {
      */
     public double getNewPrice(double price) {
         return (price - discounts.orderCredit) * (1 - discounts.orderDiscount);
+    }
+
+    /**
+     * Is the discount expired
+     */
+    public boolean isExpired() {
+        return options.expirationDate == null || options.expirationDate.isBefore(LocalDateTime.now());
     }
 }
