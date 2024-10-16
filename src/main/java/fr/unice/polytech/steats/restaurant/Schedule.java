@@ -4,7 +4,6 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDateTime;
 
 /**
  * @author Team C
@@ -53,7 +52,7 @@ public class Schedule {
      * @return If the schedule corresponds to the delivery time given in args
      */
     public Boolean contains(LocalDateTime deliveryTime) {
-        return deliveryTime.getDayOfWeek() == dayOfWeek && deliveryTime.isAfter(ChronoLocalDateTime.from(start)) && Duration.between(start, deliveryTime).compareTo(duration.multipliedBy(2)) < 0 && Duration.between(start.plus(duration), deliveryTime).compareTo(duration) > 0;
+        return deliveryTime.getDayOfWeek() == dayOfWeek && deliveryTime.toLocalTime().isAfter(start) && Duration.between(start, deliveryTime).compareTo(duration.multipliedBy(2)) < 0 && start.plus(duration).isBefore(LocalTime.from(deliveryTime));
     }
 
     /**

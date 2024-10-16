@@ -42,7 +42,7 @@ public class OrderStepDefs {
 
     @When("the user creates an order and specifies a date, an address and a restaurant")
     public void whenCreatesOrder() {
-        deliveryTime = LocalDateTime.now();
+        deliveryTime = LocalDateTime.now().plus(Duration.ofMinutes(40));
         address = new Address("ch de Carel", "Auribeau", "06810", "");
         stEats.createOrder(deliveryTime, address, restaurant);
     }
