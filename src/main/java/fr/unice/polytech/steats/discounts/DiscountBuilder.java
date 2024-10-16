@@ -1,8 +1,11 @@
 package fr.unice.polytech.steats.discounts;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.user.Role;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class used to create a {@link Discount}
@@ -13,8 +16,9 @@ public class DiscountBuilder {
 
     // Options
     static class Options {
-        boolean appliesAfterOrder;
-        LocalDateTime expirationDate;
+        boolean stackable = false;
+        boolean appliesAfterOrder = false;
+        LocalDateTime expirationDate = null;
     }
 
     private final Options options = new Options();
@@ -28,7 +32,7 @@ public class DiscountBuilder {
         int ordersAmount = 0;
         int currentOrderItemsAmount = 0;
         int itemsAmount = 0;
-        // TODO: Client's role
+        List<Role> clientRole = null;
     }
 
     private final Criteria criteria = new Criteria();
@@ -42,7 +46,7 @@ public class DiscountBuilder {
     static class Discounts {
         double orderDiscount = 0;
         double orderCredit = 0;
-        MenuItem[] freeItems;
+        MenuItem[] freeItems = new MenuItem[0];
     }
 
     private final Discounts discounts = new Discounts();
@@ -52,6 +56,24 @@ public class DiscountBuilder {
     }
 
     //region Options
+
+    /**
+     * The discount can be stacked with another discount
+     */
+    public DiscountBuilder stackable() {
+        options.stackable = true;
+        return this;
+    }
+
+    /**
+     * The discount can't be stacked with other un-stackable discounts
+     *
+     * @apiNote The discount still can be stacked with stackable discounts
+     */
+    public DiscountBuilder unstackable() {
+        options.stackable = false;
+        return this;
+    }
 
     /**
      * The discount can't be applied to the current order and will take effect at the next order
@@ -126,6 +148,16 @@ public class DiscountBuilder {
      */
     public DiscountBuilder setItemsAmount(int itemsAmount) {
         criteria.itemsAmount = itemsAmount;
+        return this;
+    }
+
+    /**
+     * The user needs to match one of these roles to be eligible for the discount
+     *
+     * @param roles A list of roles that are eligible
+     */
+    public DiscountBuilder setUserRoles(Role... roles) {
+        criteria.clientRole = new ArrayList<>(List.of(roles));
         return this;
     }
 
