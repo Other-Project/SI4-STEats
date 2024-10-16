@@ -14,7 +14,7 @@ import java.util.Optional;
  * @author Team c
  **/
 
-public class UserRegistry implements UserManager, UserFinder<User> {
+public class UserRegistry {
 
     Map<String, User> users = new HashMap<>();
 
@@ -29,32 +29,26 @@ public class UserRegistry implements UserManager, UserFinder<User> {
         users.put(Theo.getUserId(), Theo);
     }
 
-    @Override
     public List<User> findAll() {
         return List.of((User) users.values());
     }
 
-    @Override
     public Optional<User> findByName(String name) {
         return users.values().stream().filter(e -> e.getName().equals(name)).findFirst();
     }
 
-    @Override
     public Optional<User> findById(String userId) {
         return Optional.empty();
     }
 
-    @Override
     public void addUser(String userId, String userName, Role role) {
         users.computeIfAbsent(userId, k -> new User(userId, userName, role));
     }
 
-    @Override
     public void removeUser(String userId) {
         users.remove(userId);
     }
 
-    @Override
     public void updateUser(String userId, User user) {
         if (users.containsKey(userId)) {
             users.get(userId).setName(user.getName());
