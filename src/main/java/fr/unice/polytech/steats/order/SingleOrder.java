@@ -145,8 +145,15 @@ public class SingleOrder implements Order {
         appliedDiscounts.addAll(restaurant.availableDiscounts(this));
     }
 
+    @Override
     public void closeOrder() {
         status = Status.PAID;
+        this.getUser().addOrderToHistory(this);
+        sendOrderToRestaurant(this);
+    }
+
+    private void sendOrderToRestaurant(Order order) {
+        order.getRestaurant().addOrder(order);
     }
 
     /**
@@ -161,5 +168,15 @@ public class SingleOrder implements Order {
      */
     public List<Discount> getDiscounts() {
         return Collections.unmodifiableList(appliedDiscounts);
+    }
+
+    /**
+     * Validate the order
+     * Changes it's status to {@link Status#PAID}.
+     *
+     * @implNote only validate the payment, doesn't close the order
+     */
+    public void validateOrder() {
+        status = Status.PAID;
     }
 }

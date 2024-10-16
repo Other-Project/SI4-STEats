@@ -48,4 +48,10 @@ public interface Order extends Saleable {
      * @return The List of users that have ordered
      */
     List<User> getUsers();
+
+    /**
+     * Close the order.
+     * Changes it's status to {@link Status#PAID}.
+     */
+    void closeOrder();
 }
