@@ -3,10 +3,13 @@ package fr.unice.polytech.steats.order;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,7 +19,7 @@ import java.util.stream.Stream;
  * @author Team C
  */
 public class SingleOrder implements Order {
-    private final User user;
+    private final String userId;
     private final LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final Address address;
@@ -26,13 +29,13 @@ public class SingleOrder implements Order {
     private final List<Discount> appliedDiscounts = new ArrayList<>();
 
     /**
-     * @param user         The user that initialized the order
+     * @param userId         The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param address      The address the client wants the order to be delivered
      * @param restaurant   The restaurant in which the order is made
      */
-    public SingleOrder(User user, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
-        this.user = user;
+    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+        this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.address = address;
         this.restaurant = restaurant;
@@ -69,9 +72,16 @@ public class SingleOrder implements Order {
 
     @Override
     public double getPrice() {
+        List<Discount> oldDiscountsToApplied;
+        try {
+            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurant);
+        } catch (NotFoundException e) {
+            oldDiscountsToApplied = Collections.emptyList();
+        }
+
         return Stream.concat(
                 appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
-                user.getDiscountsToApplyNext().stream()
+                oldDiscountsToApplied.stream()
         ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
     }
 
@@ -96,7 +106,18 @@ public class SingleOrder implements Order {
      * @return The user that initialized the order
      */
     public User getUser() {
-        return user;
+        try {
+            return UserManager.getInstance().get(userId);
+        } catch (NotFoundException e) {
+            return null;
+        }
+    }
+
+    /**
+     * The user id that initialized the order
+     */
+    public String getUserId() {
+        return userId;
     }
 
     /**
@@ -128,6 +149,13 @@ public class SingleOrder implements Order {
      * Get the discounts to apply to the next order
      */
     public List<Discount> getDiscountsToApplyNext() {
-        return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly()).toList();
+        return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly() && !discount.isExpired()).toList();
+    }
+
+    /**
+     * Get the discounts triggered by the order
+     */
+    public List<Discount> getDiscounts() {
+        return Collections.unmodifiableList(appliedDiscounts);
     }
 }

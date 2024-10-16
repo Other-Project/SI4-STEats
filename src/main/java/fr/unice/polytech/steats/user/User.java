@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.user;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.restaurant.Restaurant;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,9 +93,21 @@ public class User {
     }
 
     /**
-     * Get the discounts to apply to the next order
+     * Gets all the orders of the user made in a specific restaurant
+     *
+     * @param restaurant The restaurant to filter the orders
      */
-    public List<Discount> getDiscountsToApplyNext() {
-        return ordersHistory.isEmpty() ? Collections.emptyList() : ordersHistory.getLast().getDiscountsToApplyNext();
+    public List<SingleOrder> getOrders(Restaurant restaurant) {
+        return ordersHistory.stream().filter(order -> order.getRestaurant().equals(restaurant)).toList();
+    }
+
+    /**
+     * Get the discounts to apply to the next order
+     *
+     * @param restaurant The restaurant where the user wants to order
+     */
+    public List<Discount> getDiscountsToApplyNext(Restaurant restaurant) {
+        List<SingleOrder> orders = getOrders(restaurant);
+        return orders.isEmpty() ? Collections.emptyList() : orders.getLast().getDiscountsToApplyNext();
     }
 }

@@ -6,7 +6,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.time.LocalTime;
+import java.time.Duration;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -23,7 +23,7 @@ public class RestaurantStepDefs {
 
     @Given("a menuItem named {string} with a price of {int}")
     public void givenARestaurantNamed(String menuItemName, Integer price) {
-        menuItem = new MenuItem(menuItemName, price, LocalTime.of(0, 20, 0));
+        menuItem = new MenuItem(menuItemName, price, Duration.ofMinutes(20));
     }
 
     @When("{string} add {string}")

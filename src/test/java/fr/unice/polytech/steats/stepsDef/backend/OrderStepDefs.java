@@ -11,8 +11,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -35,8 +35,8 @@ public class OrderStepDefs {
     @Given("a restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
         restaurant = new Restaurant(restaurantName);
-        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, LocalTime.of(0, 20, 0)));
-        restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, LocalTime.of(0, 20, 0)));
+        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
+        restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));
     }
 
     @When("the user creates an order and specifies a date, an address and a restaurant")
