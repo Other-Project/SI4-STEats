@@ -9,6 +9,7 @@ import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -28,6 +29,7 @@ public class GroupOrderStepDefs {
     @Given("The user named {string} with the id {string} is logged in")
     public void theUserWithTheIdIsLoggedIn(String name, String userId) {
         User user = new User(name, userId, Role.STUDENT);
+        UserManager.getInstance().add(userId, user);
         steats = new STEats(user);
     }
 
