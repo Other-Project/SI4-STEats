@@ -7,6 +7,7 @@ import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -157,5 +158,14 @@ public class SingleOrder implements Order {
      */
     public List<Discount> getDiscounts() {
         return Collections.unmodifiableList(appliedDiscounts);
+    }
+
+
+    /**
+     * @implNote The total preparation time of all the items in the order
+     */
+    @Override
+    public Duration getPreparationTime() {
+        return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 }
