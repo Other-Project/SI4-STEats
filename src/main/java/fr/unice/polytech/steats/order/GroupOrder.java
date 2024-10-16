@@ -7,6 +7,7 @@ import fr.unice.polytech.steats.user.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -75,6 +76,11 @@ public class GroupOrder implements Order {
         return restaurant.getFullMenu();
     }
 
+    @Override
+    public List<User> getUsers() {
+        return orders.stream().map(Order::getUsers).flatMap(Collection::stream).toList();
+    }
+
     /**
      * @return The invitation code for the group order
      */
@@ -100,5 +106,12 @@ public class GroupOrder implements Order {
      */
     public void closeGroupOrder() {
         status = Status.PAID;
+    }
+
+    /**
+     * @return The list of single orders in the group order
+     */
+    public List<Order> getOrders() {
+        return Collections.unmodifiableList(orders);
     }
 }

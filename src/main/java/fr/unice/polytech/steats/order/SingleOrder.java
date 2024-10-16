@@ -87,6 +87,11 @@ public class SingleOrder implements Order {
         return restaurant.getAvailableMenu(time);
     }
 
+    @Override
+    public List<User> getUsers() {
+        return List.of(getUser());
+    }
+
     /**
      * @return The user that initialized the order
      */
