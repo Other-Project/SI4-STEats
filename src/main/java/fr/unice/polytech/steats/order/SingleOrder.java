@@ -149,11 +149,7 @@ public class SingleOrder implements Order {
     public void closeOrder() {
         status = Status.PAID;
         this.getUser().addOrderToHistory(this);
-        sendOrderToRestaurant(this);
-    }
-
-    private void sendOrderToRestaurant(Order order) {
-        order.getRestaurant().addOrder(order);
+        restaurant.addOrder(this);
     }
 
     /**
@@ -172,7 +168,7 @@ public class SingleOrder implements Order {
 
     /**
      * Validate the order
-     * Changes it's status to {@link Status#PAID}.
+     * Changes its status to {@link Status#PAID}.
      *
      * @implNote only validate the payment, doesn't close the order
      */

@@ -51,7 +51,9 @@ public interface Order extends Saleable {
 
     /**
      * Close the order.
-     * Changes it's status to {@link Status#PAID}.
+     * Changes its status to {@link Status#PAID}.
+     * Send the order to the restaurant.
+     * Add the order to the user's history.
      */
     void closeOrder();
 }
