@@ -124,6 +124,10 @@ public class SingleOrder implements Order {
         appliedDiscounts.addAll(restaurant.availableDiscounts(this));
     }
 
+    public void closeOrder() {
+        status = Status.PAID;
+    }
+
     /**
      * Get the discounts to apply to the next order
      */

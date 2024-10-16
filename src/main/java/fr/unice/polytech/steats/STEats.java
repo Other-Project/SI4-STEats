@@ -130,8 +130,11 @@ public class STEats {
      * The user wants to proceed to the payment of the order
      */
     public void payOrder() {
-        user.pay(getTotalPrice());
-        sendOrderToRestaurant(order.getRestaurant());
+        if (user.pay(getTotalPrice())) {
+            order.closeOrder();
+            user.addOrderToHistory(order);
+            sendOrderToRestaurant(order.getRestaurant());
+        }
     }
 
     /**
@@ -141,5 +144,22 @@ public class STEats {
      */
     private void sendOrderToRestaurant(Restaurant restaurant) {
         restaurant.addOrder(order);
+    }
+
+    /**
+     * Determine if all the orders in the group order are paid
+     */
+    public boolean canCloseGroupOrder() {
+        return groupOrder.getOrders().stream().allMatch(order1 -> order1.getStatus() == Status.PAID);
+    }
+
+    /**
+     * Close the group order
+     */
+    public void closeGroupOrder() {
+        if (groupOrder == null) throw new IllegalStateException("No group order");
+        if (!canCloseGroupOrder()) throw new IllegalStateException("All orders are not payed");
+        if (groupOrder.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
+        groupOrder.closeGroupOrder();
     }
 }

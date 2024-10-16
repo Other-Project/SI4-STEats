@@ -61,8 +61,9 @@ public class User {
     }
 
     // TODO : implement this method
-    public void pay(double totalPrice) {
+    public boolean pay(double totalPrice) {
         System.out.println("Vous devez payer : " + totalPrice + "€");
+        return true;
     }
 
     /**
