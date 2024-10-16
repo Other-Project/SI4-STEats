@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Team C
  */
-public class User implements UserInterface {
+public class User {
     private String name;
     private String userId;
     private final Role role;
@@ -30,27 +30,22 @@ public class User implements UserInterface {
         this.role = role;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public String getUserId() {
         return this.userId;
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }
 
-    @Override
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    @Override
     public Role getRole() {
         return role;
     }
