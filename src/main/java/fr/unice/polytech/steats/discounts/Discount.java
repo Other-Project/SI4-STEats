@@ -85,6 +85,7 @@ public class Discount {
      * Is the discount expired
      */
     public boolean isExpired() {
-        return options.expirationDate == null || options.expirationDate.isBefore(LocalDateTime.now());
+        return (options.expirationDate == null && !options.appliesAfterOrder)
+                || (options.expirationDate != null && options.expirationDate.isBefore(LocalDateTime.now()));
     }
 }

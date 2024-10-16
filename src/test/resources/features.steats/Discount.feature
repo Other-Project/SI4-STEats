@@ -66,3 +66,10 @@ Feature: Manage discounts
       | P1   |
       | P2   |
     Then I should receive a 0.5€ discount
+
+  Scenario: Delayed cash discount
+    Given I am "Robert" with the "FACULTY" role and 1 orders at "R2" of 6 items
+    When I place an order at "R2" with the following items:
+      | name |
+      | P1   |
+    Then I should receive a 1€ discount
