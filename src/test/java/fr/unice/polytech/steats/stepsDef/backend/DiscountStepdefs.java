@@ -4,36 +4,45 @@ import fr.unice.polytech.steats.discounts.DiscountBuilder;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.restaurant.TypeOfFood;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DiscountStepdefs {
-    private final Map<String, Restaurant> restaurants = new HashMap<>();
     private String restaurant;
-    private User user;
+    private String username;
     private SingleOrder order;
+
+    @Before
+    public void before() {
+        RestaurantManager.getInstance().clear();
+        UserManager.getInstance().clear();
+    }
+
 
     @Given("a restaurant named {string} of type {string}")
     public void givenARestaurant(String restaurantName, String foodType) {
-        restaurants.put(restaurantName, new Restaurant(restaurantName, TypeOfFood.valueOf(foodType)));
+        if (!RestaurantManager.getInstance().contains(restaurantName))
+            RestaurantManager.getInstance().add(restaurantName, new Restaurant(restaurantName, TypeOfFood.valueOf(foodType)));
         restaurant = restaurantName;
     }
 
     @And("a discount of {double}% each {int} orders")
     public void aDiscountOfEachOrders(double percent, int orderAmount) {
-        restaurants.get(restaurant).addDiscount(new DiscountBuilder()
+        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderDiscount(percent / 100.0)
                 .setOrdersAmount(orderAmount)
                 .appliesDuringOrder()
@@ -42,7 +51,7 @@ public class DiscountStepdefs {
 
     @And("a discount of {double}% if the client has the {string} role")
     public void aDiscountOfIfTheClientHasTheRole(double percent, String role) {
-        restaurants.get(restaurant).addDiscount(new DiscountBuilder()
+        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderDiscount(percent / 100.0)
                 .setUserRoles(Role.valueOf(role))
                 .appliesDuringOrder()
@@ -51,8 +60,8 @@ public class DiscountStepdefs {
     }
 
     @And("each {int} orders, an offer of the following free products:")
-    public void eachOrdersAnOfferOfTheFolowingFreeProducts(int orderAmount, List<Map<String, String>> items) {
-        restaurants.get(restaurant).addDiscount(new DiscountBuilder()
+    public void eachOrdersAnOfferOfTheFollowingFreeProducts(int orderAmount, List<Map<String, String>> items) {
+        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setFreeItems(items.stream().map(item -> new MenuItem(
                         item.get("name"),
                         0,
@@ -66,7 +75,7 @@ public class DiscountStepdefs {
 
     @And("a discount of {double}€ the next time if the order has more than {int} items")
     public void aDiscountOfEuroTheNextTimeIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
-        restaurants.get(restaurant).addDiscount(new DiscountBuilder()
+        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderCredit(moneyAmount)
                 .setCurrentOrderItemsAmount(minItemAmount)
                 .appliesAfterOrder()
@@ -76,7 +85,7 @@ public class DiscountStepdefs {
 
     @And("a discount of {double}€ if the order has more than {int} items")
     public void aDiscountOfEuroIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
-        restaurants.get(restaurant).addDiscount(new DiscountBuilder()
+        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderCredit(moneyAmount)
                 .setCurrentOrderItemsAmount(minItemAmount)
                 .appliesDuringOrder()
@@ -84,25 +93,26 @@ public class DiscountStepdefs {
                 .build());
     }
 
-    @Given("I am a client with the {string} role and {int} orders at {string} of {int} items")
-    public void iAmAClientWithTheRole(String role, int orders, String restaurant, int items) {
-        iAmAClientWithTheRole(role);
+    @Given("I am {string} with the {string} role and {int} orders at {string} of {int} items")
+    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) {
+        aClientNamedWithTheRole(name, role);
         for (int i = 0; i < orders; i++) {
-            SingleOrder singleOrder = new SingleOrder(user, null, null, restaurants.get(restaurant));
+            SingleOrder singleOrder = new SingleOrder(username, null, null, RestaurantManager.getInstance().get(restaurant));
             for (int j = 0; j < items; j++)
                 singleOrder.addMenuItem(new MenuItem("P1", 5, Duration.ofMinutes(1)));
-            user.addOrderToHistory(singleOrder);
+            UserManager.getInstance().get(username).addOrderToHistory(singleOrder);
         }
     }
 
-    @Given("I am a client with the {string} role")
-    public void iAmAClientWithTheRole(String role) {
-        user = new User(role, role, Role.valueOf(role));
+    @Given("a client named {string} with the {string} role")
+    public void aClientNamedWithTheRole(String name, String role) {
+        username = name;
+        UserManager.getInstance().add(name, new User(name, name, Role.valueOf(role)));
     }
 
     @When("I place an order at {string} with the following items:")
     public void iPlaceAnOrderWithTheFollowingItems(String restaurant, List<Map<String, String>> items) {
-        order = new SingleOrder(user, null, null, restaurants.get(restaurant));
+        order = new SingleOrder(username, null, null, RestaurantManager.getInstance().get(restaurant));
         items.forEach(item -> order.addMenuItem(new MenuItem(item.get("name"), 5, Duration.ofMinutes(1))));
     }
 

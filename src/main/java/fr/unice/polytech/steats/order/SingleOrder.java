@@ -4,6 +4,7 @@ import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
  * @author Team C
  */
 public class SingleOrder implements Order {
-    private final User user;
+    private final String user;
     private final LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final Address address;
@@ -32,7 +33,7 @@ public class SingleOrder implements Order {
      * @param address      The address the client wants the order to be delivered
      * @param restaurant   The restaurant in which the order is made
      */
-    public SingleOrder(User user, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+    public SingleOrder(String user, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
         this.user = user;
         this.deliveryTime = deliveryTime;
         this.address = address;
@@ -72,7 +73,7 @@ public class SingleOrder implements Order {
     public double getPrice() {
         return Stream.concat(
                 appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
-                user.getDiscountsToApplyNext(restaurant).stream()
+                UserManager.getInstance().get(user).getDiscountsToApplyNext(restaurant).stream()
         ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
     }
 
@@ -97,7 +98,7 @@ public class SingleOrder implements Order {
      * @return The user that initialized the order
      */
     public User getUser() {
-        return user;
+        return UserManager.getInstance().get(user);
     }
 
     /**

@@ -1,5 +1,6 @@
-package fr.unice.polytech.steats;
+package fr.unice.polytech.steats.stepsDef.backend;
 
+import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.GroupOrder;
 import fr.unice.polytech.steats.order.GroupOrderManager;
@@ -12,8 +13,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class GroupOrderStepDefs {
 
@@ -47,7 +48,7 @@ public class GroupOrderStepDefs {
 
     @When("The user adds the item named {string} with a price of {double} to the group order")
     public void theUserWithTheIdAddsTheItemNamedWithAPriceOfToTheGroupOrderWithTheGroupCode(String menuItem, double price) {
-        steats.addMenuItem(new MenuItem(menuItem, price, LocalTime.of(0, 10)));
+        steats.addMenuItem(new MenuItem(menuItem, price, Duration.ofMinutes(10)));
     }
 
     @Then("The item with named {string} with a price of {double} is added to the order of the user with the id {string} in the group order with the group code {string}")

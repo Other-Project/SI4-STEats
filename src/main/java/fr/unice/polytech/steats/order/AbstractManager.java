@@ -44,4 +44,19 @@ public abstract class AbstractManager<T> {
         return items.get(key);
     }
 
+    /**
+     * Check if the manager contains an Item.
+     *
+     * @param key The key/id of the Item to check
+     */
+    public boolean contains(String key) {
+        return items.containsKey(key);
+    }
+
+    /**
+     * Clear the manager.
+     */
+    public void clear() {
+        items.clear();
+    }
 }
