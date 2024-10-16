@@ -98,4 +98,8 @@ public class Schedule implements Comparable<Schedule> {
         if (!getEnd().isAfter(dateTime.toLocalTime())) return -1;
         return 0;
     }
+
+    public String toString() {
+        return start + " - " + getEnd() + " (" + dayOfWeek + ") [" + getTotalCapacity() + "]";
+    }
 }

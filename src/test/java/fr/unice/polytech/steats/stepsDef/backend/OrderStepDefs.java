@@ -34,7 +34,7 @@ public class OrderStepDefs {
     @Given("a restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
         restaurant = new Restaurant(restaurantName);
-        Schedule schedule = new Schedule(LocalTime.now(), Duration.ofMinutes(30), Duration.ofMinutes(30), LocalDateTime.now().getDayOfWeek());
+        Schedule schedule = new Schedule(LocalTime.now(), Duration.ofMinutes(30), 5, LocalDateTime.now().getDayOfWeek());
         restaurant.addSchedule(schedule);
         restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
         restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));

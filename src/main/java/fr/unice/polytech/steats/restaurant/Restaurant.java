@@ -1,7 +1,6 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.discounts.Discount;
-import fr.unice.polytech.steats.order.GroupOrder;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 
@@ -23,6 +22,7 @@ public class Restaurant {
     private final List<Order> orders;
     private final Duration scheduleDuration;
     private final Set<Schedule> schedules = new HashSet<>();
+    private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
     public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts, Duration scheduleDuration) {
@@ -95,15 +95,19 @@ public class Restaurant {
      */
     public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) {
         if (arrivalTime == null) return menu;
-        LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
-        Set<Schedule> schedulesBefore2Hours = schedules.stream()
-                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(Duration.ofHours(2))))
-                .collect(Collectors.toSet());
-        Duration maxCapacity = schedulesBefore2Hours.stream()
-                .map(schedule -> capacityLeft(schedule, deliveryTime))
-                .max(Comparator.comparing(duration -> duration))
-                .orElseThrow(() -> new IllegalArgumentException("This restaurant can't deliver at this time"));
+        Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
         return menu.stream().filter(menuItem -> !maxCapacity.minus(menuItem.getPreparationTime()).isNegative()).toList();
+    }
+
+    /**
+     * Check if the restaurant can handle an order at a given time
+     *
+     * @param order        The order to check
+     * @param deliveryTime The time of delivery
+     */
+    public boolean canHandle(Order order, LocalDateTime deliveryTime) {
+        Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
+        return maxCapacity.compareTo(order.getPreparationTime()) >= 0;
     }
 
     private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
@@ -115,6 +119,17 @@ public class Restaurant {
                 .map(Order::getPreparationTime)
                 .reduce(Duration.ZERO, Duration::plus);
         return schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
+    }
+
+    private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) {
+        LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
+        Set<Schedule> schedulesBefore2Hours = schedules.stream()
+                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY)))
+                .collect(Collectors.toSet());
+        return schedulesBefore2Hours.stream()
+                .map(schedule -> capacityLeft(schedule, deliveryTime))
+                .max(Comparator.comparing(duration -> duration))
+                .orElseThrow(() -> new IllegalArgumentException("This restaurant can't deliver at this time"));
     }
 
     /**
