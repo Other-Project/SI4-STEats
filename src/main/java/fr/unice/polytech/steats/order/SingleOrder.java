@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  * @author Team C
  */
 public class SingleOrder implements Order {
-    private final String user;
+    private final String userId;
     private final LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final Address address;
@@ -29,13 +29,13 @@ public class SingleOrder implements Order {
     private final List<Discount> appliedDiscounts = new ArrayList<>();
 
     /**
-     * @param user         The user that initialized the order
+     * @param userId         The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param address      The address the client wants the order to be delivered
      * @param restaurant   The restaurant in which the order is made
      */
-    public SingleOrder(String user, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
-        this.user = user;
+    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+        this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.address = address;
         this.restaurant = restaurant;
@@ -74,7 +74,7 @@ public class SingleOrder implements Order {
     public double getPrice() {
         List<Discount> oldDiscountsToApplied;
         try {
-            oldDiscountsToApplied = UserManager.getInstance().get(user).getDiscountsToApplyNext(restaurant);
+            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurant);
         } catch (NotFoundException e) {
             oldDiscountsToApplied = Collections.emptyList();
         }
@@ -107,7 +107,7 @@ public class SingleOrder implements Order {
      */
     public User getUser() {
         try {
-            return UserManager.getInstance().get(user);
+            return UserManager.getInstance().get(userId);
         } catch (NotFoundException e) {
             return null;
         }
@@ -117,7 +117,7 @@ public class SingleOrder implements Order {
      * The user id that initialized the order
      */
     public String getUserId() {
-        return user;
+        return userId;
     }
 
     /**
