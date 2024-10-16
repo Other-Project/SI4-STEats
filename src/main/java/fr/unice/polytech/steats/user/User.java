@@ -30,22 +30,43 @@ public class User {
         this.role = role;
     }
 
+    /**
+     * Get username
+     *
+     * @return username
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get user id
+     * @return user id
+     */
     public String getUserId() {
         return this.userId;
     }
 
+    /**
+     * Update username
+     * @param name the new name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Update user id
+     * @param userId the new id
+     */
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
+    /**
+     * Get the user's role
+     * @return the user's role
+     */
     public Role getRole() {
         return role;
     }

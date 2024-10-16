@@ -6,7 +6,6 @@ import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.NotFoundException;
-import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -16,12 +15,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class OrderStepDefs {
 
-    User user;
     STEats stEats;
     STEatsController steatsController;
     Restaurant restaurant;
@@ -33,9 +30,7 @@ public class OrderStepDefs {
         steatsController = new STEatsController();
         UserManager.getInstance().fillForDemo();
         assertDoesNotThrow(() -> {
-            user = UserManager.getInstance().get(userId); // user = alban
-            assertNotNull(user);
-            stEats = steatsController.logging(user.getUserId());
+            stEats = steatsController.logging(userId);
         });
     }
 
