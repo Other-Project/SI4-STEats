@@ -33,7 +33,6 @@ public class User {
     /**
      * Get username
      *
-     * @return username
      */
     public String getName() {
         return name;
@@ -41,7 +40,7 @@ public class User {
 
     /**
      * Get user id
-     * @return user id
+     *
      */
     public String getUserId() {
         return this.userId;
@@ -65,7 +64,7 @@ public class User {
 
     /**
      * Get the user's role
-     * @return the user's role
+     *
      */
     public Role getRole() {
         return role;

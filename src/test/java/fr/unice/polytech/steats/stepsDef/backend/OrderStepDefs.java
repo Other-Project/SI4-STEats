@@ -29,9 +29,7 @@ public class OrderStepDefs {
     public void givenAnUser(String userId) throws NotFoundException {
         steatsController = new STEatsController();
         UserManager.getInstance().fillForDemo();
-        assertDoesNotThrow(() -> {
-            stEats = steatsController.logging(userId);
-        });
+        assertDoesNotThrow(() -> stEats = steatsController.logging(userId));
     }
 
     @Given("a restaurant named {string}")
