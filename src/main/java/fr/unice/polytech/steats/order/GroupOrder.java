@@ -103,7 +103,7 @@ public class GroupOrder implements Order {
      */
     public SingleOrder createOrder(User user) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        SingleOrder order = new SingleOrder(user, deliveryTime, address, restaurant);
+        SingleOrder order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
         orders.add(order);
         return order;
     }

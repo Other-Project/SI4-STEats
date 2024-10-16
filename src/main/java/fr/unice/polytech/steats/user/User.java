@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.user;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.restaurant.Restaurant;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +15,8 @@ import java.util.List;
  * @author Team C
  */
 public class User {
-    private final String name;
-    private final String userId;
+    private String name;
+    private String userId;
     private final Role role;
     private final List<SingleOrder> ordersHistory = new ArrayList<>();
 
@@ -31,33 +32,52 @@ public class User {
     }
 
     /**
-     * Add the order to the history of the user once it has been paid
+     * Get username
      *
-     * @param order The order that has been delivered to the user
-     */
-    public void addOrderToHistory(SingleOrder order) {
-        ordersHistory.add(order);
-    }
-
-    /**
-     * @return The name of the user
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return The role of the user
+     * Get user id
+     *
+     */
+    public String getUserId() {
+        return this.userId;
+    }
+
+    /**
+     * Update username
+     * @param name the new name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Update user id
+     * @param userId the new id
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Get the user's role
+     *
      */
     public Role getRole() {
         return role;
     }
 
     /**
-     * @return The user's ID
+     * Add the order to the history of the user once it has been paid
+     *
+     * @param order The order that has been delivered to the user
      */
-    public String getUserId() {
-        return userId;
+    public void addOrderToHistory(SingleOrder order) {
+        ordersHistory.add(order);
     }
 
     // TODO : implement this method
@@ -73,9 +93,21 @@ public class User {
     }
 
     /**
-     * Get the discounts to apply to the next order
+     * Gets all the orders of the user made in a specific restaurant
+     *
+     * @param restaurant The restaurant to filter the orders
      */
-    public List<Discount> getDiscountsToApplyNext() {
-        return ordersHistory.isEmpty() ? Collections.emptyList() : ordersHistory.getLast().getDiscountsToApplyNext();
+    public List<SingleOrder> getOrders(Restaurant restaurant) {
+        return ordersHistory.stream().filter(order -> order.getRestaurant().equals(restaurant)).toList();
+    }
+
+    /**
+     * Get the discounts to apply to the next order
+     *
+     * @param restaurant The restaurant where the user wants to order
+     */
+    public List<Discount> getDiscountsToApplyNext(Restaurant restaurant) {
+        List<SingleOrder> orders = getOrders(restaurant);
+        return orders.isEmpty() ? Collections.emptyList() : orders.getLast().getDiscountsToApplyNext();
     }
 }

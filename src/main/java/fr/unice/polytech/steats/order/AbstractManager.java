@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.user.NotFoundException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +30,8 @@ public abstract class AbstractManager<T> {
      *
      * @param key The key/id of the Item to remove
      */
-    public void remove(String key) {
-        if (!items.containsKey(key)) throw new IllegalArgumentException("The item does not exist.");
+    public void remove(String key) throws NotFoundException {
+        if (!items.containsKey(key)) throw new NotFoundException("The item does not exist.");
         items.remove(key);
     }
 
@@ -39,9 +41,24 @@ public abstract class AbstractManager<T> {
      * @param key The key/id of the Item to get
      * @return The group order
      */
-    public T get(String key) {
-        if (!items.containsKey(key)) throw new IllegalArgumentException("The item does not exist.");
+    public T get(String key) throws NotFoundException {
+        if (!items.containsKey(key)) throw new NotFoundException("The item does not exist.");
         return items.get(key);
     }
 
+    /**
+     * Check if the manager contains an Item.
+     *
+     * @param key The key/id of the Item to check
+     */
+    public boolean contains(String key) {
+        return items.containsKey(key);
+    }
+
+    /**
+     * Clear the manager.
+     */
+    public void clear() {
+        items.clear();
+    }
 }

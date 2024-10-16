@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.restaurant;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.user.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ public class Restaurant {
     private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
-    public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts, Duration scheduleDuration) {
+    public Restaurant(String name, TypeOfFood typeOfFood, List<MenuItem> menu, List<Discount> discounts,Duration scheduleDuration) {
         this.name = name;
         this.menu = menu;
         this.typeOfFood = typeOfFood;
@@ -35,7 +36,11 @@ public class Restaurant {
     }
 
     public Restaurant(String name) {
-        this(name, new ArrayList<>(), TypeOfFood.CLASSIC, new ArrayList<>(), Duration.ofMinutes(30));
+        this(name, TypeOfFood.CLASSIC);
+    }
+
+    public Restaurant(String name, TypeOfFood typeOfFood) {
+        this(name, typeOfFood, new ArrayList<>(), new ArrayList<>(),Duration.ofMinutes(30));
     }
 
     /**
@@ -79,7 +84,13 @@ public class Restaurant {
      * @param order The order to check
      */
     public List<Discount> availableDiscounts(SingleOrder order) {
-        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
+        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> {
+            try {
+                return discount.isApplicable(order);
+            } catch (NotFoundException e) {
+                return false;
+            }
+        }).toList();
         List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
         applicableDiscounts.stream()
                 .filter(discount -> !discount.isStackable())
@@ -148,6 +159,24 @@ public class Restaurant {
      */
     public void removeMenuItem(MenuItem menuItem) {
         this.menu.remove(menuItem);
+    }
+
+    /**
+     * Add a discount to the restaurant
+     *
+     * @param discount The discount
+     */
+    public void addDiscount(Discount discount) {
+        this.discounts.add(discount);
+    }
+
+    /**
+     * Remove a discount of the restaurant
+     *
+     * @param discount The discount
+     */
+    public void removeDiscount(Discount discount) {
+        this.discounts.remove(discount);
     }
 
     /**

@@ -1,13 +1,16 @@
-package fr.unice.polytech.steats;
+package fr.unice.polytech.steats.stepsDef.backend;
 
+import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.GroupOrder;
 import fr.unice.polytech.steats.order.GroupOrderManager;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -27,20 +30,21 @@ public class GroupOrderStepDefs {
     @Given("The user named {string} with the id {string} is logged in")
     public void theUserWithTheIdIsLoggedIn(String name, String userId) {
         User user = new User(name, userId, Role.STUDENT);
+        UserManager.getInstance().add(userId, user);
         steats = new STEats(user);
     }
 
     @When("The user joins the group order with the group code {string}")
-    public void the_user_joins_the_group_order(String groupCode) {
+    public void the_user_joins_the_group_order(String groupCode) throws NotFoundException {
         steats.joinGroupOrder(groupCode);
     }
 
     @Then("The user with the id {string} is added to the group order with the group code {string}")
-    public void the_user_is_added_to_the_group_order(String userId, String groupCode) {
+    public void the_user_is_added_to_the_group_order(String userId, String groupCode) throws NotFoundException {
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().size() == 1;
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .filter(order -> order instanceof SingleOrder)
-                .map(order -> ((SingleOrder) order).getUser().getUserId())
+                .map(order -> ((SingleOrder) order).getUserId())
                 .toList()
                 .contains(userId);
     }
@@ -51,7 +55,7 @@ public class GroupOrderStepDefs {
     }
 
     @Then("The item with named {string} with a price of {double} is added to the order of the user with the id {string} in the group order with the group code {string}")
-    public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, Double price, String userId, String groupCode) {
+    public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, Double price, String userId, String groupCode) throws NotFoundException {
         assert steats.getTotalPrice() == price;
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .map(order -> order.getItems().size())
@@ -62,7 +66,7 @@ public class GroupOrderStepDefs {
                 .toList()
                 .contains(menuItem);
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
-                .map(order -> ((SingleOrder) order).getUser().getUserId())
+                .map(order -> ((SingleOrder) order).getUserId())
                 .toList().contains(userId);
     }
 
