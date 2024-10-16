@@ -7,6 +7,7 @@ import fr.unice.polytech.steats.order.GroupOrderManager;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
@@ -34,12 +35,12 @@ public class GroupOrderStepDefs {
     }
 
     @When("The user joins the group order with the group code {string}")
-    public void the_user_joins_the_group_order(String groupCode) {
+    public void the_user_joins_the_group_order(String groupCode) throws NotFoundException {
         steats.joinGroupOrder(groupCode);
     }
 
     @Then("The user with the id {string} is added to the group order with the group code {string}")
-    public void the_user_is_added_to_the_group_order(String userId, String groupCode) {
+    public void the_user_is_added_to_the_group_order(String userId, String groupCode) throws NotFoundException {
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().size() == 1;
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .filter(order -> order instanceof SingleOrder)
@@ -54,7 +55,7 @@ public class GroupOrderStepDefs {
     }
 
     @Then("The item with named {string} with a price of {double} is added to the order of the user with the id {string} in the group order with the group code {string}")
-    public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, Double price, String userId, String groupCode) {
+    public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, Double price, String userId, String groupCode) throws NotFoundException {
         assert steats.getTotalPrice() == price;
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .map(order -> order.getItems().size())

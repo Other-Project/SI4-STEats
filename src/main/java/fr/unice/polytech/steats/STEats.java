@@ -3,6 +3,7 @@ package fr.unice.polytech.steats;
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
 import java.time.LocalDateTime;
@@ -68,7 +69,7 @@ public class STEats {
      *
      * @param groupCode The invitation code for the group order
      */
-    public void joinGroupOrder(String groupCode) {
+    public void joinGroupOrder(String groupCode) throws NotFoundException {
         if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         groupOrder = GroupOrderManager.getInstance().get(groupCode);
         order = groupOrder.createOrder(user);
