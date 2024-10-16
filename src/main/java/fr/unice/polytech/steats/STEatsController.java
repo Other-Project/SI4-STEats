@@ -12,15 +12,15 @@ public class STEatsController {
 
     /**
      * Create the link between the user and the facade
-     * @param userName the username to log in
+     * @param userId the username to log in
      * @return the facade associated with  the user
      */
-    public STEats logging(String userName) throws NotFoundException {
+    public STEats logging(String userId) throws NotFoundException {
         try {
-            User user = UserManager.getInstance().get(userName);
+            User user = UserManager.getInstance().get(userId);
             return new STEats(user);
         } catch (NotFoundException e) {
-            throw new NotFoundException("User " + userName + " not found");
+            throw new NotFoundException("User " + userId + " not found");
         }
     }
 }
