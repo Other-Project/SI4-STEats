@@ -1,7 +1,7 @@
 Feature: Order
 
   Background:
-    Given an user of name "Alban" and with userId "140403"
+    Given an user of id "140403"
     Given a restaurant named "La Cafet"
 
   Scenario: Creating an order

@@ -14,8 +14,8 @@ import java.util.List;
  * @author Team C
  */
 public class User {
-    private final String name;
-    private final String userId;
+    private String name;
+    private String userId;
     private final Role role;
     private final List<SingleOrder> ordersHistory = new ArrayList<>();
 
@@ -31,33 +31,52 @@ public class User {
     }
 
     /**
-     * Add the order to the history of the user once it has been paid
+     * Get username
      *
-     * @param order The order that has been delivered to the user
-     */
-    public void addOrderToHistory(SingleOrder order) {
-        ordersHistory.add(order);
-    }
-
-    /**
-     * @return The name of the user
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return The role of the user
+     * Get user id
+     *
+     */
+    public String getUserId() {
+        return this.userId;
+    }
+
+    /**
+     * Update username
+     * @param name the new name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Update user id
+     * @param userId the new id
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Get the user's role
+     *
      */
     public Role getRole() {
         return role;
     }
 
     /**
-     * @return The user's ID
+     * Add the order to the history of the user once it has been paid
+     *
+     * @param order The order that has been delivered to the user
      */
-    public String getUserId() {
-        return userId;
+    public void addOrderToHistory(SingleOrder order) {
+        ordersHistory.add(order);
     }
 
     // TODO : implement this method

@@ -1,11 +1,12 @@
 package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.STEats;
+import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.user.Role;
-import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.NotFoundException;
+import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -14,19 +15,21 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class OrderStepDefs {
 
-    User user;
+    STEats stEats;
+    STEatsController steatsController;
     Restaurant restaurant;
     LocalDateTime deliveryTime;
     Address address;
-    STEats stEats;
 
-    @Given("an user of name {string} and with userId {string}")
-    public void givenAnUser(String userName, String userId) {
-        user = new User(userName, userId, Role.STUDENT);
-        stEats = new STEats(user); // Create the link between the user and the app
+    @Given("an user of id {string}")
+    public void givenAnUser(String userId) throws NotFoundException {
+        steatsController = new STEatsController();
+        UserManager.getInstance().fillForDemo();
+        assertDoesNotThrow(() -> stEats = steatsController.logging(userId));
     }
 
     @Given("a restaurant named {string}")
