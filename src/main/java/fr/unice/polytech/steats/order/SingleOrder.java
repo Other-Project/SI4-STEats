@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.order;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
 
@@ -71,9 +72,16 @@ public class SingleOrder implements Order {
 
     @Override
     public double getPrice() {
+        List<Discount> oldDiscountsToApplied;
+        try {
+            oldDiscountsToApplied = UserManager.getInstance().get(user).getDiscountsToApplyNext(restaurant);
+        } catch (NotFoundException e) {
+            oldDiscountsToApplied = Collections.emptyList();
+        }
+
         return Stream.concat(
                 appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
-                UserManager.getInstance().get(user).getDiscountsToApplyNext(restaurant).stream()
+                oldDiscountsToApplied.stream()
         ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
     }
 
@@ -98,7 +106,18 @@ public class SingleOrder implements Order {
      * @return The user that initialized the order
      */
     public User getUser() {
-        return UserManager.getInstance().get(user);
+        try {
+            return UserManager.getInstance().get(user);
+        } catch (NotFoundException e) {
+            return null;
+        }
+    }
+
+    /**
+     * The user id that initialized the order
+     */
+    public String getUserId() {
+        return user;
     }
 
     /**

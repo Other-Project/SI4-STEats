@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.discounts;
 
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.user.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class Discount {
      * @param order The current order
      * @return True if the discount can be applied to the order
      */
-    public boolean isApplicable(SingleOrder order) {
+    public boolean isApplicable(SingleOrder order) throws NotFoundException {
         List<MenuItem> items = order.getItems();
         List<SingleOrder> orders = order.getUser().getOrders(order.getRestaurant());
         return items.size() >= criteria.currentOrderItemsAmount

@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.restaurant;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.user.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -76,7 +77,13 @@ public class Restaurant {
      * @param order The order to check
      */
     public List<Discount> availableDiscounts(SingleOrder order) {
-        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
+        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> {
+            try {
+                return discount.isApplicable(order);
+            } catch (NotFoundException e) {
+                return false;
+            }
+        }).toList();
         List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
         applicableDiscounts.stream()
                 .filter(discount -> !discount.isStackable())
@@ -106,6 +113,7 @@ public class Restaurant {
 
     /**
      * Remove a menu item to the restaurant
+     *
      * @param menuItem The menu item
      */
     public void removeMenuItem(MenuItem menuItem) {

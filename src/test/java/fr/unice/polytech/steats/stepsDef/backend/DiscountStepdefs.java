@@ -6,6 +6,7 @@ import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.restaurant.TypeOfFood;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
@@ -41,7 +42,7 @@ public class DiscountStepdefs {
     }
 
     @And("a discount of {double}% each {int} orders")
-    public void aDiscountOfEachOrders(double percent, int orderAmount) {
+    public void aDiscountOfEachOrders(double percent, int orderAmount) throws NotFoundException {
         RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderDiscount(percent / 100.0)
                 .setOrdersAmount(orderAmount)
@@ -50,7 +51,7 @@ public class DiscountStepdefs {
     }
 
     @And("a discount of {double}% if the client has the {string} role")
-    public void aDiscountOfIfTheClientHasTheRole(double percent, String role) {
+    public void aDiscountOfIfTheClientHasTheRole(double percent, String role) throws NotFoundException {
         RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderDiscount(percent / 100.0)
                 .setUserRoles(Role.valueOf(role))
@@ -60,7 +61,7 @@ public class DiscountStepdefs {
     }
 
     @And("each {int} orders, an offer of the following free products:")
-    public void eachOrdersAnOfferOfTheFollowingFreeProducts(int orderAmount, List<Map<String, String>> items) {
+    public void eachOrdersAnOfferOfTheFollowingFreeProducts(int orderAmount, List<Map<String, String>> items) throws NotFoundException {
         RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setFreeItems(items.stream().map(item -> new MenuItem(
                         item.get("name"),
@@ -74,7 +75,7 @@ public class DiscountStepdefs {
     }
 
     @And("a discount of {double}€ the next time if the order has more than {int} items")
-    public void aDiscountOfEuroTheNextTimeIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
+    public void aDiscountOfEuroTheNextTimeIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) throws NotFoundException {
         RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderCredit(moneyAmount)
                 .setCurrentOrderItemsAmount(minItemAmount)
@@ -84,7 +85,7 @@ public class DiscountStepdefs {
     }
 
     @And("a discount of {double}€ if the order has more than {int} items")
-    public void aDiscountOfEuroIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
+    public void aDiscountOfEuroIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) throws NotFoundException {
         RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
                 .setOrderCredit(moneyAmount)
                 .setCurrentOrderItemsAmount(minItemAmount)
@@ -94,7 +95,7 @@ public class DiscountStepdefs {
     }
 
     @Given("I am {string} with the {string} role and {int} orders at {string} of {int} items")
-    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) {
+    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) throws NotFoundException {
         aClientNamedWithTheRole(name, role);
         for (int i = 0; i < orders; i++) {
             SingleOrder singleOrder = new SingleOrder(username, null, null, RestaurantManager.getInstance().get(restaurant));
@@ -111,7 +112,7 @@ public class DiscountStepdefs {
     }
 
     @When("I place an order at {string} with the following items:")
-    public void iPlaceAnOrderWithTheFollowingItems(String restaurant, List<Map<String, String>> items) {
+    public void iPlaceAnOrderWithTheFollowingItems(String restaurant, List<Map<String, String>> items) throws NotFoundException {
         order = new SingleOrder(username, null, null, RestaurantManager.getInstance().get(restaurant));
         items.forEach(item -> order.addMenuItem(new MenuItem(item.get("name"), 5, Duration.ofMinutes(1))));
     }

@@ -44,7 +44,7 @@ public class GroupOrderStepDefs {
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().size() == 1;
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .filter(order -> order instanceof SingleOrder)
-                .map(order -> ((SingleOrder) order).getUser().getUserId())
+                .map(order -> ((SingleOrder) order).getUserId())
                 .toList()
                 .contains(userId);
     }
@@ -66,7 +66,7 @@ public class GroupOrderStepDefs {
                 .toList()
                 .contains(menuItem);
         assert GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
-                .map(order -> ((SingleOrder) order).getUser().getUserId())
+                .map(order -> ((SingleOrder) order).getUserId())
                 .toList().contains(userId);
     }
 
