@@ -5,7 +5,9 @@ import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -25,16 +27,15 @@ public class OrderStepDefs {
     Restaurant restaurant;
     LocalDateTime deliveryTime;
     Address address;
-    Exception exception;
 
-    @Given("an user of name {string}")
-    public void givenAnUser(String userName) {
+    @Given("an user of id {string}")
+    public void givenAnUser(String userId) throws NotFoundException {
         steatsController = new STEatsController();
-        user = STEatsController.USER_REGISTRY.findByName(userName).isPresent()
-                ? STEatsController.USER_REGISTRY.findByName(userName).get() : null;
-        assertNotNull(user);
+        UserManager.getInstance().fillForDemo();
         assertDoesNotThrow(() -> {
-            stEats = steatsController.logging(user.getName());
+            user = UserManager.getInstance().get(userId); // user = alban
+            assertNotNull(user);
+            stEats = steatsController.logging(user.getUserId());
         });
     }
 
