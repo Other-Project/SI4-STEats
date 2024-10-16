@@ -6,9 +6,6 @@ import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.Schedule;
-import fr.unice.polytech.steats.user.Role;
-import fr.unice.polytech.steats.user.User;
-import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -30,7 +27,7 @@ public class OrderStepDefs {
     Address address;
 
     @Given("an user of id {string}")
-    public void givenAnUser(String userId) throws NotFoundException {
+    public void givenAnUser(String userId) {
         steatsController = new STEatsController();
         UserManager.getInstance().fillForDemo();
         assertDoesNotThrow(() -> stEats = steatsController.logging(userId));
@@ -39,7 +36,7 @@ public class OrderStepDefs {
     @Given("a restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
         restaurant = new Restaurant(restaurantName);
-        Schedule schedule = new Schedule(LocalTime.now(), Duration.ofMinutes(30), 5, LocalDateTime.now().getDayOfWeek());
+        Schedule schedule = new Schedule(LocalTime.of(20, 15), Duration.ofMinutes(30), 5, LocalDateTime.now().getDayOfWeek());
         restaurant.addSchedule(schedule);
         restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
         restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));
@@ -47,7 +44,7 @@ public class OrderStepDefs {
 
     @When("the user creates an order and specifies a date, an address and a restaurant")
     public void whenCreatesOrder() {
-        deliveryTime = LocalDateTime.now().plus(Duration.ofMinutes(40));
+        deliveryTime = LocalDateTime.of(2024, 10, 16, 21, 0);
         address = new Address("ch de Carel", "Auribeau", "06810", "");
         stEats.createOrder(deliveryTime, address, restaurant);
     }

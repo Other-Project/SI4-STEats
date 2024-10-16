@@ -41,7 +41,6 @@ public class ScheduleTest {
         assertTrue(schedulesSorted.stream()
                 .noneMatch(schedule -> schedule.getStart().isBefore(LocalTime.of(19, 30))
                         || schedule.getEnd().isAfter(LocalTime.of(21, 30))));
-        ;
     }
 
     @Test

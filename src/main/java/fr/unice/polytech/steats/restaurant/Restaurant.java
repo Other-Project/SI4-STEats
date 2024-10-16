@@ -8,6 +8,7 @@ import fr.unice.polytech.steats.user.NotFoundException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -17,22 +18,19 @@ import java.util.stream.Collectors;
  */
 public class Restaurant {
     private final String name;
-    private final List<MenuItem> menu;
     private final TypeOfFood typeOfFood;
-    private final List<Discount> discounts;
-    private final List<Order> orders;
     private final Duration scheduleDuration;
+    private final List<MenuItem> menu = new ArrayList<>();
+    private final List<Discount> discounts = new ArrayList<>();
+    private final List<Order> orders = new ArrayList<>();
     private final Set<Schedule> schedules = new HashSet<>();
     private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
-    public Restaurant(String name, TypeOfFood typeOfFood, List<MenuItem> menu, List<Discount> discounts,Duration scheduleDuration) {
+    public Restaurant(String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
         this.name = name;
-        this.menu = menu;
         this.typeOfFood = typeOfFood;
-        this.discounts = discounts;
         this.scheduleDuration = scheduleDuration;
-        this.orders = new ArrayList<>();
     }
 
     public Restaurant(String name) {
@@ -40,7 +38,7 @@ public class Restaurant {
     }
 
     public Restaurant(String name, TypeOfFood typeOfFood) {
-        this(name, typeOfFood, new ArrayList<>(), new ArrayList<>(),Duration.ofMinutes(30));
+        this(name, typeOfFood, Duration.ofMinutes(30));
     }
 
     /**
@@ -139,7 +137,7 @@ public class Restaurant {
                 .collect(Collectors.toSet());
         return schedulesBefore2Hours.stream()
                 .map(schedule -> capacityLeft(schedule, deliveryTime))
-                .max(Comparator.comparing(duration -> duration))
+                .max(Comparator.comparing(Function.identity()))
                 .orElseThrow(() -> new IllegalArgumentException("This restaurant can't deliver at this time"));
     }
 
@@ -215,7 +213,7 @@ public class Restaurant {
      * @param schedule The schedule to add
      */
     public void addSchedule(Schedule schedule) {
-        if (schedule.getDuration().compareTo(scheduleDuration) != 0)
+        if (!schedule.getDuration().equals(scheduleDuration))
             throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
         if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
             throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");

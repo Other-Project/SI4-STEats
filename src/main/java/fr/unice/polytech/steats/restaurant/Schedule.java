@@ -11,10 +11,10 @@ import java.time.LocalTime;
  * @author Team C
  */
 public class Schedule implements Comparable<Schedule> {
-    private DayOfWeek dayOfWeek;
-    private LocalTime start;
-    private Duration duration;
-    private int nbPerson;
+    private final DayOfWeek dayOfWeek;
+    private final LocalTime start;
+    private final Duration duration;
+    private final int nbPerson;
 
     /**
      * @param start     The Localtime at which the schedule start
@@ -61,18 +61,28 @@ public class Schedule implements Comparable<Schedule> {
         return deliveryTime.getDayOfWeek() == dayOfWeek && start.isBefore(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
     }
 
+    /**
+     * If the schedule contains the order
+     *
+     * @param order The order to check
+     */
     public Boolean contains(Order order) {
         LocalDateTime deliveryTime = order.getDeliveryTime();
         return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
     }
 
+    /**
+     * Check if the schedule is between two dates
+     *
+     * @param start The start of the period
+     * @param end   The end of the period
+     */
     public boolean isBetween(LocalDateTime start, LocalDateTime end) {
         if (compareTo(start) >= 0) return false;
         if (compareTo(end) < 0) return false;
         if (contains(end)) return false;
         return !contains(start);
     }
-
 
     /**
      * @param other The other schedule
@@ -91,6 +101,11 @@ public class Schedule implements Comparable<Schedule> {
         return 0;
     }
 
+    /**
+     * Compare the schedule with a date
+     *
+     * @param dateTime The date to compare
+     */
     public int compareTo(LocalDateTime dateTime) {
         int compareDayOfWeek = dayOfWeek.compareTo(dateTime.getDayOfWeek());
         if (compareDayOfWeek != 0) return compareDayOfWeek;
@@ -99,6 +114,7 @@ public class Schedule implements Comparable<Schedule> {
         return 0;
     }
 
+    @Override
     public String toString() {
         return start + " - " + getEnd() + " (" + dayOfWeek + ") [" + getTotalCapacity() + "]";
     }
