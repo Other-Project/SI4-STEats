@@ -7,6 +7,9 @@ package fr.unice.polytech.steats;
  */
 public class PaymentSystem {
 
+    private PaymentSystem() {
+    }
+
     /**
      * Pay the order
      *
@@ -14,6 +17,7 @@ public class PaymentSystem {
      * @return if the payment was successful
      */
     public static boolean pay(double amount) {
+        // call the external payment system
         return true;
     }
 }
