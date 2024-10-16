@@ -5,8 +5,11 @@ import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.user.NotFoundException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A restaurant that serves food
@@ -15,17 +18,19 @@ import java.util.*;
  */
 public class Restaurant {
     private final String name;
-    private final List<MenuItem> menu;
     private final TypeOfFood typeOfFood;
-    private final List<Discount> discounts;
-    private final List<Order> orders;
+    private final Duration scheduleDuration;
+    private final List<MenuItem> menu = new ArrayList<>();
+    private final List<Discount> discounts = new ArrayList<>();
+    private final List<Order> orders = new ArrayList<>();
+    private final Set<Schedule> schedules = new HashSet<>();
+    private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
+    private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
-    public Restaurant(String name, TypeOfFood typeOfFood, List<MenuItem> menu, List<Discount> discounts) {
+    public Restaurant(String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
         this.name = name;
-        this.menu = menu;
         this.typeOfFood = typeOfFood;
-        this.discounts = discounts;
-        this.orders = new ArrayList<>();
+        this.scheduleDuration = scheduleDuration;
     }
 
     public Restaurant(String name) {
@@ -33,7 +38,7 @@ public class Restaurant {
     }
 
     public Restaurant(String name, TypeOfFood typeOfFood) {
-        this(name, typeOfFood, new ArrayList<>(), new ArrayList<>());
+        this(name, typeOfFood, Duration.ofMinutes(30));
     }
 
     /**
@@ -95,11 +100,45 @@ public class Restaurant {
     /**
      * The part of the menu that can be prepared and delivered in time
      *
-     * @param deliveryTime Wanted time of delivery
+     * @param arrivalTime Wanted time of delivery
      */
-    public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTime) {
-        // TODO : filter the menu according to deliveryTime
-        return new ArrayList<>(this.menu);
+    public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) {
+        if (arrivalTime == null) return menu;
+        Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
+        return menu.stream().filter(menuItem -> !maxCapacity.minus(menuItem.getPreparationTime()).isNegative()).toList();
+    }
+
+    /**
+     * Check if the restaurant can handle an order at a given time
+     *
+     * @param order        The order to check
+     * @param deliveryTime The time of delivery
+     */
+    public boolean canHandle(Order order, LocalDateTime deliveryTime) {
+        Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
+        return maxCapacity.compareTo(order.getPreparationTime()) >= 0;
+    }
+
+    private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
+        List<Order> ordersTakenAccountSchedule = orders.stream()
+                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
+                .filter(schedule::contains)
+                .toList();
+        Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream()
+                .map(Order::getPreparationTime)
+                .reduce(Duration.ZERO, Duration::plus);
+        return schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
+    }
+
+    private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) {
+        LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
+        Set<Schedule> schedulesBefore2Hours = schedules.stream()
+                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY)))
+                .collect(Collectors.toSet());
+        return schedulesBefore2Hours.stream()
+                .map(schedule -> capacityLeft(schedule, deliveryTime))
+                .max(Comparator.comparing(Function.identity()))
+                .orElseThrow(() -> new IllegalArgumentException("This restaurant can't deliver at this time"));
     }
 
     /**
@@ -166,5 +205,18 @@ public class Restaurant {
     @Override
     public String toString() {
         return name + " [" + typeOfFood + "]";
+    }
+
+    /**
+     * Add a schedule to the restaurant
+     *
+     * @param schedule The schedule to add
+     */
+    public void addSchedule(Schedule schedule) {
+        if (!schedule.getDuration().equals(scheduleDuration))
+            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
+        if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
+            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
+        schedules.add(schedule);
     }
 }
