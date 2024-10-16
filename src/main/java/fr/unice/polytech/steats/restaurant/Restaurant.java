@@ -1,12 +1,14 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.order.GroupOrder;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A restaurant that serves food
@@ -20,7 +22,7 @@ public class Restaurant {
     private final List<Discount> discounts;
     private final List<Order> orders;
     private final Duration scheduleDuration;
-    private final List<Schedule> schedules = new ArrayList<>();
+    private final Set<Schedule> schedules = new HashSet<>();
     private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
     public Restaurant(String name, List<MenuItem> menu, TypeOfFood typeOfFood, List<Discount> discounts, Duration scheduleDuration) {
@@ -89,17 +91,30 @@ public class Restaurant {
     /**
      * The part of the menu that can be prepared and delivered in time
      *
-     * @param deliveryTimeOrder Wanted time of delivery
+     * @param arrivalTime Wanted time of delivery
      */
-    public List<MenuItem> getAvailableMenu(LocalDateTime deliveryTimeOrder) {
-        Optional<Schedule> scheduleOptional = schedules.stream().filter(schedule -> schedule.contains(deliveryTimeOrder.minus(DELIVERY_TIME_RESTAURANT))).findFirst();
-        if (scheduleOptional.isEmpty())
-            throw new IllegalArgumentException("This restaurant can't deliver at this time");
-        Schedule schedule = scheduleOptional.get();
-        List<Order> ordersTakenAccountSchedule = orders.stream().filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear() && schedule.contains(order.getDeliveryTime())).toList();
-        Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
-        Duration capacityLeft = schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
-        return menu.stream().filter(menuItem -> !capacityLeft.minus(menuItem.getPreparationTime()).isNegative()).toList();
+    public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) {
+        if (arrivalTime == null) return menu;
+        LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
+        Set<Schedule> schedulesBefore2Hours = schedules.stream()
+                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(Duration.ofHours(2))))
+                .collect(Collectors.toSet());
+        Duration maxCapacity = schedulesBefore2Hours.stream()
+                .map(schedule -> capacityLeft(schedule, deliveryTime))
+                .max(Comparator.comparing(duration -> duration))
+                .orElseThrow(() -> new IllegalArgumentException("This restaurant can't deliver at this time"));
+        return menu.stream().filter(menuItem -> !maxCapacity.minus(menuItem.getPreparationTime()).isNegative()).toList();
+    }
+
+    private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
+        List<Order> ordersTakenAccountSchedule = orders.stream()
+                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
+                .filter(schedule::contains)
+                .toList();
+        Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream()
+                .map(Order::getPreparationTime)
+                .reduce(Duration.ZERO, Duration::plus);
+        return schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
     }
 
     /**
