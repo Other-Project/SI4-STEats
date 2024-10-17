@@ -1,7 +1,7 @@
 package fr.unice.polytech.steats;
 
 /**
- * Represents the payment system.
+ * Utility class for communication with the payment system.
  *
  * @author Team C
  */

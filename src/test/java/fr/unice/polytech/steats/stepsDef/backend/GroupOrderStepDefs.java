@@ -43,32 +43,33 @@ public class GroupOrderStepDefs {
     public void theUserWithTheIdIsLoggedIn(String name, String userId) throws NotFoundException {
         User user = new User(name, userId, Role.STUDENT);
         UserManager.getInstance().add(userId, user);
-        steatsMap.put(userId, stEatsController.logging(userId));
+        steatsMap.put(name, stEatsController.logging(userId));
     }
 
-    @When("The user with the id {string} joins the group order with the group code {string}")
-    public void the_user_joins_the_group_order(String userId, String groupCode) throws NotFoundException {
-        steatsMap.get(userId).joinGroupOrder(groupCode);
+    @When("{string} joins the group order with the group code {string}")
+    public void the_user_joins_the_group_order(String name, String groupCode) throws NotFoundException {
+        steatsMap.get(name).joinGroupOrder(groupCode);
     }
 
-    @Then("The user with the id {string} is added to the group order with the group code {string}")
-    public void the_user_is_added_to_the_group_order(String userId, String groupCode) throws NotFoundException {
+    @Then("{string} is added to the group order with the group code {string}")
+    public void the_user_is_added_to_the_group_order(String name, String groupCode) throws NotFoundException {
         assertEquals(1, GroupOrderManager.getInstance().get(groupCode).getOrders().size());
-        assertTrue(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
-                .filter(order -> order instanceof SingleOrder)
-                .map(order -> ((SingleOrder) order).getUserId())
-                .toList()
-                .contains(userId));
+        assertEquals(steatsMap.get(name).getOrder(), GroupOrderManager.getInstance().get(groupCode).getOrders().get(0));
+        assertEquals(name, UserManager.getInstance().get(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
+                        .map(SingleOrder::getUserId)
+                        .toList()
+                        .get(0))
+                .getName());
     }
 
-    @When("The user with the id {string} adds the item named {string} with a price of {double} to the group order")
-    public void theUserWithTheIdAddsTheItemNamedWithAPriceOfToTheGroupOrderWithTheGroupCode(String userId, String menuItem, double price) {
-        steatsMap.get(userId).addMenuItem(new MenuItem(menuItem, price, Duration.ofMinutes(10)));
+    @When("{string} adds the item named {string} with a price of {double} to the group order")
+    public void theUserWithTheIdAddsTheItemNamedWithAPriceOfToTheGroupOrderWithTheGroupCode(String name, String menuItem, double price) {
+        steatsMap.get(name).addMenuItem(new MenuItem(menuItem, price, Duration.ofMinutes(10)));
     }
 
-    @Then("The item with named {string} with a price of {double} is added to the order of the user with the id {string} in the group order with the group code {string}")
-    public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, double price, String userId, String groupCode) throws NotFoundException {
-        assertEquals(price, steatsMap.get(userId).getTotalPrice(), 0.1);
+    @Then("The item with named {string} with a price of {double} is added to the order of {string} in the group order with the group code {string}")
+    public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, double price, String name, String groupCode) throws NotFoundException {
+        assertEquals(price, steatsMap.get(name).getTotalPrice(), 0.1);
         assertTrue(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .map(order -> order.getItems().size())
                 .toList()
@@ -77,24 +78,31 @@ public class GroupOrderStepDefs {
                 .map(order -> order.getItems().getFirst().getName())
                 .toList()
                 .contains(menuItem));
+        assertEquals(price, GroupOrderManager.getInstance().get(groupCode).getPrice(), 0.1);
         assertTrue(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
-                .map(order -> ((SingleOrder) order).getUserId())
-                .toList().contains(userId));
+                .map(order -> {
+                    try {
+                        return UserManager.getInstance().get(order.getUserId()).getName();
+                    } catch (NotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList().contains(name));
     }
 
-    @When("The user with the id {string} pay")
-    public void theUserWithTheIdPay(String userId) {
-        steatsMap.get(userId).payOrder();
+    @When("{string} pay")
+    public void theUserWithTheIdPay(String name) {
+        steatsMap.get(name).payOrder();
     }
 
-    @Then("The order of the user with the id {string} is payed")
-    public void theOrderOfTheUserWithTheIdIsPayed(String userId) {
-        assertSame(Status.PAID, steatsMap.get(userId).getOrder().getStatus());
+    @Then("The order of {string} is payed")
+    public void theOrderOfTheUserWithTheIdIsPayed(String name) {
+        assertSame(Status.PAID, steatsMap.get(name).getOrder().getStatus());
     }
 
-    @And("The order is added to the history of the user with the id {string}")
-    public void theOrderIsAddedToTheHistoryOfTheUserWithTheId(String userId) throws NotFoundException {
-        assertEquals(1, UserManager.getInstance().get(userId).getOrders().size());
+    @And("The order is added to the history of {string}")
+    public void theOrderIsAddedToTheHistoryOfTheUserWithTheId(String name) throws NotFoundException {
+        assertEquals(1, UserManager.getInstance().get(steatsMap.get(name).getOrder().getUserId()).getOrders().size());
     }
 
     @And("The group order with the group code {string} is payed")
@@ -102,22 +110,22 @@ public class GroupOrderStepDefs {
         assertSame(Status.PAID, GroupOrderManager.getInstance().get(groupCode).getStatus());
     }
 
-    @And("The user with the id {string} can close the group order")
-    public void heCanCloseTheGroupOrder(String userId) throws NotFoundException {
-        assertTrue(steatsMap.get(userId).canCloseGroupOrder());
-        assertDoesNotThrow(() -> steatsMap.get(userId).closeGroupOrder());
+    @And("{string} can close the group order")
+    public void heCanCloseTheGroupOrder(String name) throws NotFoundException {
+        assertTrue(steatsMap.get(name).canCloseGroupOrder());
+        assertDoesNotThrow(() -> steatsMap.get(name).closeGroupOrder());
     }
 
 
-    @And("The user with the id {string} can't close the group order")
-    public void theUserWithTheIdCanTCloseTheGroupOrder(String userId) throws NotFoundException {
-        assertFalse(steatsMap.get(userId).canCloseGroupOrder());
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(userId).closeGroupOrder());
+    @And("{string} can't close the group order")
+    public void theUserWithTheIdCanTCloseTheGroupOrder(String name) throws NotFoundException {
+        assertFalse(steatsMap.get(name).canCloseGroupOrder());
+        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).closeGroupOrder());
     }
 
-    @When("The user with the id {string} close the group order")
-    public void theUserWithTheIdCloseTheGroupOrder(String userId) throws NotFoundException {
-        steatsMap.get(userId).closeGroupOrder();
+    @When("{string} close the group order")
+    public void theUserWithTheIdCloseTheGroupOrder(String name) throws NotFoundException {
+        steatsMap.get(name).closeGroupOrder();
     }
 
     @Then("the group order with the id {string} is closed")
