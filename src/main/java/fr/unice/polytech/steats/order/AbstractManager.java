@@ -2,7 +2,9 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.user.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,5 +62,14 @@ public abstract class AbstractManager<T> {
      */
     public void clear() {
         items.clear();
+    }
+
+    /**
+     * Get all the items in the manager.
+     *
+     * @return The list of items in the manager
+     */
+    public List<T> getAll() {
+        return new ArrayList<>(items.values());
     }
 }

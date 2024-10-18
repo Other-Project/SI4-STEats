@@ -143,15 +143,14 @@ public class STEats {
 
     /**
      * The user wants to proceed to the payment of the order
+     *
+     * @return If the payment was successful
      */
-    public void payOrder() {
-        if (order.getStatus() == Status.PAID) throw new IllegalStateException("Order already paid");
+    public boolean payOrder() throws NotFoundException {
         if (groupCode != null) {
-            order.validateOrder();
-            return;
+            return GroupOrderManager.getInstance().get(groupCode).pay(order);
         }
-        if (!user.pay(getTotalPrice())) return;
-        order.closeOrder();
+        return order.pay(true);
     }
 
     /**

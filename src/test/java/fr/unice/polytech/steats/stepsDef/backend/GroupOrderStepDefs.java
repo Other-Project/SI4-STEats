@@ -17,8 +17,10 @@ import io.cucumber.java.en.When;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -69,16 +71,12 @@ public class GroupOrderStepDefs {
 
     @Then("The item with named {string} with a price of {double} is added to the order of {string} in the group order with the group code {string}")
     public void theItemWithNamedIsAddedToTheOrderOfTheUserWithTheIdInTheGroupOrderWithTheGroupCode(String menuItem, double price, String name, String groupCode) throws NotFoundException {
-        assertEquals(price, steatsMap.get(name).getTotalPrice(), 0.1);
+        assertEquals(price, steatsMap.get(name).getTotalPrice(), 0.01);
         assertTrue(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
-                .map(order -> order.getItems().size())
-                .toList()
-                .contains(1));
-        assertTrue(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
-                .map(order -> order.getItems().getFirst().getName())
-                .toList()
-                .contains(menuItem));
-        assertEquals(price, GroupOrderManager.getInstance().get(groupCode).getPrice(), 0.1);
+                .map(SingleOrder::getItems)
+                .flatMap(Collection::stream)
+                .anyMatch(item -> Objects.equals(item.getName(), menuItem)));
+        assertEquals(price, GroupOrderManager.getInstance().get(groupCode).getPrice(), 0.01);
         assertTrue(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
                 .map(order -> {
                     try {
@@ -91,8 +89,8 @@ public class GroupOrderStepDefs {
     }
 
     @When("{string} pay")
-    public void theUserWithTheIdPay(String name) {
-        steatsMap.get(name).payOrder();
+    public void theUserWithTheIdPay(String name) throws NotFoundException {
+        boolean succes = steatsMap.get(name).payOrder();
     }
 
     @Then("The order of {string} is payed")

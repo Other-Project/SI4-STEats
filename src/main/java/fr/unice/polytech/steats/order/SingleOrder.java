@@ -148,7 +148,7 @@ public class SingleOrder implements Order {
 
     @Override
     public void closeOrder() {
-        status = Status.PAID;
+        validateOrder();
         this.getUser().addOrderToHistory(this);
         restaurant.addOrder(this);
     }
@@ -183,5 +183,17 @@ public class SingleOrder implements Order {
     @Override
     public Duration getPreparationTime() {
         return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    /**
+     * Pay the order
+     */
+    public boolean pay(boolean closeOrder) throws NotFoundException {
+        if (status == Status.PAID) throw new IllegalStateException("Order already paid");
+        User user = UserManager.getInstance().get(userId);
+        if (!user.pay(getPrice())) return false;
+        if (closeOrder) closeOrder();
+        else validateOrder();
+        return true;
     }
 }
