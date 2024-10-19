@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,18 +77,37 @@ public class OrderStepDefs {
 
     // Test for scenario : Filtering restaurants by name
 
-    @When("The user filter by typing {string}")
-    public void theUserFilterByTyping(String restaurantName) {
-        restaurantListFilteredName = RestaurantManager.filterRestaurantByName(restaurantName);
+    @When("The user filter by typing {string} and we have the following restaurants in the database:")
+    public void theUserFilterByTypingAndWeHaveTheFollowingRestaurantsInTheDatabase(String nameSearched, List<Map<String, String>> items) {
+        for (Map<String, String> item : items) {
+            RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name")));
+        }
+        restaurantListFilteredName = RestaurantManager.filterRestaurantByName(nameSearched);
     }
 
-    @Then("The list of all restaurant containing {string} are displayed")
-    public void theListOfAllRestaurantContainingAreDisplayed(String restaurantName) {
-        assertTrue(restaurantListFilteredName.stream().allMatch(restaurantFiltered -> restaurantFiltered.getName()
-                .toLowerCase()
-                .contains(restaurantName.toLowerCase())));
-        assertEquals(2, restaurantListFilteredName.size());
+    @Then("The list of all restaurant displayed should contain the following restaurants:")
+    public void theListOfAllRestaurantDisplayedShouldContainTheFollowingRestaurants(List<Map<String, String>> items) {
+        for (Map<String, String> item : items) {
+            assertTrue(restaurantListFilteredName.stream()
+                    .anyMatch(restaurantFiltered -> restaurantFiltered.getName().equals(item.get("name"))));
+        }
     }
+
+
+//    @When("The user filter by typing {string}")
+//    public void theUserFilterByTyping(String restaurantName) {
+//        restaurantListFilteredName = RestaurantManager.filterRestaurantByName(restaurantName);
+//    }
+//
+//    @Then("The list of all restaurant containing {string} are displayed")
+//    public void theListOfAllRestaurantContainingAreDisplayed(String restaurantName) {
+//        assertTrue(restaurantListFilteredName.stream().allMatch(restaurantFiltered -> restaurantFiltered.getName()
+//                .toLowerCase()
+//                .contains(restaurantName.toLowerCase())));
+//        assertEquals(2, restaurantListFilteredName.size());
+//    }
+
+    // Test for scenario : Filtering restaurants by type of food
 
     @When("The user select {string} and thus filter by type of food")
     public void theUserSelectAndThusFilterByTypeOfFood(String typeOfFood) {

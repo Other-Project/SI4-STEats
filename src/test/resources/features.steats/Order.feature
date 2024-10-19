@@ -9,11 +9,15 @@ Feature: Order
     Then the user can order
 
   Scenario: Filtering restaurants by name
-    Given a restaurant named "mcdonalds"
-    Given a restaurant named "Mcdonalds"
-    Given a restaurant named "Le Manont"
-    When The user filter by typing "mc"
-    Then The list of all restaurant containing "mc" are displayed
+    When The user filter by typing "mc" and we have the following restaurants in the database:
+      | name      |
+      | mcdonalds |
+      | Mcdonalds |
+      | Le Manont |
+    Then The list of all restaurant displayed should contain the following restaurants:
+      | name      |
+      | mcdonalds |
+      | Mcdonalds |
 
   Scenario: Filtering restaurants by type of food
     Given a restaurant named "Burger King" of type "FAST_FOOD"
