@@ -130,4 +130,29 @@ public class GroupOrderStepDefs {
     public void theGroupOrderIsClosed(String groupeCode) throws NotFoundException {
         assertSame(Status.PAID, GroupOrderManager.getInstance().get(groupeCode).getStatus());
     }
+
+    @When("{string} creates a group order from the restaurant {string} and to deliver for {string} at {string}")
+    public void createsAGroupOrderFromTheRestaurantAndToDeliverForAt(String name, String restaurant, String time, String adress) {
+        assertNotNull(steatsMap.get(name).createGroupOrder(LocalDateTime.parse(time), new Address(adress, "1", "1", "1"), new Restaurant(restaurant)));
+    }
+
+    @Then("{string} receives a group code")
+    public void receiveAGroupCode(String name) {
+        assertNotNull(steatsMap.get(name).getGroupCode());
+    }
+
+    @When("{string} creates a group order from the restaurant {string} and to deliver at {string}")
+    public void createsAGroupOrderFromTheRestaurantAndToDeliverAt(String name, String restaurant, String adress) {
+        steatsMap.get(name).createGroupOrder(null, new Address(adress, "1", "1", "1"), new Restaurant(restaurant));
+    }
+
+    @And("{string} can't change the delivery time to {string} to the group order")
+    public void canTChangeTheDeliveryTimeToToTheGroupOrder(String name, String time) {
+        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.parse(time)));
+    }
+
+    @And("{string} can add {string} as delivery time to the group order")
+    public void canAddAsDeliveryTimeToTheGroupOrder(String name, String time) {
+        assertDoesNotThrow(() -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.parse(time)));
+    }
 }

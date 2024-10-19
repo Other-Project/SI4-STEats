@@ -4,7 +4,19 @@ Feature: Manage GroupOrder
   Background:
     Given The user named "Alex" with the id "1234" is logged in
     Given The user named "Alban" with the id "4321" is logged in
+    Given The user named "Alexandre" with the id "2323" is logged in
+    Given The user named "Alexandra" with the id "3232" is logged in
     Given A group order with the group code "groupCode2" from the restaurant "McDonald's" and to deliver for "2024-03-29T10:15:30" at "292 Chemin de la Rigolade"
+
+  Scenario: Create GroupOrder with a delivery time
+    When "Alexandre" creates a group order from the restaurant "McDonald's" and to deliver for "2024-03-29T10:15:30" at "292 Chemin de la Rigolade"
+    Then "Alexandre" receives a group code
+    And "Alexandre" can't change the delivery time to "2024-03-29T10:18:30" to the group order
+
+  Scenario: Create GroupOrder without a delivery time
+    When "Alexandra" creates a group order from the restaurant "McDonald's" and to deliver at "292 Chemin de la Rigolade"
+    Then "Alexandra" receives a group code
+    And "Alexandra" can add "2024-03-29T10:15:30" as delivery time to the group order
 
   Scenario: Join GroupOrder
     When "Alex" joins the group order with the group code "groupCode2"

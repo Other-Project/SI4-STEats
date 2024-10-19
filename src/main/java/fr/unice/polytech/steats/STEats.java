@@ -52,18 +52,20 @@ public class STEats {
 
     /**
      * Create a group order.
-     * @param groupCode The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
      * @param address The address where the group order must be delivered
      * @param restaurant The restaurant in which the group order is made
+     *
+     * @return The invitation code for the group order
      */
-    public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
+    public String createGroupOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        GroupOrder groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
+        GroupOrder groupOrder = new GroupOrder(deliveryTime, address, restaurant);
+        this.groupCode = groupOrder.getGroupCode();
         GroupOrderManager.getInstance().add(groupCode, groupOrder);
-        this.groupCode = groupCode;
         order = groupOrder.createOrder(user);
         updateFullMenu(order);
+        return groupCode;
     }
 
     /**
@@ -74,6 +76,15 @@ public class STEats {
 
     public SingleOrder getOrder() {
         return order;
+    }
+
+    /**
+     * Get the group code of the group order
+     *
+     * @return The group code
+     */
+    public String getGroupCode() {
+        return groupCode;
     }
 
     /**
@@ -172,5 +183,15 @@ public class STEats {
         if (groupOrder.getStatus() == Status.PAID) throw new IllegalStateException(GROUP_ORDER_ALREADY_CLOSED);
         if (groupOrder.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
         groupOrder.closeOrder();
+    }
+
+    /**
+     * Change the delivery time of the group order
+     *
+     * @param deliveryTime The new delivery time
+     */
+    public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException {
+        if (groupCode == null) throw new IllegalStateException("Cannot change delivery time of a single order");
+        GroupOrderManager.getInstance().get(groupCode).setDeliveryTime(deliveryTime);
     }
 }
