@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.user;
 
+import fr.unice.polytech.steats.PaymentSystem;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
@@ -80,9 +81,14 @@ public class User {
         ordersHistory.add(order);
     }
 
-    // TODO : implement this method
-    public void pay(double totalPrice) {
-        System.out.println("Vous devez payer : " + totalPrice + "€");
+    /**
+     * Pay the totalPrice
+     *
+     * @param totalPrice The total price of the order
+     * @return If the payment was successful
+     */
+    public boolean pay(double totalPrice) {
+        return PaymentSystem.pay(totalPrice);
     }
 
     /**

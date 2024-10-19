@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
 import java.time.Duration;
@@ -21,7 +22,7 @@ import java.util.List;
 public class GroupOrder implements Order {
     private final LocalDateTime deliveryTime;
     private final String groupCode;
-    private final List<Order> orders = new ArrayList<>();
+    private final List<SingleOrder> orders = new ArrayList<>();
     private final Address address;
     private Status status = Status.INITIALISED;
     private final Restaurant restaurant;
@@ -108,19 +109,21 @@ public class GroupOrder implements Order {
         return order;
     }
 
-    /**
-     * Close the group order.
-     * No more single order can be added.
-     * Changes it's status to {@link Status#PAID}.
-     */
-    public void closeGroupOrder() {
+    @Override
+    public void closeOrder() {
         status = Status.PAID;
+        orders.forEach(SingleOrder::closeOrder);
     }
 
     /**
      * @return The list of single orders in the group order
      */
-    public List<Order> getOrders() {
+    public List<SingleOrder> getOrders() {
         return Collections.unmodifiableList(orders);
+    }
+
+    public boolean pay(SingleOrder order) throws NotFoundException {
+        if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
+        return order.pay(false);
     }
 }

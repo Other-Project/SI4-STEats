@@ -11,6 +11,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -36,7 +37,7 @@ public class OrderStepDefs {
     @Given("a restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
         restaurant = new Restaurant(restaurantName);
-        Schedule schedule = new Schedule(LocalTime.of(20, 15), Duration.ofMinutes(30), 5, LocalDateTime.now().getDayOfWeek());
+        Schedule schedule = new Schedule(LocalTime.of(20, 15), Duration.ofMinutes(30), 5, DayOfWeek.WEDNESDAY);
         restaurant.addSchedule(schedule);
         restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
         restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));
