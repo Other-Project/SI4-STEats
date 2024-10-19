@@ -14,3 +14,9 @@ Feature: Order
     When The user filter by typing "mc"
     Then The list of all restaurant containing "mc" are displayed
 
+  Scenario: Filtering restaurants by type of food
+    Given a restaurant named "Burger King" of type "FAST_FOOD"
+    Given a restaurant named "McDonald" of type "FAST_FOOD"
+    Given a restaurant named "La chèvre d'or" of type "CLASSIC"
+    When The user select "FAST_FOOD" and thus filter by type of food
+    Then The list of all restaurant of type "FAST_FOOD" are displayed

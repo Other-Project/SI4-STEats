@@ -3,11 +3,9 @@ package fr.unice.polytech.steats.stepsDef.backend;
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
-import fr.unice.polytech.steats.restaurant.MenuItem;
-import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.restaurant.Schedule;
+import fr.unice.polytech.steats.restaurant.*;
 import fr.unice.polytech.steats.user.UserManager;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -29,7 +27,13 @@ public class OrderStepDefs {
     LocalDateTime deliveryTime;
     Address address;
     List<Restaurant> restaurantListFilteredName;
+    List<Restaurant> restaurantListFilteredTypeOfFood;
 
+
+    @Before
+    public void before() {
+        RestaurantManager.getInstance().clear();
+    }
 
     // Background for order test
 
@@ -70,7 +74,7 @@ public class OrderStepDefs {
 
     @When("The user filter by typing {string}")
     public void theUserFilterByTyping(String restaurantName) {
-        restaurantListFilteredName = stEats.filterRestaurantByName(restaurantName);
+        restaurantListFilteredName = RestaurantManager.filterRestaurantByName(restaurantName);
     }
 
     @Then("The list of all restaurant containing {string} are displayed")
@@ -79,5 +83,17 @@ public class OrderStepDefs {
                 .toLowerCase()
                 .contains(restaurantName.toLowerCase())));
         assertEquals(2, restaurantListFilteredName.size());
+    }
+
+    @When("The user select {string} and thus filter by type of food")
+    public void theUserSelectAndThusFilterByTypeOfFood(String typeOfFood) {
+        restaurantListFilteredTypeOfFood = RestaurantManager.filterRestaurantByTypeOfFood(TypeOfFood.valueOf(typeOfFood));
+    }
+
+    @Then("The list of all restaurant of type {string} are displayed")
+    public void theListOfAllRestaurantOfTypeAreDisplayed(String typeOfFood) {
+        assertTrue(restaurantListFilteredTypeOfFood.stream()
+                .allMatch(restaurantFiltered -> restaurantFiltered.getTypeOfFood() == TypeOfFood.valueOf(typeOfFood)));
+        assertEquals(2, restaurantListFilteredTypeOfFood.size());
     }
 }

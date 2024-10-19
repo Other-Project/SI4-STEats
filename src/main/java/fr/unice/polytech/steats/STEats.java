@@ -160,10 +160,4 @@ public class STEats {
         return RestaurantManager.getInstance().getAll();
     }
 
-    public List<Restaurant> filterRestaurantByName(String name) {
-        return getAllRestaurants().stream().filter(restaurant -> restaurant.getName()
-                        .toLowerCase()
-                        .contains(name.toLowerCase()))
-                .toList();
-    }
 }

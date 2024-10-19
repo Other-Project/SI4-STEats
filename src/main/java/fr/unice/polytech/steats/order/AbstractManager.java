@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.user.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public abstract class AbstractManager<T> {
      * Get an Item from the manager.
      *
      * @param key The key/id of the Item to get
-     * @return The group order
+     * @return The value of the key
      */
     public T get(String key) throws NotFoundException {
         if (!items.containsKey(key)) throw new NotFoundException("The item does not exist.");
@@ -53,7 +54,7 @@ public abstract class AbstractManager<T> {
      * @return A list of all the items in items
      */
     public List<T> getAll() {
-        return items.values().stream().toList();
+        return new ArrayList<>(items.values());
     }
 
     /**
