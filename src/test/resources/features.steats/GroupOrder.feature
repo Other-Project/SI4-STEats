@@ -20,7 +20,7 @@ Feature: Manage GroupOrder
     Given "Alban" joins the group order with the group code "groupCode2"
     Given "Alex" adds the item named "bigmac" with a price of 10.0 to the group order
     Given "Alban" adds the item named "bigmac++" with a price of 20.0 to the group order
-    When "Alex" pay
+    When "Alex" pays
     Then The order of "Alex" is payed
     And "Alex" can't close the group order
 
@@ -29,8 +29,8 @@ Feature: Manage GroupOrder
     Given "Alban" joins the group order with the group code "groupCode2"
     Given "Alex" adds the item named "bigmac" with a price of 10.0 to the group order
     Given "Alban" adds the item named "bigmac++" with a price of 20.0 to the group order
-    Given "Alex" pay
-    When "Alban" pay
+    Given "Alex" pays
+    When "Alban" pays
     Then The order of "Alban" is payed
     And "Alban" can close the group order
 
@@ -39,8 +39,8 @@ Feature: Manage GroupOrder
     Given "Alban" joins the group order with the group code "groupCode2"
     Given "Alex" adds the item named "bigmac" with a price of 10.0 to the group order
     Given "Alban" adds the item named "bigmac++" with a price of 20.0 to the group order
-    Given "Alex" pay
-    Given "Alban" pay
+    Given "Alex" pays
+    Given "Alban" pays
     When "Alex" close the group order
     Then the group order with the id "groupCode2" is closed
     And The order is added to the history of "Alex"

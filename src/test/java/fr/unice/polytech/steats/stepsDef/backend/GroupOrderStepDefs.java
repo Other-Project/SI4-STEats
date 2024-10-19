@@ -88,9 +88,9 @@ public class GroupOrderStepDefs {
                 .toList().contains(name));
     }
 
-    @When("{string} pay")
+    @When("{string} pays")
     public void theUserWithTheIdPay(String name) throws NotFoundException {
-        boolean succes = steatsMap.get(name).payOrder();
+        assertTrue(steatsMap.get(name).payOrder());
     }
 
     @Then("The order of {string} is payed")
