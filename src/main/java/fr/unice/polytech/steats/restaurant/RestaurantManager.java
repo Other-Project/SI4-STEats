@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.order.AbstractManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,8 +27,15 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
         return INSTANCE;
     }
 
+    /**
+     * Filter the restaurants by name
+     *
+     * @param name The name of the restaurant
+     * @return A list of restaurants that have the name given in args
+     */
     public static List<Restaurant> filterRestaurantByName(String name) {
-        return getInstance().items.values()
+        return getInstance().items
+                .values()
                 .stream()
                 .filter(restaurant -> restaurant.getName()
                         .toLowerCase()
@@ -35,10 +43,31 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
                 .toList();
     }
 
+    /**
+     * Filter the restaurants by type of food
+     *
+     * @param typeOfFood The type of food the restaurant serves
+     * @return A list of restaurants that serve the type of food given in args
+     */
     public static List<Restaurant> filterRestaurantByTypeOfFood(TypeOfFood typeOfFood) {
         return getInstance().items
-                .values().stream()
+                .values()
+                .stream()
                 .filter(restaurant -> restaurant.getTypeOfFood() == typeOfFood)
+                .toList();
+    }
+
+    /**
+     * Filter the restaurants by delivery time
+     *
+     * @param deliveryTime The time the user wants the order to be delivered
+     * @return A list of restaurants that can deliver at the time given in args
+     */
+    public static List<Restaurant> filterRestaurantByDeliveryTime(LocalDateTime deliveryTime) {
+        return getInstance().items
+                .values()
+                .stream()
+                .filter(restaurant -> restaurant.canDeliverAt(deliveryTime))
                 .toList();
     }
 }

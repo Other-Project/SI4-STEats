@@ -3,7 +3,9 @@ package fr.unice.polytech.steats.stepsDef.backend;
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
+import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.*;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -14,6 +16,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
@@ -28,6 +31,7 @@ public class OrderStepDefs {
     Address address;
     List<Restaurant> restaurantListFilteredName;
     List<Restaurant> restaurantListFilteredTypeOfFood;
+    List<Restaurant> restaurantListFilteredDeliveryTime;
 
 
     @Before
@@ -95,5 +99,47 @@ public class OrderStepDefs {
         assertTrue(restaurantListFilteredTypeOfFood.stream()
                 .allMatch(restaurantFiltered -> restaurantFiltered.getTypeOfFood() == TypeOfFood.valueOf(typeOfFood)));
         assertEquals(2, restaurantListFilteredTypeOfFood.size());
+    }
+
+    @Given("an available restaurant named {string} with schedule that starts at {string}")
+    public void anAvailableRestaurantNamedWithScheduleThatStartsAt(String restaurantName, String localTime) {
+        restaurant = new Restaurant(restaurantName);
+        if (!RestaurantManager.getInstance().contains(restaurantName))
+            RestaurantManager.getInstance().add(restaurantName, restaurant);
+        DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
+        LocalTime localTimeParsed = LocalTime.parse(localTime, parser);
+        Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
+        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
+        restaurant.addSchedule(schedule);
+    }
+
+    @Given("a fully booked restaurant named {string} with schedule that starts at {string}")
+    public void aFullyBookedRestaurantNamedWithScheduleThatStartsAt(String restaurantName, String localTime) {
+        restaurant = new Restaurant(restaurantName);
+        if (!RestaurantManager.getInstance().contains(restaurantName))
+            RestaurantManager.getInstance().add(restaurantName, restaurant);
+        DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
+        LocalTime localTimeParsed = LocalTime.parse(localTime, parser);
+        Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
+        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
+        restaurant.addSchedule(schedule);
+        SingleOrder order = new SingleOrder("1", LocalDateTime.of(2024, 3, 29, 10, 0), new Address("ch de Carel", "Auribeau", "06810", ""), restaurant);
+        order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
+        restaurant.addOrder(order);
+    }
+
+    @When("The user choose to filter all restaurant that can deliver a MenuItem for {string}")
+    public void theUserChooseToFilterAllRestaurantThatCanDeliverAMenuItemFor(String localDateTime) throws NotFoundException {
+        RestaurantManager.getInstance().remove("La Cafet");
+        LocalDateTime deliveryTime = LocalDateTime.parse(localDateTime);
+        restaurantListFilteredDeliveryTime = RestaurantManager.filterRestaurantByDeliveryTime(deliveryTime);
+    }
+
+    @Then("The list of all restaurant that can deliver at least one MenuItem for {string} are displayed")
+    public void theListOfAllRestaurantThatCanDeliverAtLeastOneMenuItemForAreDisplayed(String localDateTime) {
+        LocalDateTime deliveryTime = LocalDateTime.parse(localDateTime);
+        assertTrue(restaurantListFilteredDeliveryTime.stream()
+                .allMatch(restaurantFiltered -> restaurantFiltered.canDeliverAt(deliveryTime)));
+        assertEquals(3, restaurantListFilteredDeliveryTime.size());
     }
 }

@@ -119,6 +119,23 @@ public class Restaurant {
         return maxCapacity.compareTo(order.getPreparationTime()) >= 0;
     }
 
+    /**
+     * Check if the restaurant can deliver at a given time
+     *
+     * @param deliveryTime The time of delivery
+     * @return True if the restaurant can deliver at the given time, false otherwise
+     */
+    public boolean canDeliverAt(LocalDateTime deliveryTime) {
+        try {
+            Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
+            return menu.stream()
+                    .anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
     private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
         List<Order> ordersTakenAccountSchedule = orders.stream()
                 .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
