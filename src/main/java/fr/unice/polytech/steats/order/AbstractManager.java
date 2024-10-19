@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.order;
 import fr.unice.polytech.steats.user.NotFoundException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,6 +45,15 @@ public abstract class AbstractManager<T> {
     public T get(String key) throws NotFoundException {
         if (!items.containsKey(key)) throw new NotFoundException("The item does not exist.");
         return items.get(key);
+    }
+
+    /**
+     * Get all the items of the manager
+     *
+     * @return A list of all the items in items
+     */
+    public List<T> getAll() {
+        return items.values().stream().toList();
     }
 
     /**

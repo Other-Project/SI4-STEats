@@ -3,6 +3,7 @@ package fr.unice.polytech.steats;
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * Represents the entry point of the application.
  * This class is responsible for managing the order of the user.
+ *
  * @author Team C
  */
 public class STEats {
@@ -31,7 +33,8 @@ public class STEats {
     /**
      * @implNote The constructor for an unregistered user
      */
-    public STEats() {}
+    public STEats() {
+    }
 
     private void updateFullMenu(Order order) {
         this.fullMenu = order.getRestaurant().getFullMenu();
@@ -39,9 +42,10 @@ public class STEats {
 
     /**
      * Create a single order.
+     *
      * @param deliveryTime The time the user wants the order to be delivered
-     * @param address The address the user wants the order to be delivered
-     * @param restaurant The restaurant in which the order is made
+     * @param address      The address the user wants the order to be delivered
+     * @param restaurant   The restaurant in which the order is made
      */
     public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
@@ -51,10 +55,11 @@ public class STEats {
 
     /**
      * Create a group order.
-     * @param groupCode The invitation code for the group order
+     *
+     * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
-     * @param address The address where the group order must be delivered
-     * @param restaurant The restaurant in which the group order is made
+     * @param address      The address where the group order must be delivered
+     * @param restaurant   The restaurant in which the group order is made
      */
     public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
         if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
@@ -92,6 +97,7 @@ public class STEats {
 
     /**
      * Add a menu item to the order.
+     *
      * @param menuItem The menu item to add to the order
      */
     public void addMenuItem(MenuItem menuItem) {
@@ -100,6 +106,7 @@ public class STEats {
 
     /**
      * Remove a menu item from the order.
+     *
      * @param menuItem The menu item to remove from the order
      */
     public void removeMenuItem(MenuItem menuItem) {
@@ -142,5 +149,21 @@ public class STEats {
      */
     private void sendOrderToRestaurant(Restaurant restaurant) {
         restaurant.addOrder(order);
+    }
+
+    /**
+     * Retrieve the list of all the restaurants
+     *
+     * @return The list of all the restaurants
+     */
+    public List<Restaurant> getAllRestaurants() {
+        return RestaurantManager.getInstance().getAll();
+    }
+
+    public List<Restaurant> filterRestaurantByName(String name) {
+        return getAllRestaurants().stream().filter(restaurant -> restaurant.getName()
+                        .toLowerCase()
+                        .contains(name.toLowerCase()))
+                .toList();
     }
 }
