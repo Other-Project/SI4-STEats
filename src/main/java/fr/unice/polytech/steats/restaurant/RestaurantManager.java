@@ -28,19 +28,35 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
     }
 
     /**
+     * Filter the restaurants by name, type of food and if they can deliver at a certain time
+     *
+     * @param name         The name the restaurant's name should contain
+     * @param type         The type of food the restaurant should serve
+     * @param deliveryTime The time when the order should be delivered
+     * @return A list of restaurants that match the criteria
+     */
+    public static List<Restaurant> filterRestaurant(String name, TypeOfFood type, LocalDateTime deliveryTime) {
+        List<Restaurant> restaurantList = getInstance().getAll();
+        if (name != null && !name.isEmpty()) {
+            restaurantList.removeIf(restaurant -> !restaurant.getName().toLowerCase().contains(name.toLowerCase()));
+        }
+        if (type != null) {
+            restaurantList.removeIf(restaurant -> !(restaurant.getTypeOfFood() == type));
+        }
+        if (deliveryTime != null) {
+            restaurantList.removeIf(restaurant -> !restaurant.canDeliverAt(deliveryTime));
+        }
+        return restaurantList;
+    }
+
+    /**
      * Filter the restaurants by name
      *
      * @param name The name of the restaurant
      * @return A list of restaurants that have the name given in args
      */
     public static List<Restaurant> filterRestaurantByName(String name) {
-        return getInstance().items
-                .values()
-                .stream()
-                .filter(restaurant -> restaurant.getName()
-                        .toLowerCase()
-                        .contains(name.toLowerCase()))
-                .toList();
+        return filterRestaurant(name, null, null);
     }
 
     /**
@@ -50,11 +66,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      * @return A list of restaurants that serve the type of food given in args
      */
     public static List<Restaurant> filterRestaurantByTypeOfFood(TypeOfFood typeOfFood) {
-        return getInstance().items
-                .values()
-                .stream()
-                .filter(restaurant -> restaurant.getTypeOfFood() == typeOfFood)
-                .toList();
+        return filterRestaurant(null, typeOfFood, null);
     }
 
     /**
@@ -64,11 +76,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      * @return A list of restaurants that can deliver at the time given in args
      */
     public static List<Restaurant> filterRestaurantByDeliveryTime(LocalDateTime deliveryTime) {
-        return getInstance().items
-                .values()
-                .stream()
-                .filter(restaurant -> restaurant.canDeliverAt(deliveryTime))
-                .toList();
+        return filterRestaurant(null, null, deliveryTime);
     }
 }
 

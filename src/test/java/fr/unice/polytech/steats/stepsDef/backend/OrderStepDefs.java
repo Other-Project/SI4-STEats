@@ -30,9 +30,7 @@ public class OrderStepDefs {
     Restaurant restaurant;
     LocalDateTime deliveryTime;
     Address address;
-    List<Restaurant> restaurantListFilteredName;
-    List<Restaurant> restaurantListFilteredTypeOfFood;
-    List<Restaurant> restaurantListFilteredDeliveryTime;
+    List<Restaurant> restaurantListFiltered;
 
 
     @Before
@@ -74,6 +72,17 @@ public class OrderStepDefs {
         assertFalse(stEats.getAvailableMenu().isEmpty());
     }
 
+    // Test list order for scenario :
+
+    @Then("The list of all restaurant displayed should contain the following restaurants:")
+    public void theListOfAllRestaurantDisplayedShouldContainTheFollowingRestaurants(List<Map<String, String>> items) {
+        for (Map<String, String> item : items) {
+            assertTrue(restaurantListFiltered.stream()
+                    .anyMatch(restaurantFiltered -> restaurantFiltered.getName().equals(item.get("name"))));
+        }
+        assertEquals(items.size(), restaurantListFiltered.size());
+    }
+
 
     // Test for scenario : Filtering restaurants by name
 
@@ -82,84 +91,38 @@ public class OrderStepDefs {
         for (Map<String, String> item : items) {
             RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name")));
         }
-        restaurantListFilteredName = RestaurantManager.filterRestaurantByName(nameSearched);
+        restaurantListFiltered = RestaurantManager.filterRestaurantByName(nameSearched);
     }
-
-    @Then("The list of all restaurant displayed should contain the following restaurants:")
-    public void theListOfAllRestaurantDisplayedShouldContainTheFollowingRestaurants(List<Map<String, String>> items) {
-        for (Map<String, String> item : items) {
-            assertTrue(restaurantListFilteredName.stream()
-                    .anyMatch(restaurantFiltered -> restaurantFiltered.getName().equals(item.get("name"))));
-        }
-    }
-
-
-//    @When("The user filter by typing {string}")
-//    public void theUserFilterByTyping(String restaurantName) {
-//        restaurantListFilteredName = RestaurantManager.filterRestaurantByName(restaurantName);
-//    }
-//
-//    @Then("The list of all restaurant containing {string} are displayed")
-//    public void theListOfAllRestaurantContainingAreDisplayed(String restaurantName) {
-//        assertTrue(restaurantListFilteredName.stream().allMatch(restaurantFiltered -> restaurantFiltered.getName()
-//                .toLowerCase()
-//                .contains(restaurantName.toLowerCase())));
-//        assertEquals(2, restaurantListFilteredName.size());
-//    }
 
     // Test for scenario : Filtering restaurants by type of food
 
-    @When("The user select {string} and thus filter by type of food")
-    public void theUserSelectAndThusFilterByTypeOfFood(String typeOfFood) {
-        restaurantListFilteredTypeOfFood = RestaurantManager.filterRestaurantByTypeOfFood(TypeOfFood.valueOf(typeOfFood));
+    @When("The user select {string} and we have the following restaurants in the database:")
+    public void theUserSelectAndWeHaveTheFollowingRestaurantsInTheDatabase(String typeOfFood, List<Map<String, String>> items) {
+        for (Map<String, String> item : items) {
+            RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name"), TypeOfFood.valueOf(item.get("typeOfFood"))));
+        }
+        restaurantListFiltered = RestaurantManager.filterRestaurantByTypeOfFood(TypeOfFood.valueOf(typeOfFood));
     }
 
-    @Then("The list of all restaurant of type {string} are displayed")
-    public void theListOfAllRestaurantOfTypeAreDisplayed(String typeOfFood) {
-        assertTrue(restaurantListFilteredTypeOfFood.stream()
-                .allMatch(restaurantFiltered -> restaurantFiltered.getTypeOfFood() == TypeOfFood.valueOf(typeOfFood)));
-        assertEquals(2, restaurantListFilteredTypeOfFood.size());
-    }
+    // Test for scenario : Filtering restaurants by delivery time
 
-    @Given("an available restaurant named {string} with schedule that starts at {string}")
-    public void anAvailableRestaurantNamedWithScheduleThatStartsAt(String restaurantName, String localTime) {
-        restaurant = new Restaurant(restaurantName);
-        if (!RestaurantManager.getInstance().contains(restaurantName))
-            RestaurantManager.getInstance().add(restaurantName, restaurant);
-        DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
-        LocalTime localTimeParsed = LocalTime.parse(localTime, parser);
-        Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
-        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
-        restaurant.addSchedule(schedule);
-    }
-
-    @Given("a fully booked restaurant named {string} with schedule that starts at {string}")
-    public void aFullyBookedRestaurantNamedWithScheduleThatStartsAt(String restaurantName, String localTime) {
-        restaurant = new Restaurant(restaurantName);
-        if (!RestaurantManager.getInstance().contains(restaurantName))
-            RestaurantManager.getInstance().add(restaurantName, restaurant);
-        DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
-        LocalTime localTimeParsed = LocalTime.parse(localTime, parser);
-        Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
-        restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
-        restaurant.addSchedule(schedule);
-        SingleOrder order = new SingleOrder("1", LocalDateTime.of(2024, 3, 29, 10, 0), new Address("ch de Carel", "Auribeau", "06810", ""), restaurant);
-        order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
-        restaurant.addOrder(order);
-    }
-
-    @When("The user choose to filter all restaurant that can deliver a MenuItem for {string}")
-    public void theUserChooseToFilterAllRestaurantThatCanDeliverAMenuItemFor(String localDateTime) throws NotFoundException {
+    @When("The user choose to filter all restaurant that can deliver a MenuItem for {string} and we have the following restaurants in the database:")
+    public void theUserChooseToFilterAllRestaurantThatCanDeliverAMenuItemForAndWeHaveTheFollowingRestaurantsInTheDatabase(String deliveryTime, List<Map<String, String>> items) throws NotFoundException {
+        LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
         RestaurantManager.getInstance().remove("La Cafet");
-        LocalDateTime deliveryTime = LocalDateTime.parse(localDateTime);
-        restaurantListFilteredDeliveryTime = RestaurantManager.filterRestaurantByDeliveryTime(deliveryTime);
-    }
-
-    @Then("The list of all restaurant that can deliver at least one MenuItem for {string} are displayed")
-    public void theListOfAllRestaurantThatCanDeliverAtLeastOneMenuItemForAreDisplayed(String localDateTime) {
-        LocalDateTime deliveryTime = LocalDateTime.parse(localDateTime);
-        assertTrue(restaurantListFilteredDeliveryTime.stream()
-                .allMatch(restaurantFiltered -> restaurantFiltered.canDeliverAt(deliveryTime)));
-        assertEquals(3, restaurantListFilteredDeliveryTime.size());
+        for (Map<String, String> item : items) {
+            restaurant = new Restaurant(item.get("name"));
+            DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
+            LocalTime localTimeParsed = LocalTime.parse(item.get("scheduleStart"), parser);
+            Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
+            restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
+            restaurant.addSchedule(schedule);
+            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, new Address("ch de Carel", "Auribeau", "06810", ""), restaurant);
+            Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("orderDuration")));
+            order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
+            restaurant.addOrder(order);
+            RestaurantManager.getInstance().add(item.get("name"), restaurant);
+        }
+        restaurantListFiltered = RestaurantManager.filterRestaurantByDeliveryTime(deliveryTimeParsed);
     }
 }

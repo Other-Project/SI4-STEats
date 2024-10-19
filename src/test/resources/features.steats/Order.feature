@@ -14,23 +14,36 @@ Feature: Order
       | mcdonalds |
       | Mcdonalds |
       | Le Manont |
+      | Mc burger |
+      | Le Mac    |
     Then The list of all restaurant displayed should contain the following restaurants:
       | name      |
       | mcdonalds |
       | Mcdonalds |
+      | Mc burger |
 
   Scenario: Filtering restaurants by type of food
-    Given a restaurant named "Burger King" of type "FAST_FOOD"
-    Given a restaurant named "McDonald" of type "FAST_FOOD"
-    Given a restaurant named "La chèvre d'or" of type "CLASSIC"
-    When The user select "FAST_FOOD" and thus filter by type of food
-    Then The list of all restaurant of type "FAST_FOOD" are displayed
+    When The user select "FAST_FOOD" and we have the following restaurants in the database:
+      | name           | typeOfFood |
+      | Burger King    | FAST_FOOD  |
+      | McDonald       | FAST_FOOD  |
+      | La chevre d'or | CLASSIC    |
+    Then The list of all restaurant displayed should contain the following restaurants:
+      | name        |
+      | Burger King |
+      | McDonald    |
 
   Scenario: Filtering restaurants that can deliver during a certain time
-    Given an available restaurant named "Macdonald available 1" with schedule that starts at "10:00:00"
-    Given an available restaurant named "Macdonald available 2" with schedule that starts at "9:30:00"
-    Given an available restaurant named "Macdonald available 3" with schedule that starts at "9:00:00"
-    Given an available restaurant named "Macdonald available 4" with schedule that starts at "8:30:00"
-    Given a fully booked restaurant named "Macdonald full booked" with schedule that starts at "10:00:00"
-    When The user choose to filter all restaurant that can deliver a MenuItem for "2024-03-29T10:15:30"
-    Then The list of all restaurant that can deliver at least one MenuItem for "2024-03-29T10:15:30" are displayed
+    When The user choose to filter all restaurant that can deliver a MenuItem for "2024-03-29T10:15:30" and we have the following restaurants in the database:
+      | name                  | scheduleStart | orderDuration |
+      | Macdonald available 0 | 10:30:00      | 15            |
+      | Macdonald available 1 | 10:00:00      | 15            |
+      | Macdonald available 2 | 9:30:00       | 15            |
+      | Macdonald available 3 | 9:00:00       | 15            |
+      | Macdonald available 4 | 8:30:00       | 15            |
+      | Macdonald full booked | 10:00:00      | 30            |
+    Then The list of all restaurant displayed should contain the following restaurants:
+      | name                  |
+      | Macdonald available 2 |
+      | Macdonald available 3 |
+      | Macdonald available 4 |
