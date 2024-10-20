@@ -92,12 +92,12 @@ Feature: Manage GroupOrder
     Given "Alban" pays
     Given "Alexandra" pays
     When "Alex" close the group order that doesn't have a delivery time
-    Then "Alex" he need to choose the delivery time so he gets the next delivery time from "2024-10-21T12:30:00" to "2024-10-21T15:00:00" and gets :
+    Then "Alex" he need to choose the delivery time so he gets the next 2 delivery time from "2024-10-21T12:30:00" and gets :
       | deliveryTime     |
       | 2024-10-21T14:00 |
       | 2024-10-21T14:30 |
     And "Alex" can choose the following delivery time : "2024-10-21T14:00"
-          # also 2024-10-21T14:30 is possible but he can only change the delivery time once
+          # also 2024-10-21T14:30 or 2024-10-21T15:00 are possible but he can only change the delivery time once
 
 
 

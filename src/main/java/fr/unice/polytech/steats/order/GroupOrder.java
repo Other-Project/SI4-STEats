@@ -112,8 +112,10 @@ public class GroupOrder implements Order {
      * @implNote The delivery time can only be set once.
      */
     public void setDeliveryTime(LocalDateTime deliveryTime) {
-        System.out.println("Delivery time: " + deliveryTime);
         if (this.deliveryTime != null) throw new IllegalStateException("Delivery time already set");
+        if (orders.stream().noneMatch(order -> order.getItems().isEmpty())
+                && !restaurant.canHandle(this, deliveryTime))
+            throw new IllegalStateException("Delivery time not available");
         this.deliveryTime = deliveryTime;
         for (SingleOrder order : orders) {
             order.setDeliveryTime(deliveryTime);
@@ -159,16 +161,14 @@ public class GroupOrder implements Order {
      * Calculate the available delivery times for the group order.
      *
      * @param from The start of the time range
-     * @param to   The end of the time range
+     * @param numberOfTimes The number of delivery times to calculate
      * @return The list of available delivery times
      */
-    public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, LocalDateTime to) {
+    public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) {
         List<LocalDateTime> availableTimes = new ArrayList<>();
         LocalDateTime time = from;
-        while (time.isBefore(to)) {
-            if (restaurant.canHandle(this, time)) {
-                availableTimes.add(time);
-            }
+        while (availableTimes.size() < numberOfTimes) {
+            if (restaurant.canHandle(this, time)) availableTimes.add(time);
             time = time.plusMinutes(30);
         }
         return availableTimes;

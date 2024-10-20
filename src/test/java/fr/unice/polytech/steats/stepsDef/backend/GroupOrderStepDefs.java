@@ -195,13 +195,13 @@ public class GroupOrderStepDefs {
         steatsMap.get(name).addMenuItem(new MenuItem(menu, price, Duration.ofHours(hours).plusMinutes(minutes)));
     }
 
-    @Then("{string} he need to choose the delivery time so he gets the next delivery time from {string} to {string} and gets :")
-    public void whenToGetsTheNextDeliveryTimeFromTo(String name, String from, String to, List<Map<String, String>> deliveryTime) throws NotFoundException {
+    @Then("{string} he need to choose the delivery time so he gets the next {int} delivery time from {string} and gets :")
+    public void heNeedToChooseTheDeliveryTimeSoHeGetsTheNextDeliveryTimeFromAndGets(String name, int numberOfTimes, String from, List<Map<String, String>> deliveryTime) throws NotFoundException {
         assertEquals(
                 deliveryTime.stream().map(item -> LocalDateTime.parse(item.get("deliveryTime"))).toList(),
-                steatsMap.get(name).getAvailableDeliveryTimes(LocalDateTime.parse(from), LocalDateTime.parse(to))
-        );
+                steatsMap.get(name).getAvailableDeliveryTimes(LocalDateTime.parse(from), numberOfTimes));
     }
+
 
     @And("{string} can choose the following delivery time : {string}")
     public void canChooseTheFollowingDeliveryTime(String name, String time) {
