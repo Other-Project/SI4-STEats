@@ -36,17 +36,13 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      * @return A list of restaurants that match the criteria
      */
     public static List<Restaurant> filterRestaurant(String name, TypeOfFood type, LocalDateTime deliveryTime) {
-        List<Restaurant> restaurantList = getInstance().getAll();
-        if (name != null && !name.isEmpty()) {
-            restaurantList.removeIf(restaurant -> !restaurant.getName().toLowerCase().contains(name.toLowerCase()));
-        }
-        if (type != null) {
-            restaurantList.removeIf(restaurant -> !(restaurant.getTypeOfFood() == type));
-        }
-        if (deliveryTime != null) {
-            restaurantList.removeIf(restaurant -> !restaurant.canDeliverAt(deliveryTime));
-        }
-        return restaurantList;
+        String nameFilter = name == null || name.isEmpty() ? null : name.toLowerCase();
+        return getInstance().getAll()
+                .stream()
+                .filter(restaurant -> nameFilter == null || nameFilter.isEmpty() || restaurant.getName().toLowerCase().contains(nameFilter))
+                .filter(restaurant -> type == null || restaurant.getTypeOfFood() == type)
+                .filter(restaurant -> deliveryTime == null || restaurant.canDeliverAt(deliveryTime))
+                .toList();
     }
 
     /**

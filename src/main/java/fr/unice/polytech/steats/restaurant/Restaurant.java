@@ -133,7 +133,6 @@ public class Restaurant {
         } catch (Exception e) {
             return false;
         }
-
     }
 
     private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {

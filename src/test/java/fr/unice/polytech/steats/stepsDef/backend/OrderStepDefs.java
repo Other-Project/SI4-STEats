@@ -5,7 +5,6 @@ import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.*;
-import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -24,7 +23,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderStepDefs {
-
     STEats stEats;
     STEatsController steatsController;
     Restaurant restaurant;
@@ -32,13 +30,12 @@ public class OrderStepDefs {
     Address address;
     List<Restaurant> restaurantListFiltered;
 
-
     @Before
     public void before() {
         RestaurantManager.getInstance().clear();
     }
 
-    // Background for order test
+    //region Background for order test
 
     @Given("an user of id {string}")
     public void givenAnUser(String userId) {
@@ -58,7 +55,9 @@ public class OrderStepDefs {
         restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));
     }
 
-    // Test for scenario : Creating an order
+    //endregion
+
+    //region Test for scenario : Creating an order
 
     @When("the user creates an order and specifies a date, an address and a restaurant")
     public void whenCreatesOrder() {
@@ -72,7 +71,9 @@ public class OrderStepDefs {
         assertFalse(stEats.getAvailableMenu().isEmpty());
     }
 
-    // Test list order for scenario :
+    //endregion
+
+    //region Test list order for scenario :
 
     @Then("The list of all restaurant displayed should contain the following restaurants:")
     public void theListOfAllRestaurantDisplayedShouldContainTheFollowingRestaurants(List<Map<String, String>> items) {
@@ -83,33 +84,45 @@ public class OrderStepDefs {
         assertEquals(items.size(), restaurantListFiltered.size());
     }
 
+    //endregion
 
-    // Test for scenario : Filtering restaurants by name
+    //region Test for scenario : Filtering restaurants by name
 
-    @When("The user filter by typing {string} and we have the following restaurants in the database:")
-    public void theUserFilterByTypingAndWeHaveTheFollowingRestaurantsInTheDatabase(String nameSearched, List<Map<String, String>> items) {
+    @Given("The following restaurants :")
+    public void theFollowingRestaurants(List<Map<String, String>> items) {
         for (Map<String, String> item : items) {
             RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name")));
         }
-        restaurantListFiltered = RestaurantManager.filterRestaurantByName(nameSearched);
     }
 
-    // Test for scenario : Filtering restaurants by type of food
+    @When("The user filter by typing {string}")
+    public void theUserFilterByTyping(String restaurantName) {
+        restaurantListFiltered = RestaurantManager.filterRestaurant(restaurantName, null, null);
+    }
 
-    @When("The user select {string} and we have the following restaurants in the database:")
-    public void theUserSelectAndWeHaveTheFollowingRestaurantsInTheDatabase(String typeOfFood, List<Map<String, String>> items) {
+    //endregion
+
+    //region Test for scenario : Filtering restaurants by type of food
+
+    @Given("The following restaurants with type of food :")
+    public void theFollowingRestaurantsWithTypeOfFood(List<Map<String, String>> items) {
         for (Map<String, String> item : items) {
             RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name"), TypeOfFood.valueOf(item.get("typeOfFood"))));
         }
-        restaurantListFiltered = RestaurantManager.filterRestaurantByTypeOfFood(TypeOfFood.valueOf(typeOfFood));
     }
 
-    // Test for scenario : Filtering restaurants by delivery time
+    @When("The user filter by selecting {string}")
+    public void theUserFilterBySelecting(String typeOfFood) {
+        restaurantListFiltered = RestaurantManager.filterRestaurant(null, TypeOfFood.valueOf(typeOfFood), null);
+    }
 
-    @When("The user choose to filter all restaurant that can deliver a MenuItem for {string} and we have the following restaurants in the database:")
-    public void theUserChooseToFilterAllRestaurantThatCanDeliverAMenuItemForAndWeHaveTheFollowingRestaurantsInTheDatabase(String deliveryTime, List<Map<String, String>> items) throws NotFoundException {
+    //endregion
+
+    //region Test for scenario : Filtering restaurants by delivery time
+
+    @Given("The following restaurants with schedule and order duration and order scheduled to {string} :")
+    public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledTo(String deliveryTime, List<Map<String, String>> items) {
         LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
-        RestaurantManager.getInstance().remove("La Cafet");
         for (Map<String, String> item : items) {
             restaurant = new Restaurant(item.get("name"));
             DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
@@ -123,14 +136,22 @@ public class OrderStepDefs {
             restaurant.addOrder(order);
             RestaurantManager.getInstance().add(item.get("name"), restaurant);
         }
+    }
+
+    @When("The user filter by selecting a delivery time of {string}")
+    public void theUserFilterBySelectingADeliveryTimeOf(String deliveryTime) {
+        LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
         restaurantListFiltered = RestaurantManager.filterRestaurantByDeliveryTime(deliveryTimeParsed);
     }
 
-    @When("The user filter by typing {string} and select {string} and we have the following restaurants in the database:")
-    public void theUserFilterByTypingAndSelectAndWeHaveTheFollowingRestaurantsInTheDatabase(String restaurantName, String typeOfFood, List<Map<String, String>> items) {
-        for (Map<String, String> item : items) {
-            RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name"), TypeOfFood.valueOf(item.get("typeOfFood"))));
-        }
+    //endregion
+
+    //region Test for scenario : Filtering restaurants by name and type of food
+
+    @When("The user filter by typing {string} and selecting {string}")
+    public void theUserFilterByTypingAndSelecting(String restaurantName, String typeOfFood) {
         restaurantListFiltered = RestaurantManager.filterRestaurant(restaurantName, TypeOfFood.valueOf(typeOfFood), null);
     }
+
+    //endregion
 }
