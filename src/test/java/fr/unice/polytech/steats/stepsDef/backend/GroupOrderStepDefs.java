@@ -130,13 +130,13 @@ public class GroupOrderStepDefs {
     }
 
     @Then("the group order with the id {string} is closed")
-    public void theGroupOrderIsClosed(String groupeCode) throws NotFoundException {
-        assertSame(Status.PAID, GroupOrderManager.getInstance().get(groupeCode).getStatus());
+    public void theGroupOrderIsClosed(String groupCode) throws NotFoundException {
+        assertSame(Status.PAID, GroupOrderManager.getInstance().get(groupCode).getStatus());
     }
 
     @When("{string} creates a group order from the restaurant {string} and to deliver for {string} at {string}")
-    public void createsAGroupOrderFromTheRestaurantAndToDeliverForAt(String name, String restaurant, String time, String adress) {
-        assertNotNull(steatsMap.get(name).createGroupOrder(LocalDateTime.parse(time), new Address(adress, "1", "1", "1"), new Restaurant(restaurant)));
+    public void createsAGroupOrderFromTheRestaurantAndToDeliverForAt(String name, String restaurant, String time, String address) {
+        assertNotNull(steatsMap.get(name).createGroupOrder(LocalDateTime.parse(time), address, new Restaurant(restaurant)));
     }
 
     @Then("{string} receives a group code")
@@ -145,8 +145,8 @@ public class GroupOrderStepDefs {
     }
 
     @When("{string} creates a group order from the restaurant {string} and to deliver at {string}")
-    public void createsAGroupOrderFromTheRestaurantAndToDeliverAt(String name, String restaurant, String adress) {
-        steatsMap.get(name).createGroupOrder(null, new Address(adress, "1", "1", "1"), new Restaurant(restaurant));
+    public void createsAGroupOrderFromTheRestaurantAndToDeliverAt(String name, String restaurant, String address) {
+        steatsMap.get(name).createGroupOrder(null, address, new Restaurant(restaurant));
     }
 
     @And("{string} can't change the delivery time to {string} to the group order")
@@ -188,8 +188,8 @@ public class GroupOrderStepDefs {
     }
 
     @Given("A group order with the group code {string} from the restaurant {string} at {string}")
-    public void aGroupOrderWithTheGroupCodeFromTheRestaurantAt(String groupCode, String restaurant, String adress) throws NotFoundException {
-        GroupOrderManager.getInstance().add(groupCode, new GroupOrder(groupCode, null, new Address(adress, "1", "1", "1"), RestaurantManager.getInstance().get(restaurant)));
+    public void aGroupOrderWithTheGroupCodeFromTheRestaurantAt(String groupCode, String restaurant, String address) throws NotFoundException {
+        GroupOrderManager.getInstance().add(groupCode, new GroupOrder(groupCode, null, address, RestaurantManager.getInstance().get(restaurant)));
     }
 
     @Given("{string} adds the item named {string} with a price of {double} and a preparation time of {int}:{int} to the group order")

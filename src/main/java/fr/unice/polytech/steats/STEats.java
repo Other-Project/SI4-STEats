@@ -56,7 +56,7 @@ public class STEats {
      * @param addressId The label of the address where the group order must be delivered
      * @param restaurant The restaurant in which the group order is made
      */
-    public String createGroupOrder(LocalDateTime deliveryTime, Address addressId, Restaurant restaurant) throws IllegalStateException {
+    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurant);
         this.groupCode = groupOrder.getGroupCode();

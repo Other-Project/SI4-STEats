@@ -27,7 +27,7 @@ public class GroupOrder implements Order {
     /**
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
-     * @param addressId      The label of the address where the group order must be delivered
+     * @param addressId    The label of the address where the group order must be delivered
      * @param restaurant   The restaurant in which the group order is made
      */
     public GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
@@ -39,11 +39,11 @@ public class GroupOrder implements Order {
 
     /**
      * @param deliveryTime The time the group order must be delivered
-     * @param address      The address where the group order must be delivered
+     * @param addressId    The label of the address where the group order must be delivered
      * @param restaurant   The restaurant in which the group order is made
      */
-    public GroupOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
-        this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, address, restaurant);
+    public GroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+        this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurant);
     }
 
     @Override
