@@ -22,6 +22,16 @@ Feature: Manage GroupOrder
     When "Alex" joins the group order with the group code "groupCode2"
     Then "Alex" is added to the group order with the group code "groupCode2"
 
+  Scenario: Join GroupOrder with a wrong group code
+    Then "Alex" can't join the group order with the group code "groupCode3"
+
+  Scenario: Multiple GroupOrder
+    Given A group order with the group code "groupCode89" from the restaurant "McDonald's" and to deliver for "2024-03-29T10:15:30" at "292 Chemin de la Rigolade"
+    When "Alex" joins the group order with the group code "groupCode2"
+    When "Alban" joins the group order with the group code "groupCode89"
+    Then "Alex" is added to the group order with the group code "groupCode2"
+    And "Alban" is added to the group order with the group code "groupCode89"
+
   Scenario: Add Item to GroupOrder
     When "Alex" joins the group order with the group code "groupCode2"
     When "Alex" adds the item named "bigmac" with a price of 10.0 to the group order
@@ -98,6 +108,3 @@ Feature: Manage GroupOrder
       | 2024-10-21T14:30 |
     And "Alex" can choose the following delivery time : "2024-10-21T14:00"
           # also 2024-10-21T14:30 or 2024-10-21T15:00 are possible but he can only change the delivery time once
-
-
-

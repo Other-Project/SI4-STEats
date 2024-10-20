@@ -30,7 +30,7 @@ public class GroupOrder implements Order {
      * @param addressId    The label of the address where the group order must be delivered
      * @param restaurant   The restaurant in which the group order is made
      */
-    public GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+    private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
@@ -117,13 +117,10 @@ public class GroupOrder implements Order {
      */
     public void setDeliveryTime(LocalDateTime deliveryTime) {
         if (this.deliveryTime != null) throw new IllegalStateException("Delivery time already set");
-        if (orders.stream().noneMatch(order -> order.getItems().isEmpty())
-                && !restaurant.canHandle(this, deliveryTime))
+        if (orders.stream().noneMatch(order -> order.getItems().isEmpty()) && !restaurant.canHandle(this, deliveryTime))
             throw new IllegalStateException("Delivery time not available");
         this.deliveryTime = deliveryTime;
-        for (SingleOrder order : orders) {
-            order.setDeliveryTime(deliveryTime);
-        }
+        for (SingleOrder order : orders) order.setDeliveryTime(deliveryTime);
     }
 
     /**
