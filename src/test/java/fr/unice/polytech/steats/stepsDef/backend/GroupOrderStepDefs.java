@@ -2,7 +2,10 @@ package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
-import fr.unice.polytech.steats.order.*;
+import fr.unice.polytech.steats.order.GroupOrder;
+import fr.unice.polytech.steats.order.GroupOrderManager;
+import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.Status;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.NotFoundException;
@@ -38,7 +41,7 @@ public class GroupOrderStepDefs {
 
     @Given("A group order with the group code {string} from the restaurant {string} and to deliver for {string} at {string}")
     public void a_group_order_is_created(String groupCode, String restaurant, String deliveryTime, String address) {
-        GroupOrderManager.getInstance().add(groupCode, new GroupOrder(groupCode, LocalDateTime.parse(deliveryTime), new Address(address, "1", "1", "1"), new Restaurant(restaurant)));
+        GroupOrderManager.getInstance().add(groupCode, new GroupOrder(groupCode, LocalDateTime.parse(deliveryTime), address, new Restaurant(restaurant)));
     }
 
     @Given("The user named {string} with the id {string} is logged in")
@@ -56,11 +59,9 @@ public class GroupOrderStepDefs {
     @Then("{string} is added to the group order with the group code {string}")
     public void the_user_is_added_to_the_group_order(String name, String groupCode) throws NotFoundException {
         assertEquals(1, GroupOrderManager.getInstance().get(groupCode).getOrders().size());
-        assertEquals(steatsMap.get(name).getOrder(), GroupOrderManager.getInstance().get(groupCode).getOrders().get(0));
+        assertEquals(steatsMap.get(name).getOrder(), GroupOrderManager.getInstance().get(groupCode).getOrders().getFirst());
         assertEquals(name, UserManager.getInstance().get(GroupOrderManager.getInstance().get(groupCode).getOrders().stream()
-                        .map(SingleOrder::getUserId)
-                        .toList()
-                        .get(0))
+                        .map(SingleOrder::getUserId).findFirst().orElse(null))
                 .getName());
     }
 
@@ -117,8 +118,9 @@ public class GroupOrderStepDefs {
 
     @And("{string} can't close the group order")
     public void theUserWithTheIdCanTCloseTheGroupOrder(String name) throws NotFoundException {
-        assertFalse(steatsMap.get(name).canCloseGroupOrder());
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).closeGroupOrder());
+        STEats facade = steatsMap.get(name);
+        assertFalse(facade.canCloseGroupOrder());
+        assertThrows(IllegalStateException.class, facade::closeGroupOrder);
     }
 
     @When("{string} close the group order")

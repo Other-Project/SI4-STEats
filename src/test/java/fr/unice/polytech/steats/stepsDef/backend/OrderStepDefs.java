@@ -2,7 +2,6 @@ package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
-import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.Schedule;
@@ -25,7 +24,6 @@ public class OrderStepDefs {
     STEatsController steatsController;
     Restaurant restaurant;
     LocalDateTime deliveryTime;
-    Address address;
 
     @Given("an user of id {string}")
     public void givenAnUser(String userId) {
@@ -46,8 +44,7 @@ public class OrderStepDefs {
     @When("the user creates an order and specifies a date, an address and a restaurant")
     public void whenCreatesOrder() {
         deliveryTime = LocalDateTime.of(2024, 10, 16, 21, 0);
-        address = new Address("ch de Carel", "Auribeau", "06810", "");
-        stEats.createOrder(deliveryTime, address, restaurant);
+        stEats.createOrder(deliveryTime, null, restaurant);
     }
 
     @Then("the user can order")
