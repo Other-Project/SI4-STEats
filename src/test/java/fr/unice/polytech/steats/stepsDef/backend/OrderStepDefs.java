@@ -125,4 +125,12 @@ public class OrderStepDefs {
         }
         restaurantListFiltered = RestaurantManager.filterRestaurantByDeliveryTime(deliveryTimeParsed);
     }
+
+    @When("The user filter by typing {string} and select {string} and we have the following restaurants in the database:")
+    public void theUserFilterByTypingAndSelectAndWeHaveTheFollowingRestaurantsInTheDatabase(String restaurantName, String typeOfFood, List<Map<String, String>> items) {
+        for (Map<String, String> item : items) {
+            RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name"), TypeOfFood.valueOf(item.get("typeOfFood"))));
+        }
+        restaurantListFiltered = RestaurantManager.filterRestaurant(restaurantName, TypeOfFood.valueOf(typeOfFood), null);
+    }
 }

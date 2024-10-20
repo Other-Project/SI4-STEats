@@ -47,3 +47,16 @@ Feature: Order
       | Macdonald available 2 |
       | Macdonald available 3 |
       | Macdonald available 4 |
+
+  Scenario: Filtering restaurants by name and type of food
+    When The user filter by typing "mc" and select "FAST_FOOD" and we have the following restaurants in the database:
+      | name           | typeOfFood |
+      | mcdonalds      | FAST_FOOD  |
+      | Mcdonalds      | FAST_FOOD  |
+      | Le Manont      | CLASSIC    |
+      | Mc gastronomic | GOURMET    |
+      | Burger King    | FAST_FOOD  |
+    Then The list of all restaurant displayed should contain the following restaurants:
+      | name      |
+      | mcdonalds |
+      | Mcdonalds |
