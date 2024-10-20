@@ -17,11 +17,12 @@ import java.util.List;
  * @author Team C
  */
 public class STEats {
-    private GroupOrder groupOrder;
+    private String groupCode;
     private SingleOrder order;
     private List<MenuItem> fullMenu;
     private User user;
     private static final String ORDER_ALREADY_IN_PROGRESS = "An order is already in progress.";
+    private static final String GROUP_ORDER_ALREADY_CLOSED = "Group order already closed";
 
     /**
      * @param user The person using the application (browsing or/and ordering)
@@ -62,11 +63,22 @@ public class STEats {
      * @param restaurant   The restaurant in which the group order is made
      */
     public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
-        if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
-        order = groupOrder.createOrder(user);
+        if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
+        GroupOrder groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
         GroupOrderManager.getInstance().add(groupCode, groupOrder);
+        this.groupCode = groupCode;
+        order = groupOrder.createOrder(user);
         updateFullMenu(order);
+    }
+
+    /**
+     * Get the order of the user
+     *
+     * @return the order of the user
+     */
+
+    public SingleOrder getOrder() {
+        return order;
     }
 
     /**
@@ -75,8 +87,10 @@ public class STEats {
      * @param groupCode The invitation code for the group order
      */
     public void joinGroupOrder(String groupCode) throws NotFoundException {
-        if (groupOrder != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        groupOrder = GroupOrderManager.getInstance().get(groupCode);
+        if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
+        GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
+        if (groupOrder.getStatus() == Status.PAID) throw new IllegalStateException(GROUP_ORDER_ALREADY_CLOSED);
+        this.groupCode = groupOrder.getGroupCode();
         order = groupOrder.createOrder(user);
         updateFullMenu(order);
     }
@@ -136,19 +150,35 @@ public class STEats {
 
     /**
      * The user wants to proceed to the payment of the order
+     *
+     * @return If the payment was successful
      */
-    public void payOrder() {
-        user.pay(getTotalPrice());
-        sendOrderToRestaurant(order.getRestaurant());
+    public boolean payOrder() throws NotFoundException {
+        if (groupCode != null) {
+            return GroupOrderManager.getInstance().get(groupCode).pay(order);
+        }
+        return order.pay(true);
     }
 
     /**
-     * Send an order to a restaurant
-     *
-     * @param restaurant the restaurant where to send the order
+     * Determine if all the orders in the group order are paid
      */
-    private void sendOrderToRestaurant(Restaurant restaurant) {
-        restaurant.addOrder(order);
+    public boolean canCloseGroupOrder() throws NotFoundException {
+        GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
+        return !groupOrder.getStatus().equals(Status.PAID)
+                && groupOrder.getOrders().stream().allMatch(order1 -> order1.getStatus() == Status.PAID);
+    }
+
+    /**
+     * Close the group order
+     */
+    public void closeGroupOrder() throws NotFoundException {
+        if (groupCode == null) throw new IllegalStateException("No group order");
+        if (!canCloseGroupOrder()) throw new IllegalStateException("All orders are not payed");
+        GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
+        if (groupOrder.getStatus() == Status.PAID) throw new IllegalStateException(GROUP_ORDER_ALREADY_CLOSED);
+        if (groupOrder.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
+        groupOrder.closeOrder();
     }
 
     /**

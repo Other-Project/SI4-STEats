@@ -146,6 +146,13 @@ public class SingleOrder implements Order {
         appliedDiscounts.addAll(restaurant.availableDiscounts(this));
     }
 
+    @Override
+    public void closeOrder() {
+        validateOrder();
+        this.getUser().addOrderToHistory(this);
+        restaurant.addOrder(this);
+    }
+
     /**
      * Get the discounts to apply to the next order
      */
@@ -160,6 +167,15 @@ public class SingleOrder implements Order {
         return Collections.unmodifiableList(appliedDiscounts);
     }
 
+    /**
+     * Validate the order
+     * Changes its status to {@link Status#PAID}.
+     *
+     * @implNote only validate the payment, doesn't close the order
+     */
+    public void validateOrder() {
+        status = Status.PAID;
+    }
 
     /**
      * @implNote The total preparation time of all the items in the order
@@ -167,5 +183,17 @@ public class SingleOrder implements Order {
     @Override
     public Duration getPreparationTime() {
         return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    /**
+     * Pay the order
+     */
+    public boolean pay(boolean closeOrder) throws NotFoundException {
+        if (status == Status.PAID) throw new IllegalStateException("Order already paid");
+        User user = UserManager.getInstance().get(userId);
+        if (!user.pay(getPrice())) return false;
+        if (closeOrder) closeOrder();
+        else validateOrder();
+        return true;
     }
 }

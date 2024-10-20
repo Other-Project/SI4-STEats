@@ -51,6 +51,14 @@ public interface Order extends Saleable {
     List<User> getUsers();
 
     /**
+     * Close the order.
+     * Changes its status to {@link Status#PAID}.
+     * Send the order to the restaurant.
+     * Add the order to the user's history.
+     */
+    void closeOrder();
+      
+    /**
      * @return The time it takes to prepare the order
      */
     Duration getPreparationTime();

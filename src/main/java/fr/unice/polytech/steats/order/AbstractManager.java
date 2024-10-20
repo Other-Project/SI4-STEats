@@ -72,4 +72,13 @@ public abstract class AbstractManager<T> {
     public void clear() {
         items.clear();
     }
+
+    /**
+     * Get all the items in the manager.
+     *
+     * @return The list of items in the manager
+     */
+    public List<T> getAll() {
+        return new ArrayList<>(items.values());
+    }
 }
