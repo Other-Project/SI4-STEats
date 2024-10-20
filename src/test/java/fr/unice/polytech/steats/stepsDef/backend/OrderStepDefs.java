@@ -95,7 +95,7 @@ public class OrderStepDefs {
     }
 
     @When("the user wants to pay for the items in its cart")
-    public void whenWantsToPayTheOrder() throws NotFoundException {
+    public void whenWantsToPayTheOrder() {
         assertEquals(2, stEats.getCart().size());
     }
 
