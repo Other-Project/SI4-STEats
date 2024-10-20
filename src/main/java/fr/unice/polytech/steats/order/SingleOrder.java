@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  */
 public class SingleOrder implements Order {
     private final String userId;
-    private final LocalDateTime deliveryTime;
+    private LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final String addressId;
     private final Restaurant restaurant;
@@ -123,6 +123,16 @@ public class SingleOrder implements Order {
      */
     public String getUserId() {
         return userId;
+    }
+
+    /**
+     * Set the delivery time of the order
+     * Can only be called by group orders
+     *
+     * @param deliveryTime The time the client wants the order to be delivered
+     */
+    public void setDeliveryTime(LocalDateTime deliveryTime) {
+        this.deliveryTime = deliveryTime;
     }
 
     /**
