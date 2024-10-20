@@ -5,6 +5,8 @@ import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.*;
+import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.Schedule;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -62,8 +64,7 @@ public class OrderStepDefs {
     @When("the user creates an order and specifies a date, an address and a restaurant")
     public void whenCreatesOrder() {
         deliveryTime = LocalDateTime.of(2024, 10, 16, 21, 0);
-        address = new Address("ch de Carel", "Auribeau", "06810", "");
-        stEats.createOrder(deliveryTime, address, restaurant);
+        stEats.createOrder(deliveryTime, null, restaurant);
     }
 
     @Then("the user can order")

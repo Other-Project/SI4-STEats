@@ -23,7 +23,7 @@ public class SingleOrder implements Order {
     private final String userId;
     private final LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
-    private final Address address;
+    private final String addressId;
     private final Restaurant restaurant;
 
     private Status status = Status.INITIALISED;
@@ -32,13 +32,13 @@ public class SingleOrder implements Order {
     /**
      * @param userId         The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
-     * @param address      The address the client wants the order to be delivered
+     * @param addressId      The label of the address the client wants the order to be delivered
      * @param restaurant   The restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+    public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
         this.userId = userId;
         this.deliveryTime = deliveryTime;
-        this.address = address;
+        this.addressId = addressId;
         this.restaurant = restaurant;
     }
 
@@ -54,7 +54,11 @@ public class SingleOrder implements Order {
 
     @Override
     public Address getAddress() {
-        return address;
+        try {
+            return AddressManager.getInstance().get(addressId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The address of the group order is not found.");
+        }
     }
 
     @Override

@@ -23,20 +23,20 @@ public class GroupOrder implements Order {
     private final LocalDateTime deliveryTime;
     private final String groupCode;
     private final List<SingleOrder> orders = new ArrayList<>();
-    private final Address address;
+    private final String addressId;
     private Status status = Status.INITIALISED;
     private final Restaurant restaurant;
 
     /**
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
-     * @param address      The address where the group order must be delivered
+     * @param addressId      The label of the address where the group order must be delivered
      * @param restaurant   The restaurant in which the group order is made
      */
-    public GroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+    public GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
-        this.address = address;
+        this.addressId = addressId;
         this.restaurant = restaurant;
     }
 
@@ -52,7 +52,11 @@ public class GroupOrder implements Order {
 
     @Override
     public Address getAddress() {
-        return address;
+        try {
+            return AddressManager.getInstance().get(addressId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The address of the group order is not found.");
+        }
     }
 
     @Override
@@ -104,7 +108,7 @@ public class GroupOrder implements Order {
      */
     public SingleOrder createOrder(User user) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        SingleOrder order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
+        SingleOrder order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurant);
         orders.add(order);
         return order;
     }

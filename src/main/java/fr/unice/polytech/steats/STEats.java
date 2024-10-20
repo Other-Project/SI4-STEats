@@ -45,12 +45,13 @@ public class STEats {
      * Create a single order.
      *
      * @param deliveryTime The time the user wants the order to be delivered
-     * @param address      The address the user wants the order to be delivered
      * @param restaurant   The restaurant in which the order is made
+     * @param addressId The label of the address the user wants the order to be delivered
+     * @param restaurant The restaurant in which the order is made
      */
-    public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
+    public void createOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
+        order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurant);
         updateFullMenu(order);
     }
 
@@ -59,12 +60,13 @@ public class STEats {
      *
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
-     * @param address      The address where the group order must be delivered
      * @param restaurant   The restaurant in which the group order is made
+     * @param addressId The label of the address where the group order must be delivered
+     * @param restaurant The restaurant in which the group order is made
      */
-    public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
+    public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        GroupOrder groupOrder = new GroupOrder(groupCode, deliveryTime, address, restaurant);
+        GroupOrder groupOrder = new GroupOrder(groupCode, deliveryTime, addressId, restaurant);
         GroupOrderManager.getInstance().add(groupCode, groupOrder);
         this.groupCode = groupCode;
         order = groupOrder.createOrder(user);
@@ -146,6 +148,13 @@ public class STEats {
      */
     public User getUser() {
         return user;
+    }
+
+    /**
+     * Get all the available delivery addresses (e.g. "Campus SophiaTech", "Lucioles", "IUT", etc.)
+     */
+    public List<String> getAddresses() {
+        return AddressManager.getInstance().getAll().stream().map(Address::label).toList();
     }
 
     /**

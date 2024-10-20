@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.order.AbstractManager;
+import fr.unice.polytech.steats.AbstractManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
