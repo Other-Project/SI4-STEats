@@ -1,13 +1,15 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats;
 
 import fr.unice.polytech.steats.user.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Will manage generic items
- * It will be able to create, delete, update, get and store items
+ * Manage generic items
+ * It stores items and is able to create, delete and get them
  *
  * @author Team C
  */
@@ -60,5 +62,14 @@ public abstract class AbstractManager<T> {
      */
     public void clear() {
         items.clear();
+    }
+
+    /**
+     * Get all the items in the manager.
+     *
+     * @return The list of items in the manager
+     */
+    public List<T> getAll() {
+        return new ArrayList<>(items.values());
     }
 }

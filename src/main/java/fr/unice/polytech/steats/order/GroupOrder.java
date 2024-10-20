@@ -2,8 +2,10 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,21 +22,21 @@ import java.util.List;
 public class GroupOrder implements Order {
     private final LocalDateTime deliveryTime;
     private final String groupCode;
-    private final List<Order> orders = new ArrayList<>();
-    private final Address address;
+    private final List<SingleOrder> orders = new ArrayList<>();
+    private final String addressId;
     private Status status = Status.INITIALISED;
     private final Restaurant restaurant;
 
     /**
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
-     * @param address      The address where the group order must be delivered
+     * @param addressId      The label of the address where the group order must be delivered
      * @param restaurant   The restaurant in which the group order is made
      */
-    public GroupOrder(String groupCode, LocalDateTime deliveryTime, Address address, Restaurant restaurant) {
+    public GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
-        this.address = address;
+        this.addressId = addressId;
         this.restaurant = restaurant;
     }
 
@@ -50,7 +52,11 @@ public class GroupOrder implements Order {
 
     @Override
     public Address getAddress() {
-        return address;
+        try {
+            return AddressManager.getInstance().get(addressId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The address of the group order is not found.");
+        }
     }
 
     @Override
@@ -82,6 +88,14 @@ public class GroupOrder implements Order {
     }
 
     /**
+     * @return The total preparation time of all the single order in the group order
+     */
+    @Override
+    public Duration getPreparationTime() {
+        return orders.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    /**
      * @return The invitation code for the group order
      */
     public String getGroupCode() {
@@ -94,24 +108,26 @@ public class GroupOrder implements Order {
      */
     public SingleOrder createOrder(User user) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        SingleOrder order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
+        SingleOrder order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurant);
         orders.add(order);
         return order;
     }
 
-    /**
-     * Close the group order.
-     * No more single order can be added.
-     * Changes it's status to {@link Status#PAID}.
-     */
-    public void closeGroupOrder() {
+    @Override
+    public void closeOrder() {
         status = Status.PAID;
+        orders.forEach(SingleOrder::closeOrder);
     }
 
     /**
      * @return The list of single orders in the group order
      */
-    public List<Order> getOrders() {
+    public List<SingleOrder> getOrders() {
         return Collections.unmodifiableList(orders);
+    }
+
+    public boolean pay(SingleOrder order) throws NotFoundException {
+        if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
+        return order.pay(false);
     }
 }

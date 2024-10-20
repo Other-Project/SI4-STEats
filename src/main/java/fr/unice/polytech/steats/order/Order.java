@@ -4,6 +4,7 @@ import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.user.User;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,4 +49,17 @@ public interface Order extends Saleable {
      * @return The List of users that have ordered
      */
     List<User> getUsers();
+
+    /**
+     * Close the order.
+     * Changes its status to {@link Status#PAID}.
+     * Send the order to the restaurant.
+     * Add the order to the user's history.
+     */
+    void closeOrder();
+      
+    /**
+     * @return The time it takes to prepare the order
+     */
+    Duration getPreparationTime();
 }

@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.AbstractManager;
+
 /**
  * Will manage group orders
  * It will be able to create, delete, update, get and store group orders
