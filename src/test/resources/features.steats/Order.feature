@@ -18,3 +18,9 @@ Feature: Order
     Given the user orders "Boeuf Bourguignon" and "Pavé de saumon" from the given restaurant
     When the user deletes "Pavé de saumon"
     Then "Pavé de saumon" doesn't appear in the cart anymore
+
+  Scenario: Pay the order
+    Given the order the user created
+    Given the user orders "Boeuf Bourguignon" and "Pavé de saumon" from the given restaurant
+    When the user wants to pay for the items in its cart
+    Then the user pays the order and the order is closed

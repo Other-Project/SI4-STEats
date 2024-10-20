@@ -2,9 +2,11 @@ package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
+import fr.unice.polytech.steats.order.Status;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.Schedule;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -16,8 +18,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class OrderStepDefs {
@@ -91,5 +92,16 @@ public class OrderStepDefs {
     public void thenDoesntAppearTheCart(String itemName) {
         assertEquals(stEats.getCart().size(), 1);
         assertFalse(stEats.getCart().stream().anyMatch(item -> item.getName().equals(itemName)));
+    }
+
+    @When("the user wants to pay for the items in its cart")
+    public void whenWantsToPayTheOrder() throws NotFoundException {
+        assertEquals(2, stEats.getCart().size());
+    }
+
+    @Then("the user pays the order and the order is closed")
+    public void thenUserPaysTheOrderAndTheOrderIsClosed() throws NotFoundException {
+        assertTrue(stEats.payOrder());
+        assertEquals(stEats.getOrder().getStatus(), Status.PAID);
     }
 }
