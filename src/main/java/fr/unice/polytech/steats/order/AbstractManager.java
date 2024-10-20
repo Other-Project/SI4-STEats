@@ -49,15 +49,6 @@ public abstract class AbstractManager<T> {
     }
 
     /**
-     * Get all the items of the manager
-     *
-     * @return A list of all the items in items
-     */
-    public List<T> getAll() {
-        return new ArrayList<>(items.values());
-    }
-
-    /**
      * Check if the manager contains an Item.
      *
      * @param key The key/id of the Item to check
