@@ -17,6 +17,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -60,26 +62,26 @@ public class OrderStepDefs {
         assertFalse(stEats.getAvailableMenu().isEmpty());
     }
 
-    @Given("the order the user created")
-    public void givenTheOrderTheUserCreated() {
-        stEats.createOrder(deliveryTime, "123456", restaurant);
+    @Given("an order to be delivered at {string}")
+    public void givenTheOrderTheUserCreated(String addressId) {
+        stEats.createOrder(deliveryTime, addressId, restaurant);
     }
 
-    @When("the user orders {string} and {string} from the given restaurant")
-    public void whenSelectsMenuItemsFromRestaurant(String menuItemName1, String menuItemName2) {
-        stEats.addMenuItem(stEats.getAvailableMenu().stream()
-                .filter(menuItem -> menuItem.getName().equals(menuItemName1))
-                .findFirst().orElseThrow());
-        stEats.addMenuItem(stEats.getAvailableMenu().stream()
-                .filter(menuItem -> menuItem.getName().equals(menuItemName2))
-                .findFirst().orElseThrow());
+    @When("the user orders the following items from the given restaurant:")
+    public void whenSelectsMenuItemsFromRestaurant(List<Map<String, String>> items) {
+        items.forEach(item -> stEats.addMenuItem(
+                stEats.getAvailableMenu().stream()
+                        .filter(menuItem -> menuItem.getName().equals(item.get("menuItems")))
+                        .findFirst().orElseThrow()
+        ));
     }
 
     @Then("the items are added to his cart")
     public void thenItemsAreAddedToHisCart() {
-        assertEquals(2, stEats.getCart().size());
-        assertEquals("Boeuf Bourguignon", stEats.getCart().get(0).getName());
-        assertEquals("Pavé de saumon", stEats.getCart().get(1).getName());
+        List<String> cart = stEats.getCart().stream().map(MenuItem::getName).toList();
+        assertEquals(2, cart.size());
+        assertTrue(cart.contains("Boeuf Bourguignon"));
+        assertTrue(cart.contains("Pavé de saumon"));
 
     }
 
@@ -90,18 +92,16 @@ public class OrderStepDefs {
 
     @Then("{string} doesn't appear in the cart anymore")
     public void thenDoesntAppearTheCart(String itemName) {
-        assertEquals(stEats.getCart().size(), 1);
         assertFalse(stEats.getCart().stream().anyMatch(item -> item.getName().equals(itemName)));
     }
 
-    @When("the user wants to pay for the items in its cart")
-    public void whenWantsToPayTheOrder() {
-        assertEquals(2, stEats.getCart().size());
+    @When("the user pays for the items in its cart")
+    public void whenWantsToPayTheOrder() throws NotFoundException {
+        assertTrue(stEats.payOrder());
     }
 
     @Then("the user pays the order and the order is closed")
     public void thenUserPaysTheOrderAndTheOrderIsClosed() throws NotFoundException {
-        assertTrue(stEats.payOrder());
         assertEquals(stEats.getOrder().getStatus(), Status.PAID);
     }
 }

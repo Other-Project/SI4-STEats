@@ -9,18 +9,27 @@ Feature: Order
     Then the user can order
 
   Scenario: Adding items to the cart
-    Given the order the user created
-    When the user orders "Boeuf Bourguignon" and "Pavé de saumon" from the given restaurant
+    Given an order to be delivered at "123456"
+    When the user orders the following items from the given restaurant:
+      | menuItems         |
+      | Boeuf Bourguignon |
+      | Pavé de saumon    |
     Then the items are added to his cart
 
   Scenario: Remove item from the cart
-    Given the order the user created
-    Given the user orders "Boeuf Bourguignon" and "Pavé de saumon" from the given restaurant
+    Given an order to be delivered at "123456"
+    Given the user orders the following items from the given restaurant:
+      | menuItems         |
+      | Boeuf Bourguignon |
+      | Pavé de saumon    |
     When the user deletes "Pavé de saumon"
     Then "Pavé de saumon" doesn't appear in the cart anymore
 
   Scenario: Pay the order
-    Given the order the user created
-    Given the user orders "Boeuf Bourguignon" and "Pavé de saumon" from the given restaurant
-    When the user wants to pay for the items in its cart
+    Given an order to be delivered at "123456"
+    Given the user orders the following items from the given restaurant:
+      | menuItems         |
+      | Boeuf Bourguignon |
+      | Pavé de saumon    |
+    When the user pays for the items in its cart
     Then the user pays the order and the order is closed
