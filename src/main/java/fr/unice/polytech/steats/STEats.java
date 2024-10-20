@@ -41,19 +41,19 @@ public class STEats {
     /**
      * Create a single order.
      * @param deliveryTime The time the user wants the order to be delivered
-     * @param address The address the user wants the order to be delivered
+     * @param addressId The label of the address the user wants the order to be delivered
      * @param restaurant The restaurant in which the order is made
      */
-    public void createOrder(LocalDateTime deliveryTime, Address address, Restaurant restaurant) throws IllegalStateException {
+    public void createOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        order = new SingleOrder(user.getUserId(), deliveryTime, address, restaurant);
+        order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurant);
         updateFullMenu(order);
     }
 
     /**
      * Create a group order.
      * @param deliveryTime The time the group order must be delivered
-     * @param address The address where the group order must be delivered
+     * @param addressId The label of the address where the group order must be delivered
      * @param restaurant The restaurant in which the group order is made
      *
      * @return The invitation code for the group order
@@ -161,6 +161,13 @@ public class STEats {
      */
     public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) throws NotFoundException {
         return GroupOrderManager.getInstance().get(groupCode).getAvailableDeliveryTimes(from, numberOfTimes);
+    }
+  
+    /**
+     * Get all the available delivery addresses (e.g. "Campus SophiaTech", "Lucioles", "IUT", etc.)
+     */
+    public List<String> getAddresses() {
+        return AddressManager.getInstance().getAll().stream().map(Address::label).toList();
     }
 
     /**
