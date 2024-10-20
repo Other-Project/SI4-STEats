@@ -96,7 +96,7 @@ public class OrderStepDefs {
 
     @When("The user filter by typing {string}")
     public void theUserFilterByTyping(String restaurantName) {
-        restaurantListFiltered = RestaurantManager.filterRestaurant(restaurantName, null, null);
+        restaurantListFiltered = RestaurantManager.filterRestaurantByName(restaurantName);
     }
 
     //endregion
@@ -112,7 +112,7 @@ public class OrderStepDefs {
 
     @When("The user filter by selecting {string}")
     public void theUserFilterBySelecting(String typeOfFood) {
-        restaurantListFiltered = RestaurantManager.filterRestaurant(null, TypeOfFood.valueOf(typeOfFood), null);
+        restaurantListFiltered = RestaurantManager.filterRestaurantByTypeOfFood(TypeOfFood.valueOf(typeOfFood));
     }
 
     //endregion
