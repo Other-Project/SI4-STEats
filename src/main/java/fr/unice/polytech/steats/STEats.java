@@ -153,6 +153,17 @@ public class STEats {
     }
 
     /**
+     * Get the list of possible delivery times for the group order
+     *
+     * @param from The time from which the delivery times are calculated
+     * @param to   The time to which the delivery times are calculated
+     * @return The list of possible delivery times
+     */
+    public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, LocalDateTime to) throws NotFoundException {
+        return GroupOrderManager.getInstance().get(groupCode).getAvailableDeliveryTimes(from, to);
+    }
+
+    /**
      * The user wants to proceed to the payment of the order
      *
      * @return If the payment was successful
@@ -192,6 +203,9 @@ public class STEats {
      */
     public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException {
         if (groupCode == null) throw new IllegalStateException("Cannot change delivery time of a single order");
+        if (!getAvailableDeliveryTimes(deliveryTime, deliveryTime.plusMinutes(1)).contains(deliveryTime)) {
+            throw new IllegalStateException("Delivery time not available");
+        }
         GroupOrderManager.getInstance().get(groupCode).setDeliveryTime(deliveryTime);
     }
 }
