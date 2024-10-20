@@ -3,10 +3,9 @@ package fr.unice.polytech.steats.stepsDef.backend;
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
+import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.*;
-import fr.unice.polytech.steats.restaurant.MenuItem;
-import fr.unice.polytech.steats.restaurant.Schedule;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -29,7 +28,6 @@ public class OrderStepDefs {
     STEatsController steatsController;
     Restaurant restaurant;
     LocalDateTime deliveryTime;
-    Address address;
     List<Restaurant> restaurantListFiltered;
 
     @Before
@@ -124,6 +122,7 @@ public class OrderStepDefs {
     @Given("The following restaurants with schedule and order duration and order scheduled to {string} :")
     public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledTo(String deliveryTime, List<Map<String, String>> items) {
         LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
+        int id = 0;
         for (Map<String, String> item : items) {
             restaurant = new Restaurant(item.get("name"));
             DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
@@ -131,7 +130,8 @@ public class OrderStepDefs {
             Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
             restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
             restaurant.addSchedule(schedule);
-            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, new Address("ch de Carel", "Auribeau", "06810", ""), restaurant);
+            AddressManager.getInstance().add("Address N°" + id++, new Address("Campus SophiaTech", "1", "rue", "ville", "codePostal"));
+            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Address N°" + id++, restaurant);
             Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("orderDuration")));
             order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
             restaurant.addOrder(order);

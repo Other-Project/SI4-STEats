@@ -39,7 +39,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
         String nameFilter = name == null || name.isEmpty() ? null : name.toLowerCase();
         return getInstance().getAll()
                 .stream()
-                .filter(restaurant -> nameFilter == null || nameFilter.isEmpty() || restaurant.getName().toLowerCase().contains(nameFilter))
+                .filter(restaurant -> nameFilter == null || restaurant.getName().toLowerCase().contains(nameFilter))
                 .filter(restaurant -> type == null || restaurant.getTypeOfFood() == type)
                 .filter(restaurant -> deliveryTime == null || restaurant.canDeliverAt(deliveryTime))
                 .toList();
