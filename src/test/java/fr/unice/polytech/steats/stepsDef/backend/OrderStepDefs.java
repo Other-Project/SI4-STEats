@@ -5,7 +5,6 @@ import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -33,7 +32,7 @@ public class OrderStepDefs {
     }
 
     @Given("an user of id {string}")
-    public void givenAnUser(String userId) throws NotFoundException {
+    public void givenAnUser(String userId) {
         steatsController = new STEatsController();
         UserManager.getInstance().fillForDemo();
         assertDoesNotThrow(() -> stEats = steatsController.logging(userId));
