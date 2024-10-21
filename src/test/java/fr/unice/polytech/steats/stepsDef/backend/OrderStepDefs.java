@@ -5,11 +5,8 @@ import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.restaurant.*;
 import fr.unice.polytech.steats.order.Status;
-import fr.unice.polytech.steats.restaurant.MenuItem;
-import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.restaurant.Schedule;
+import fr.unice.polytech.steats.restaurant.*;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.Before;
@@ -24,13 +21,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class OrderStepDefs {
     STEats stEats;
