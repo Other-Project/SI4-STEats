@@ -128,8 +128,7 @@ public class Restaurant {
     public boolean canDeliverAt(LocalDateTime deliveryTime) {
         try {
             Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-            return menu.stream()
-                    .anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
+            return menu.stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
         } catch (Exception e) {
             return false;
         }

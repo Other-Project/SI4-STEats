@@ -77,8 +77,7 @@ public class OrderStepDefs {
     @Then("The list of all restaurant displayed should contain the following restaurants:")
     public void theListOfAllRestaurantDisplayedShouldContainTheFollowingRestaurants(List<Map<String, String>> items) {
         for (Map<String, String> item : items) {
-            assertTrue(restaurantListFiltered.stream()
-                    .anyMatch(restaurantFiltered -> restaurantFiltered.getName().equals(item.get("name"))));
+            assertTrue(restaurantListFiltered.stream().anyMatch(restaurantFiltered -> restaurantFiltered.getName().equals(item.get("name"))));
         }
         assertEquals(items.size(), restaurantListFiltered.size());
     }
@@ -96,7 +95,7 @@ public class OrderStepDefs {
 
     @When("The user filter by typing {string}")
     public void theUserFilterByTyping(String restaurantName) {
-        restaurantListFiltered = RestaurantManager.filterRestaurantByName(restaurantName);
+        restaurantListFiltered = RestaurantManager.filterRestaurant(restaurantName);
     }
 
     //endregion
@@ -112,7 +111,7 @@ public class OrderStepDefs {
 
     @When("The user filter by selecting {string}")
     public void theUserFilterBySelecting(String typeOfFood) {
-        restaurantListFiltered = RestaurantManager.filterRestaurantByTypeOfFood(TypeOfFood.valueOf(typeOfFood));
+        restaurantListFiltered = RestaurantManager.filterRestaurant(TypeOfFood.valueOf(typeOfFood));
     }
 
     //endregion
@@ -122,7 +121,6 @@ public class OrderStepDefs {
     @Given("The following restaurants with schedule and order duration and order scheduled to {string} :")
     public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledTo(String deliveryTime, List<Map<String, String>> items) {
         LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
-        int id = 0;
         for (Map<String, String> item : items) {
             restaurant = new Restaurant(item.get("name"));
             DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
@@ -130,8 +128,7 @@ public class OrderStepDefs {
             Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
             restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
             restaurant.addSchedule(schedule);
-            AddressManager.getInstance().add("Address N°" + id++, new Address("Campus SophiaTech", "1", "rue", "ville", "codePostal"));
-            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Address N°" + id++, restaurant);
+            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus Sophia Tech", restaurant);
             Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("orderDuration")));
             order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
             restaurant.addOrder(order);
@@ -142,7 +139,7 @@ public class OrderStepDefs {
     @When("The user filter by selecting a delivery time of {string}")
     public void theUserFilterBySelectingADeliveryTimeOf(String deliveryTime) {
         LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
-        restaurantListFiltered = RestaurantManager.filterRestaurantByDeliveryTime(deliveryTimeParsed);
+        restaurantListFiltered = RestaurantManager.filterRestaurant(deliveryTimeParsed);
     }
 
     //endregion
@@ -152,6 +149,11 @@ public class OrderStepDefs {
     @When("The user filter by typing {string} and selecting {string}")
     public void theUserFilterByTypingAndSelecting(String restaurantName, String typeOfFood) {
         restaurantListFiltered = RestaurantManager.filterRestaurant(restaurantName, TypeOfFood.valueOf(typeOfFood), null);
+    }
+
+    @Given("The address labelled {string}")
+    public void theAddressLabelled(String addressLabel) {
+        AddressManager.getInstance().add(addressLabel, new Address("Campus Sophia Tech", "1", "rue", "ville", "codePostal"));
     }
 
     //endregion

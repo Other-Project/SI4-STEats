@@ -51,7 +51,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      * @param name The name of the restaurant
      * @return A list of restaurants that have the name given in args
      */
-    public static List<Restaurant> filterRestaurantByName(String name) {
+    public static List<Restaurant> filterRestaurant(String name) {
         return filterRestaurant(name, null, null);
     }
 
@@ -61,7 +61,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      * @param typeOfFood The type of food the restaurant serves
      * @return A list of restaurants that serve the type of food given in args
      */
-    public static List<Restaurant> filterRestaurantByTypeOfFood(TypeOfFood typeOfFood) {
+    public static List<Restaurant> filterRestaurant(TypeOfFood typeOfFood) {
         return filterRestaurant(null, typeOfFood, null);
     }
 
@@ -71,8 +71,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      * @param deliveryTime The time the user wants the order to be delivered
      * @return A list of restaurants that can deliver at the time given in args
      */
-    public static List<Restaurant> filterRestaurantByDeliveryTime(LocalDateTime deliveryTime) {
+    public static List<Restaurant> filterRestaurant(LocalDateTime deliveryTime) {
         return filterRestaurant(null, null, deliveryTime);
     }
 }
-
