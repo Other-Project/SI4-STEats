@@ -74,76 +74,248 @@ UC20 <. UC30 : extends
 
 ```mermaid
 classDiagram
-class Restaurant {
-    name : String
-    getMenu(Time delivery_time) MenuItem[]
+direction BT
+class AbstractManager~T~ {
+  + add(String, T) void
+  + contains(String) boolean
+  + get(String) T
+  + remove(String) void
+  + clear() void
+   List~T~ all
 }
-
-class Schedule {
-    start : Time
-    end : Time
-    nb_person : int
-}
-
-class MenuItem {
-    name : String
-    price : double
-    preparation_time : Time
-}
-
-class TypeOfFood {
-    <<Enumeration>>
-    FAST_FOOD
-    DRINKS
-    SNACKS
-    DESERTS
-}
-
-class Order {
-    delivery_time : DateTime
-    user_id : String
-    addMenuItem(MenuItem item) void
-    getTotalPrice() double
-    pay()
-    useDiscount()
-    checkIfDiscount()
-    addDiscountToUser()
-}
-
-class GroupOrder {
-    group_code : String
-    delivery_time : DateTime
-    createOrder(String userId) Order
-    getMenu() MenuItem[]
-    closeGroupOrder() void
-}
-
 class Address {
-    additional_adress : String
-    street : String
-    city : String
-    postal_code : String
+  + label() String
+  + postal_code() String
+  + city() String
+  + street() String
+  + additional_address() String
 }
-
+class AddressManager {
+   AddressManager INSTANCE
+}
+class Discount {
+  + value(double) double
+  + isApplicable(SingleOrder) boolean
+  + freeItems() List~MenuItem~
+  + getNewPrice(double) double
+  + canBeAppliedDirectly() boolean
+   boolean stackable
+   boolean expired
+}
+class DiscountBuilder {
+  + expiresAt(LocalDateTime) DiscountBuilder
+  + neverExpires() DiscountBuilder
+  + unstackable() DiscountBuilder
+  + stackable() DiscountBuilder
+  + build() Discount
+  + appliesAfterOrder() DiscountBuilder
+  + oneTimeOffer() DiscountBuilder
+  + appliesDuringOrder() DiscountBuilder
+   double orderCredit
+   MenuItem[] freeItems
+   Criteria criteria
+   double orderDiscount
+   int currentOrderItemsAmount
+   Role[] userRoles
+   Discounts discounts
+   int ordersAmount
+   Options options
+   int itemsAmount
+}
+class GroupOrder {
+  + pay(SingleOrder) boolean
+  + closeOrder() void
+  + createOrder(User) SingleOrder
+  + getAvailableMenu(LocalDateTime) List~MenuItem~
+   double price
+   List~SingleOrder~ orders
+   List~User~ users
+   Restaurant restaurant
+   Duration preparationTime
+   String groupCode
+   Address address
+   LocalDateTime deliveryTime
+   List~MenuItem~ items
+   Status status
+}
+class GroupOrderManager {
+   GroupOrderManager INSTANCE
+}
+class MenuItem {
+  + hashCode() int
+  + toString() String
+  + equals(Object) boolean
+   double price
+   String name
+   Duration preparationTime
+}
+class NotFoundException
+class Order {
+<<Interface>>
+  + getAvailableMenu(LocalDateTime) List~MenuItem~
+  + closeOrder() void
+   List~User~ users
+   Restaurant restaurant
+   Duration preparationTime
+   Address address
+   LocalDateTime deliveryTime
+   List~MenuItem~ items
+   Status status
+}
+class PaymentSystem {
+  + pay(double) boolean
+}
+class Restaurant {
+  + addDiscount(Discount) void
+  + equals(Object) boolean
+  + getAvailableMenu(LocalDateTime) List~MenuItem~
+  + removeMenuItem(MenuItem) void
+  + hashCode() int
+  + toString() String
+  + removeDiscount(Discount) void
+  - getMaxCapacityLeft(LocalDateTime) Duration
+  + addSchedule(Schedule) void
+  + addOrder(Order) void
+  + availableDiscounts(SingleOrder) List~Discount~
+  + addMenuItem(MenuItem) void
+  + discounts() List~Discount~
+  + canHandle(Order, LocalDateTime) boolean
+  - capacityLeft(Schedule, LocalDateTime) Duration
+   String name
+   TypeOfFood typeOfFood
+   List~Order~ orders
+   List~MenuItem~ fullMenu
+}
+class RestaurantManager {
+   RestaurantManager INSTANCE
+}
+class Role {
+<<enumeration>>
+  + values() Role[]
+  + valueOf(String) Role
+}
+class STEats {
+  + closeGroupOrder() void
+  + canCloseGroupOrder() boolean
+  + createOrder(LocalDateTime, String, Restaurant) void
+  + payOrder() boolean
+  + joinGroupOrder(String) void
+  + addMenuItem(MenuItem) void
+  + removeMenuItem(MenuItem) void
+  - updateFullMenu(Order) void
+  + createGroupOrder(String, LocalDateTime, String, Restaurant) void
+   List~MenuItem~ availableMenu
+   SingleOrder order
+   List~MenuItem~ fullMenu
+   double totalPrice
+   List~MenuItem~ cart
+   User user
+   List~String~ addresses
+}
+class STEatsController {
+  + logging(String) STEats
+}
+class Saleable {
+<<Interface>>
+   double price
+}
+class Schedule {
+  + overlap(Schedule) boolean
+  + isBetween(LocalDateTime, LocalDateTime) boolean
+  + contains(LocalDateTime) Boolean
+  + compareTo(Schedule) int
+  + contains(Order) Boolean
+  + toString() String
+  + compareTo(LocalDateTime) int
+   Duration totalCapacity
+   Duration duration
+   LocalTime end
+   LocalTime start
+}
+class SingleOrder {
+  + closeOrder() void
+  + pay(boolean) boolean
+  + addMenuItem(MenuItem) void
+  + getAvailableMenu(LocalDateTime) List~MenuItem~
+  + removeMenuItem(MenuItem) void
+  + validateOrder() void
+  - updateDiscounts() void
+   List~Discount~ discounts
+   Address address
+   User user
+   double price
+   List~User~ users
+   Restaurant restaurant
+   Duration preparationTime
+   List~Discount~ discountsToApplyNext
+   double subPrice
+   LocalDateTime deliveryTime
+   List~MenuItem~ items
+   Status status
+   String userId
+}
+class SingleOrderManager {
+   SingleOrderManager INSTANCE
+}
 class Status {
-    <<Enumeration>>
-    INITIALISED
-    COMPLETING
-    FINALISING
-    IN_PREPARATION
-    READY_FOR_DELIVERY
-    IN_DELIVERY
-    DELIVERED
+<<enumeration>>
+  + valueOf(String) Status
+  + values() Status[]
+}
+class TypeOfFood {
+<<enumeration>>
+  + values() TypeOfFood[]
+  + valueOf(String) TypeOfFood
+}
+class User {
+  + addOrderToHistory(SingleOrder) void
+  + pay(double) boolean
+  + getOrders(Restaurant) List~SingleOrder~
+  + getDiscountsToApplyNext(Restaurant) List~Discount~
+   String name
+   List~Order~ orders
+   Role role
+   String userId
+}
+class UserManager {
+  + fillForDemo() void
+   UserManager INSTANCE
 }
 
-Order "* orders " -- "1 group " GroupOrder
-Restaurant "1 restaurant" -- "1..* menu" MenuItem
-MenuItem "1..* items"  --  "* orders" Order
-Restaurant "1 restaurant" -- "* orders" Order
-Status "1 status" <-- "* " Order
-Restaurant "1 restaurant" -- " * schedules" Schedule
-Address "1 address" -- "* orders" Order
-TypeOfFood "1 type_of_food" <-- "*" Restaurant
+AbstractManager~T~  ..>  NotFoundException : «create»
+AddressManager  -->  AbstractManager~T~ 
+DiscountBuilder  ..>  Discount : «create»
+GroupOrder  ..>  Order 
+GroupOrder "1" *--> "restaurant 1" Restaurant 
+GroupOrder  ..>  SingleOrder : «create»
+GroupOrder "1" *--> "orders *" SingleOrder 
+GroupOrder "1" *--> "status 1" Status 
+GroupOrderManager  -->  AbstractManager~T~ 
+MenuItem  ..>  Saleable 
+Order  -->  Saleable 
+Restaurant "1" *--> "discounts *" Discount 
+Restaurant "1" *--> "menu *" MenuItem 
+Restaurant "1" *--> "orders *" Order 
+Restaurant "1" *--> "schedules *" Schedule 
+Restaurant "1" *--> "typeOfFood 1" TypeOfFood 
+RestaurantManager  -->  AbstractManager~T~ 
+STEats  ..>  GroupOrder : «create»
+STEats "1" *--> "fullMenu *" MenuItem 
+STEats "1" *--> "order 1" SingleOrder 
+STEats  ..>  SingleOrder : «create»
+STEats "1" *--> "user 1" User 
+STEatsController  ..>  NotFoundException : «create»
+STEatsController  ..>  STEats : «create»
+SingleOrder "1" *--> "appliedDiscounts *" Discount 
+SingleOrder "1" *--> "items *" MenuItem 
+SingleOrder  ..>  Order 
+SingleOrder "1" *--> "restaurant 1" Restaurant 
+SingleOrder "1" *--> "status 1" Status 
+SingleOrderManager  -->  AbstractManager~T~ 
+User "1" *--> "role 1" Role 
+User "1" *--> "ordersHistory *" SingleOrder 
+UserManager  -->  AbstractManager~T~ 
+UserManager  ..>  User : «create»
 ```
 
 # Sequence Diagram
