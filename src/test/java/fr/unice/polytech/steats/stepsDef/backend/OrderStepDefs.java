@@ -79,7 +79,7 @@ public class OrderStepDefs {
     @Then("the following items are in his cart:")
     public void thenItemsAreAddedToHisCart(List<Map<String, String>> items) {
         List<String> cart = stEats.getCart().stream().map(MenuItem::getName).toList();
-        assertEquals(2, cart.size());
+        assertEquals(items.size(), cart.size());
         items.forEach(item -> assertTrue(cart.contains(item.get("menuItems"))));
     }
 
