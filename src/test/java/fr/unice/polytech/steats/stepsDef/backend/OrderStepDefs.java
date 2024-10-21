@@ -153,7 +153,8 @@ public class OrderStepDefs {
 
     @Given("The address labelled {string}")
     public void theAddressLabelled(String addressLabel) {
-        AddressManager.getInstance().add(addressLabel, new Address("Campus Sophia Tech", "1", "rue", "ville", "codePostal"));
+        if (!AddressManager.getInstance().contains(addressLabel))
+            AddressManager.getInstance().add(addressLabel, new Address("Campus Sophia Tech", "1", "rue", "ville", "codePostal"));
     }
 
     //endregion
