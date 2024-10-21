@@ -6,6 +6,11 @@ import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.*;
+import fr.unice.polytech.steats.order.Status;
+import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.Schedule;
+import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -19,9 +24,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class OrderStepDefs {
     STEats stEats;
@@ -33,6 +42,7 @@ public class OrderStepDefs {
     @Before
     public void before() {
         RestaurantManager.getInstance().clear();
+        UserManager.getInstance().clear();
     }
 
     //region Background for order test
@@ -158,4 +168,45 @@ public class OrderStepDefs {
     }
 
     //endregion
+
+    @Given("an order to be delivered at {string}")
+    public void givenTheOrderTheUserCreated(String addressId) {
+        stEats.createOrder(deliveryTime, addressId, restaurant);
+    }
+
+    @When("the user orders the following items from the given restaurant:")
+    public void whenSelectsMenuItemsFromRestaurant(List<Map<String, String>> items) {
+        items.forEach(item -> stEats.addMenuItem(
+                stEats.getAvailableMenu().stream()
+                        .filter(menuItem -> menuItem.getName().equals(item.get("menuItems")))
+                        .findFirst().orElseThrow()
+        ));
+    }
+
+    @Then("the following items are in his cart:")
+    public void thenItemsAreAddedToHisCart(List<Map<String, String>> items) {
+        List<String> cart = stEats.getCart().stream().map(MenuItem::getName).toList();
+        assertEquals(items.size(), cart.size());
+        items.forEach(item -> assertTrue(cart.contains(item.get("menuItems"))));
+    }
+
+    @When("the user deletes {string}")
+    public void whenDeletesOrderedBefore(String itemName) {
+        stEats.removeMenuItem(stEats.getCart().stream().filter(item -> item.getName().equals(itemName)).findFirst().orElseThrow());
+    }
+
+    @Then("{string} doesn't appear in the cart anymore")
+    public void thenDoesntAppearTheCart(String itemName) {
+        assertFalse(stEats.getCart().stream().anyMatch(item -> item.getName().equals(itemName)));
+    }
+
+    @When("the user pays for the items in its cart")
+    public void whenWantsToPayTheOrder() throws NotFoundException {
+        assertTrue(stEats.payOrder());
+    }
+
+    @Then("the order has the {string} status")
+    public void thenUserPaysTheOrderAndTheOrderIsClosed(String status) {
+        assertEquals(stEats.getOrder().getStatus(), Status.valueOf(status));
+    }
 }
