@@ -76,8 +76,8 @@ public class OrderStepDefs {
         ));
     }
 
-    @Then("the items are added to his cart")
-    public void thenItemsAreAddedToHisCart() {
+    @Then("the following items are in his cart:")
+    public void thenItemsAreAddedToHisCart(List<Map<String, String>> items) {
         List<String> cart = stEats.getCart().stream().map(MenuItem::getName).toList();
         assertEquals(2, cart.size());
         assertTrue(cart.contains("Boeuf Bourguignon"));
@@ -100,8 +100,8 @@ public class OrderStepDefs {
         assertTrue(stEats.payOrder());
     }
 
-    @Then("the user pays the order and the order is closed")
-    public void thenUserPaysTheOrderAndTheOrderIsClosed() throws NotFoundException {
-        assertEquals(stEats.getOrder().getStatus(), Status.PAID);
+    @Then("the order has the {string} status")
+    public void thenUserPaysTheOrderAndTheOrderIsClosed(String status) {
+        assertEquals(stEats.getOrder().getStatus(), Status.valueOf(status));
     }
 }

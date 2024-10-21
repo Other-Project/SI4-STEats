@@ -14,7 +14,10 @@ Feature: Order
       | menuItems         |
       | Boeuf Bourguignon |
       | Pavé de saumon    |
-    Then the items are added to his cart
+    Then the following items are in his cart:
+      | menuItems         |
+      | Boeuf Bourguignon |
+      | Pavé de saumon    |
 
   Scenario: Remove item from the cart
     Given an order to be delivered at "123456"
@@ -32,4 +35,4 @@ Feature: Order
       | Boeuf Bourguignon |
       | Pavé de saumon    |
     When the user pays for the items in its cart
-    Then the user pays the order and the order is closed
+    Then the order has the "PAID" status
