@@ -58,19 +58,18 @@ public class STEats {
     /**
      * Create a group order.
      *
-     * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
-     * @param restaurant   The restaurant in which the group order is made
      * @param addressId The label of the address where the group order must be delivered
      * @param restaurant The restaurant in which the group order is made
      */
-    public void createGroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
+    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        GroupOrder groupOrder = new GroupOrder(groupCode, deliveryTime, addressId, restaurant);
+        GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurant);
+        this.groupCode = groupOrder.getGroupCode();
         GroupOrderManager.getInstance().add(groupCode, groupOrder);
-        this.groupCode = groupCode;
         order = groupOrder.createOrder(user);
         updateFullMenu(order);
+        return groupCode;
     }
 
     /**
@@ -81,6 +80,15 @@ public class STEats {
 
     public SingleOrder getOrder() {
         return order;
+    }
+
+    /**
+     * Get the group code of the group order
+     *
+     * @return The group code
+     */
+    public String getGroupCode() {
+        return groupCode;
     }
 
     /**
@@ -151,6 +159,17 @@ public class STEats {
     }
 
     /**
+     * Get the list of possible delivery times for the group order
+     *
+     * @param from The time from which the delivery times are calculated
+     * @param numberOfTimes The number of possible delivery times
+     * @return The list of possible delivery times
+     */
+    public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) throws NotFoundException {
+        return GroupOrderManager.getInstance().get(groupCode).getAvailableDeliveryTimes(from, numberOfTimes);
+    }
+
+    /**
      * Get all the available delivery addresses (e.g. "Campus SophiaTech", "Lucioles", "IUT", etc.)
      */
     public List<String> getAddresses() {
@@ -199,4 +218,14 @@ public class STEats {
         return RestaurantManager.getInstance().getAll();
     }
 
+
+    /**
+     * Change the delivery time of the group order
+     *
+     * @param deliveryTime The new delivery time
+     */
+    public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException {
+        if (groupCode == null) throw new IllegalStateException("Cannot change delivery time of a single order");
+        GroupOrderManager.getInstance().get(groupCode).setDeliveryTime(deliveryTime);
+    }
 }

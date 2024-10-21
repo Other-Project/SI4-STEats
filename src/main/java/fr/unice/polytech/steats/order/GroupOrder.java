@@ -7,10 +7,7 @@ import fr.unice.polytech.steats.user.User;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * A group order is an order that contains multiples single order, each from a different user.
@@ -20,7 +17,7 @@ import java.util.List;
  * @author Team C
  */
 public class GroupOrder implements Order {
-    private final LocalDateTime deliveryTime;
+    private LocalDateTime deliveryTime;
     private final String groupCode;
     private final List<SingleOrder> orders = new ArrayList<>();
     private final String addressId;
@@ -30,14 +27,23 @@ public class GroupOrder implements Order {
     /**
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
-     * @param addressId      The label of the address where the group order must be delivered
+     * @param addressId    The label of the address where the group order must be delivered
      * @param restaurant   The restaurant in which the group order is made
      */
-    public GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+    private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
         this.restaurant = restaurant;
+    }
+
+    /**
+     * @param deliveryTime The time the group order must be delivered
+     * @param addressId    The label of the address where the group order must be delivered
+     * @param restaurant   The restaurant in which the group order is made
+     */
+    public GroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+        this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurant);
     }
 
     @Override
@@ -103,7 +109,23 @@ public class GroupOrder implements Order {
     }
 
     /**
+     * Change the delivery time of the group order.
+     * The delivery time of the single orders will be updated as well.
+     *
+     * @param deliveryTime The time the group order must be delivered
+     * @implNote The delivery time can only be set once.
+     */
+    public void setDeliveryTime(LocalDateTime deliveryTime) {
+        if (this.deliveryTime != null) throw new IllegalStateException("Delivery time already set");
+        if (orders.stream().noneMatch(order -> order.getItems().isEmpty()) && !restaurant.canHandle(this, deliveryTime))
+            throw new IllegalStateException("Delivery time not available");
+        this.deliveryTime = deliveryTime;
+        for (SingleOrder order : orders) order.setDeliveryTime(deliveryTime);
+    }
+
+    /**
      * @param user The user that joined the group order
+     *
      * @return The order created with the user ID, and with the delivery time and the address of the group order.
      */
     public SingleOrder createOrder(User user) {
@@ -126,8 +148,30 @@ public class GroupOrder implements Order {
         return Collections.unmodifiableList(orders);
     }
 
+    /**
+     * @param order The single order of the user that wants to pay
+     *
+     * @return if the payment was successful
+     */
     public boolean pay(SingleOrder order) throws NotFoundException {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
         return order.pay(false);
+    }
+
+    /**
+     * Calculate the available delivery times for the group order.
+     *
+     * @param from The start of the time range
+     * @param numberOfTimes The number of delivery times to calculate
+     * @return The list of available delivery times
+     */
+    public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) {
+        List<LocalDateTime> availableTimes = new ArrayList<>();
+        LocalDateTime time = from;
+        while (availableTimes.size() < numberOfTimes) {
+            if (restaurant.canHandle(this, time)) availableTimes.add(time);
+            time = time.plusMinutes(30);
+        }
+        return availableTimes;
     }
 }
