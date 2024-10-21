@@ -129,7 +129,7 @@ public class OrderStepDefs {
             restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
             restaurant.addSchedule(schedule);
             SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus Sophia Tech", restaurant);
-            Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("orderDuration")));
+            Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("preparationTime")));
             order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
             restaurant.addOrder(order);
             RestaurantManager.getInstance().add(item.get("name"), restaurant);

@@ -45,8 +45,8 @@ public class STEats {
      * Create a single order.
      *
      * @param deliveryTime The time the user wants the order to be delivered
-     * @param restaurant   The restaurant in which the order is made
      * @param addressId    The label of the address the user wants the order to be delivered
+     * @param restaurant   The restaurant in which the order is made
      */
     public void createOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
@@ -209,8 +209,6 @@ public class STEats {
 
     /**
      * Retrieve the list of all the restaurants
-     *
-     * @return The list of all the restaurants
      */
     public List<Restaurant> getAllRestaurants() {
         return RestaurantManager.getInstance().getAll();
