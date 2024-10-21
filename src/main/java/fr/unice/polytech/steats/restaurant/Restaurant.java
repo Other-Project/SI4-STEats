@@ -27,16 +27,34 @@ public class Restaurant {
     private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
+    /**
+     * Create a restaurant
+     *
+     * @param name             The name of the restaurant
+     * @param typeOfFood       The type of food the restaurant serves
+     * @param scheduleDuration The duration of the schedule
+     */
     public Restaurant(String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
         this.name = name;
         this.typeOfFood = typeOfFood;
         this.scheduleDuration = scheduleDuration;
     }
 
+    /**
+     * Create a restaurant
+     *
+     * @param name The name of the restaurant
+     */
     public Restaurant(String name) {
         this(name, TypeOfFood.CLASSIC);
     }
 
+    /**
+     * Create a restaurant
+     *
+     * @param name       The name of the restaurant
+     * @param typeOfFood The type of food the restaurant serves
+     */
     public Restaurant(String name, TypeOfFood typeOfFood) {
         this(name, typeOfFood, Duration.ofMinutes(30));
     }

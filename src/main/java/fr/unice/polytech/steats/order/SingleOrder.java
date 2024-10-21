@@ -30,9 +30,9 @@ public class SingleOrder implements Order {
     private final List<Discount> appliedDiscounts = new ArrayList<>();
 
     /**
-     * @param userId         The user that initialized the order
+     * @param userId       The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
-     * @param addressId      The label of the address the client wants the order to be delivered
+     * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurant   The restaurant in which the order is made
      */
     public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
@@ -201,6 +201,9 @@ public class SingleOrder implements Order {
 
     /**
      * Pay the order
+     *
+     * @param closeOrder true if the order should be closed after the payment
+     * @return true if the payment is successful, false otherwise
      */
     public boolean pay(boolean closeOrder) throws NotFoundException {
         if (status == Status.PAID) throw new IllegalStateException("Order already paid");

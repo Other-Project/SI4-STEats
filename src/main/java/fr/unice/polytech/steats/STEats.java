@@ -46,8 +46,7 @@ public class STEats {
      *
      * @param deliveryTime The time the user wants the order to be delivered
      * @param restaurant   The restaurant in which the order is made
-     * @param addressId The label of the address the user wants the order to be delivered
-     * @param restaurant The restaurant in which the order is made
+     * @param addressId    The label of the address the user wants the order to be delivered
      */
     public void createOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
@@ -59,8 +58,8 @@ public class STEats {
      * Create a group order.
      *
      * @param deliveryTime The time the group order must be delivered
-     * @param addressId The label of the address where the group order must be delivered
-     * @param restaurant The restaurant in which the group order is made
+     * @param addressId    The label of the address where the group order must be delivered
+     * @param restaurant   The restaurant in which the group order is made
      */
     public String createGroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
@@ -77,7 +76,6 @@ public class STEats {
      *
      * @return the order of the user
      */
-
     public SingleOrder getOrder() {
         return order;
     }
@@ -161,7 +159,7 @@ public class STEats {
     /**
      * Get the list of possible delivery times for the group order
      *
-     * @param from The time from which the delivery times are calculated
+     * @param from          The time from which the delivery times are calculated
      * @param numberOfTimes The number of possible delivery times
      * @return The list of possible delivery times
      */
@@ -217,7 +215,6 @@ public class STEats {
     public List<Restaurant> getAllRestaurants() {
         return RestaurantManager.getInstance().getAll();
     }
-
 
     /**
      * Change the delivery time of the group order

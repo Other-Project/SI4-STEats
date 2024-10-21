@@ -12,6 +12,7 @@ public class STEatsController {
 
     /**
      * Create the link between the user and the facade
+     *
      * @param userName the username to log in
      * @return the facade associated with  the user
      */

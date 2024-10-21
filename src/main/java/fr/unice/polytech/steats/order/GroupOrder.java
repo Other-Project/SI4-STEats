@@ -124,8 +124,9 @@ public class GroupOrder implements Order {
     }
 
     /**
-     * @param user The user that joined the group order
+     * Add a user to the group order.
      *
+     * @param user The user that joined the group order
      * @return The order created with the user ID, and with the delivery time and the address of the group order.
      */
     public SingleOrder createOrder(User user) {
@@ -149,8 +150,9 @@ public class GroupOrder implements Order {
     }
 
     /**
-     * @param order The single order of the user that wants to pay
+     * Pay the single order of a user.
      *
+     * @param order The single order of the user that wants to pay
      * @return if the payment was successful
      */
     public boolean pay(SingleOrder order) throws NotFoundException {
@@ -161,7 +163,7 @@ public class GroupOrder implements Order {
     /**
      * Calculate the available delivery times for the group order.
      *
-     * @param from The start of the time range
+     * @param from          The start of the time range
      * @param numberOfTimes The number of delivery times to calculate
      * @return The list of available delivery times
      */
