@@ -9,12 +9,22 @@ public class MenuItem implements Saleable {
     private final double price;
     private final Duration preparationTime;
 
+    /**
+     * Create a menu item
+     *
+     * @param name            The name of the menu item
+     * @param price           The price of the menu item
+     * @param preparationTime The time needed to prepare the menu item
+     */
     public MenuItem(String name, double price, Duration preparationTime) {
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
     }
 
+    /**
+     * Get the name of the menu item
+     */
     public String getName() {
         return this.name;
     }
@@ -27,6 +37,9 @@ public class MenuItem implements Saleable {
         return this.price;
     }
 
+    /**
+     * Get the preparation time of the menu item
+     */
     public Duration getPreparationTime() {
         return this.preparationTime;
     }

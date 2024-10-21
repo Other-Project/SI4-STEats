@@ -41,7 +41,7 @@ public abstract class AbstractManager<T> {
      * Get an Item from the manager.
      *
      * @param key The key/id of the Item to get
-     * @return The group order
+     * @return The value associated with the key
      */
     public T get(String key) throws NotFoundException {
         if (!items.containsKey(key)) throw new NotFoundException("The item does not exist.");
