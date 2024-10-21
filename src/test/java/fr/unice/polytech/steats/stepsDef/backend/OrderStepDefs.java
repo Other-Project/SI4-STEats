@@ -80,9 +80,7 @@ public class OrderStepDefs {
     public void thenItemsAreAddedToHisCart(List<Map<String, String>> items) {
         List<String> cart = stEats.getCart().stream().map(MenuItem::getName).toList();
         assertEquals(2, cart.size());
-        assertTrue(cart.contains("Boeuf Bourguignon"));
-        assertTrue(cart.contains("Pavé de saumon"));
-
+        items.forEach(item -> assertTrue(cart.contains(item.get("menuItems"))));
     }
 
     @When("the user deletes {string}")
