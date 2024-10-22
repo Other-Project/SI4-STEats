@@ -40,6 +40,13 @@ public interface Order extends Saleable {
     Restaurant getRestaurant();
 
     /**
+     * Get the group code of the order
+     *
+     * @return null if not applicable
+     */
+    String getGroupCode();
+
+    /**
      * @return A copy of the items of the order
      */
     List<MenuItem> getItems();
