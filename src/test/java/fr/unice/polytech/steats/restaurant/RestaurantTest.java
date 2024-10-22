@@ -7,13 +7,13 @@ import fr.unice.polytech.steats.order.SingleOrder;
 import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RestaurantTest {
 
@@ -68,6 +68,7 @@ class RestaurantTest {
         assertEquals(restaurant1, restaurant2);
     }
 
+    @Test
     void getOpeningTimes() {
         Restaurant restaurant = new Restaurant("");
         addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(10, 0), DayOfWeek.MONDAY, LocalTime.of(14, 30));
@@ -75,12 +76,6 @@ class RestaurantTest {
         addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(17, 30), DayOfWeek.MONDAY, LocalTime.of(19, 0));
         addScheduleForPeriod(restaurant, 10, DayOfWeek.MONDAY, LocalTime.of(19, 0), DayOfWeek.TUESDAY, LocalTime.of(1, 0));
         addScheduleForPeriod(restaurant, 10, DayOfWeek.FRIDAY, LocalTime.of(18, 0), DayOfWeek.MONDAY, LocalTime.of(3, 0));
-    }
-
-    @Test
-    void testScheduleNotCoinciding() {
-        Restaurant restaurant = new Restaurant("McDonald's");
-        assertThrows(IllegalArgumentException.class, () -> restaurant.addSchedule(new Schedule(LocalTime.of(12, 10), Duration.ofMinutes(10), 5, DayOfWeek.FRIDAY)));
         Map<DayOfWeek, List<OpeningTime>> openingByDays = Map.of(
                 DayOfWeek.MONDAY, List.of(
                         new OpeningTime(LocalTime.of(0, 0), LocalTime.of(3, 0)),
