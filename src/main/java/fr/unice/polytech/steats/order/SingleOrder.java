@@ -252,16 +252,6 @@ public class SingleOrder implements Order {
     }
 
     /**
-     * Validate the order
-     * Changes its status to {@link Status#PAID}.
-     *
-     * @implNote only validate the payment, doesn't close the order
-     */
-    private void validateOrder() {
-        status = Status.PAID;
-    }
-
-    /**
      * @implNote The total preparation time of all the items in the order
      */
     @Override
@@ -284,7 +274,7 @@ public class SingleOrder implements Order {
         Optional<Payment> optionalPayment = PaymentSystem.pay(getPrice());
         if (optionalPayment.isEmpty()) return false;
         this.payment = optionalPayment.get();
-        validateOrder();
+        status = Status.PAID;
         return true;
     }
 }
