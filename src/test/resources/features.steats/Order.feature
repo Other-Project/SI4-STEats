@@ -6,8 +6,8 @@ Feature: Order
 
   Scenario: Creating an order
     When the user creates an order and specifies a date, an address and a restaurant :
-      | date     | addressId | restaurant |
-      | 10:15:30 | Sophia    | La Cafet   |
+      | date     | addressId         | restaurant |
+      | 10:15:30 | Campus SophiaTech | La Cafet   |
     Then the user can order
 
   Scenario: Filtering restaurants by name
@@ -38,7 +38,7 @@ Feature: Order
       | McDonald    |
 
   Scenario: Filtering restaurants that can deliver during a certain time
-    Given The address labelled "Campus Sophia Tech"
+    Given The address labelled "Campus SophiaTech"
     Given The following restaurants with schedule and order duration and order scheduled to tomorrow at "10:15:30" :
       | name                  | scheduleStart | preparationTime |
       | Macdonald available 0 | 10:30:00      | 15              |
@@ -69,7 +69,7 @@ Feature: Order
       | Mcdonalds |
 
   Scenario: Adding items to the cart
-    Given an order to be delivered at "Campus sophiaTech Amphi A"
+    Given an order to be delivered at "Campus SophiaTech"
     When the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
@@ -80,7 +80,7 @@ Feature: Order
       | Pave de saumon    |
 
   Scenario: Remove item from the cart
-    Given an order to be delivered at "Campus sophiaTech Amphi A"
+    Given an order to be delivered at "Campus SophiaTech"
     Given the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
@@ -89,7 +89,7 @@ Feature: Order
     Then "Pave de saumon" doesn't appear in the cart anymore
 
   Scenario: Pay the order
-    Given an order to be delivered at "Campus sophiaTech Amphi A"
+    Given an order to be delivered at "Campus SophiaTech"
     Given the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
