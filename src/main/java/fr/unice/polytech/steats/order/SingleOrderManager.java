@@ -33,7 +33,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param userId The id of the user
      */
     public List<SingleOrder> getOrdersByUser(String userId) {
-        return getAll().stream().filter(singleOrder -> singleOrder.getUserId().equals(userId)).toList();
+        return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId())).toList();
     }
 
     /**

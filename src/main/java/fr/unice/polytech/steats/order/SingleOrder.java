@@ -58,6 +58,8 @@ public class SingleOrder implements Order {
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
         if (!AddressManager.getInstance().contains(addressId))
             throw new IllegalArgumentException("This address is unknown");
+        if (!RestaurantManager.getInstance().contains(restaurantId))
+            throw new IllegalArgumentException("This restaurant is unknown");
         this.userId = userId;
         this.groupCode = groupCode;
         this.deliveryTime = deliveryTime;

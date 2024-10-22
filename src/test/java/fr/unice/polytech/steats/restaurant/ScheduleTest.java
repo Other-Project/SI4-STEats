@@ -30,9 +30,9 @@ public class ScheduleTest {
     }
 
     @Test
-    public void test_schedules_edge_case() {
+    void test_schedules_edge_case() {
         LocalDateTime deliveryTime = LocalDateTime.of(2024, 10, 18, 21, 30);
-        assertEquals(deliveryTime.getDayOfWeek(), DayOfWeek.FRIDAY);
+        assertEquals(DayOfWeek.FRIDAY, deliveryTime.getDayOfWeek());
         List<Schedule> schedulesSorted = scheduleList
                 .stream()
                 .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(Duration.ofHours(2))))
@@ -44,9 +44,9 @@ public class ScheduleTest {
     }
 
     @Test
-    public void test_schedules_general_case() {
+    void test_schedules_general_case() {
         LocalDateTime deliveryTime = LocalDateTime.of(2024, 10, 18, 21, 45);
-        assertEquals(deliveryTime.getDayOfWeek(), DayOfWeek.FRIDAY);
+        assertEquals(DayOfWeek.FRIDAY, deliveryTime.getDayOfWeek());
         List<Schedule> schedulesSorted = scheduleList
                 .stream()
                 .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(Duration.ofHours(2))))

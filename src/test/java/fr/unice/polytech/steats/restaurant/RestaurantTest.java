@@ -1,12 +1,14 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.STEats;
+import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.discounts.DiscountBuilder;
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.*;
@@ -17,10 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RestaurantTest {
 
-    @BeforeAll
-    public static void setUp() {
-        SingleOrderManager.getInstance().clear();
+    @BeforeEach
+    public void setUp() {
+        RestaurantManager.getInstance().clear();
         AddressManager.getInstance().clear();
+        UserManager.getInstance().clear();
+        GroupOrderManager.getInstance().clear();
+        SingleOrderManager.getInstance().clear();
         AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
 
@@ -34,6 +39,53 @@ class RestaurantTest {
     }
 
     @Test
+    void testGetTypeOfFood() {
+        Restaurant restaurant = new Restaurant("McDonald's", TypeOfFood.FAST_FOOD);
+        assertEquals(TypeOfFood.FAST_FOOD, restaurant.getTypeOfFood());
+    }
+
+    @Test
+    void testGetOrders() {
+        Restaurant restaurant = new Restaurant("McDonald's");
+        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
+        Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
+        AddressManager.getInstance().add(address.label(), address);
+        User user = new User("John", "JohnID", Role.EXTERNAL);
+        UserManager.getInstance().add("JohnID", user);
+        User user2 = new User("Jane", "JaneID", Role.EXTERNAL);
+        UserManager.getInstance().add("JaneID", user2);
+        STEats steats = new STEats(user);
+        STEats steats2 = new STEats(user2);
+        steats.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        steats2.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        List<Order> orders = restaurant.getOrders();
+        assertEquals(2, orders.size());
+    }
+
+    @Test
+    void testRemoveDiscount() {
+        Restaurant restaurant = new Restaurant("McDonald's");
+        Discount discount = new DiscountBuilder().build();
+        restaurant.addDiscount(discount);
+        assertEquals(1, restaurant.discounts().size());
+        restaurant.removeDiscount(discount);
+        assertEquals(0, restaurant.discounts().size());
+    }
+
+    @Test
+    void testEquals() {
+        Restaurant restaurant1 = new Restaurant("McDonald's");
+        Restaurant restaurant2 = new Restaurant("McDonald's");
+        Discount discount = new DiscountBuilder().build();
+        restaurant1.addDiscount(discount);
+        restaurant2.addDiscount(discount);
+        MenuItem menuItem = new MenuItem("Big Mac", 5.0, null);
+        restaurant1.addMenuItem(menuItem);
+        restaurant2.addMenuItem(menuItem);
+        assertEquals(restaurant1, restaurant2);
+    }
+
+    @Test
     void getOpeningTimes() {
         Restaurant restaurant = new Restaurant("");
         addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(10, 0), DayOfWeek.MONDAY, LocalTime.of(14, 30));
@@ -41,7 +93,6 @@ class RestaurantTest {
         addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(17, 30), DayOfWeek.MONDAY, LocalTime.of(19, 0));
         addScheduleForPeriod(restaurant, 10, DayOfWeek.MONDAY, LocalTime.of(19, 0), DayOfWeek.TUESDAY, LocalTime.of(1, 0));
         addScheduleForPeriod(restaurant, 10, DayOfWeek.FRIDAY, LocalTime.of(18, 0), DayOfWeek.MONDAY, LocalTime.of(3, 0));
-
         Map<DayOfWeek, List<OpeningTime>> openingByDays = Map.of(
                 DayOfWeek.MONDAY, List.of(
                         new OpeningTime(LocalTime.of(0, 0), LocalTime.of(3, 0)),
