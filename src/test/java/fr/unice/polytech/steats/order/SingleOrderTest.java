@@ -25,7 +25,9 @@ class SingleOrderTest {
         UserManager.getInstance().add(user.getName(), user);
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
         AddressManager.getInstance().add(address.label(), address);
-        SingleOrder singleOrder = new SingleOrder(user.getName(), null, "Campus Sophia Tech", null);
+        Restaurant restaurant = new Restaurant("McDonald's");
+        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
+        SingleOrder singleOrder = new SingleOrder(user.getName(), null, "Campus Sophia Tech", restaurant.getName());
         assertEquals(singleOrder.getAddress(), address);
     }
 

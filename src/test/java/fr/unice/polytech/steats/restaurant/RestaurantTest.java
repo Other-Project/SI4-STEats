@@ -4,6 +4,7 @@ import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
@@ -26,6 +27,11 @@ class RestaurantTest {
         }
     }
 
+    @BeforeEach
+    public void setUp() {
+        RestaurantManager.getInstance().clear();
+    }
+
     @Test
     void testGetTypeOfFood() {
         Restaurant restaurant = new Restaurant("McDonald's", TypeOfFood.FAST_FOOD);
@@ -35,8 +41,9 @@ class RestaurantTest {
     @Test
     void testGetOrders() {
         Restaurant restaurant = new Restaurant("McDonald's");
-        Order order1 = new SingleOrder("John", LocalDateTime.of(2025, 12, 24, 11, 20), "Campus Sophia Tech", null);
-        Order order2 = new SingleOrder("John", LocalDateTime.of(2025, 12, 24, 11, 20), "Campus Sophia Tech", null);
+        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
+        Order order1 = new SingleOrder("John", LocalDateTime.of(2025, 12, 24, 11, 20), "Campus Sophia Tech", restaurant.getName());
+        Order order2 = new SingleOrder("John", LocalDateTime.of(2025, 12, 24, 11, 20), "Campus Sophia Tech", restaurant.getName());
         restaurant.addOrder(order1);
         restaurant.addOrder(order2);
         List<Order> orders = restaurant.getOrders();
