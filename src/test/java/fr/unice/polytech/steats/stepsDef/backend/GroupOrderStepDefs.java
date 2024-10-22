@@ -158,7 +158,9 @@ public class GroupOrderStepDefs {
 
     @And("{string} can't change the delivery time to {string} to the group order")
     public void canTChangeTheDeliveryTimeToToTheGroupOrder(String name, String time) {
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.parse(time)));
+        STEats stEats = steatsMap.get(name);
+        LocalDateTime deliveryTime = LocalDateTime.parse(time);
+        assertThrows(IllegalStateException.class, () -> stEats.changeDeliveryTime(deliveryTime));
     }
 
     @And("{string} can add {string} as delivery time to the group order")
@@ -220,12 +222,13 @@ public class GroupOrderStepDefs {
     }
 
     @When("{string} close the group order that doesn't have a delivery time")
-    public void closeTheGroupOrderThatDoesnTHaveADeliveryTime(String name) {
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).closeGroupOrder());
+    public void closeTheGroupOrderThatDoesntHaveADeliveryTime(String name) {
+        STEats stEats = steatsMap.get(name);
+        assertThrows(IllegalStateException.class, stEats::closeGroupOrder);
     }
 
     @Then("{string} can't join the group order with the group code {string}")
-    public void canTJoinTheGroupOrderWithTheGroupCode(String name, String groupCode) {
+    public void cantJoinTheGroupOrderWithTheGroupCode(String name, String groupCode) {
         assertThrows(NotFoundException.class, () -> steatsMap.get(name).joinGroupOrder(groupCodeMap.get(groupCode)));
     }
 }
