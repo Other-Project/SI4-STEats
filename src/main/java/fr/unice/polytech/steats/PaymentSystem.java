@@ -1,5 +1,10 @@
 package fr.unice.polytech.steats;
 
+import fr.unice.polytech.steats.order.Payment;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 /**
  * Utility class for communication with the payment system.
  *
@@ -11,13 +16,13 @@ public class PaymentSystem {
     }
 
     /**
-     * Pay the order
+     * Pay the order.
      *
-     * @param amount the amount to pay
-     * @return if the payment was successful
+     * @param amount The amount to pay
+     * @return The payment
      */
-    public static boolean pay(double amount) {
-        // call the external payment system
-        return true;
+    public static Optional<Payment> pay(double amount) {
+        // Here we would call the payment system API
+        return Optional.of(new Payment(LocalDateTime.now(), amount));
     }
 }

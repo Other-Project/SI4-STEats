@@ -6,6 +6,9 @@ Feature: Manage GroupOrder
     Given The user named "Alban" with the id "4321" is logged in
     Given The user named "Alexandre" with the id "2323" is logged in
     Given The user named "Alexandra" with the id "3232" is logged in
+    Given The following restaurants :
+      | name       |
+      | McDonald's |
     Given A group order with the group code "groupCode2" from the restaurant "McDonald's" and to deliver for "2024-03-29T10:15:30" at "292 Chemin de la Rigolade"
 
   Scenario: Create GroupOrder with a delivery time

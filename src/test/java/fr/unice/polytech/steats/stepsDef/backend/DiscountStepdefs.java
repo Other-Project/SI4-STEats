@@ -98,7 +98,7 @@ public class DiscountStepdefs {
     public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) throws NotFoundException {
         aClientNamedWithTheRole(name, role);
         for (int i = 0; i < orders; i++) {
-            SingleOrder singleOrder = new SingleOrder(username, null, null, RestaurantManager.getInstance().get(restaurant));
+            SingleOrder singleOrder = new SingleOrder(username, null, null, restaurant);
             for (int j = 0; j < items; j++)
                 singleOrder.addMenuItem(new MenuItem("P1", 5, Duration.ofMinutes(1)));
             UserManager.getInstance().get(username).addOrderToHistory(singleOrder);
@@ -112,8 +112,8 @@ public class DiscountStepdefs {
     }
 
     @When("I place an order at {string} with the following items:")
-    public void iPlaceAnOrderWithTheFollowingItems(String restaurant, List<Map<String, String>> items) throws NotFoundException {
-        order = new SingleOrder(username, null, null, RestaurantManager.getInstance().get(restaurant));
+    public void iPlaceAnOrderWithTheFollowingItems(String restaurant, List<Map<String, String>> items) {
+        order = new SingleOrder(username, null, null, restaurant);
         items.forEach(item -> order.addMenuItem(new MenuItem(item.get("name"), 5, Duration.ofMinutes(1))));
     }
 
