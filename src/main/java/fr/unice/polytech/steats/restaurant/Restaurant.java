@@ -142,11 +142,11 @@ public class Restaurant {
 
     private Duration getAveragePreparationTime() {
         if (orders.isEmpty()) return Duration.ZERO;
-        return orders.stream()
+        return orders.reversed().stream()
                 .limit(RELEVENT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
                 .map(Order::getPreparationTime)
                 .reduce(Duration.ZERO, Duration::plus)
-                .dividedBy(orders.size());
+                .dividedBy(Math.min(RELEVENT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION, orders.size()));
     }
 
     /**

@@ -46,6 +46,8 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
+        if (GroupOrderManager.getInstance().getAll().stream().noneMatch((groupOrder -> groupOrder.getOrders().contains(this))))
+            getRestaurant().addOrder(this);
     }
 
     @Override
@@ -190,7 +192,7 @@ public class SingleOrder implements Order {
     }
 
     void closeOrder() {
-        if (status == Status.PAID) throw new IllegalStateException("Order already closed");
+        if (status != Status.PAID) throw new IllegalStateException("Order not paid");
         this.getUser().addOrderToHistory(this);
     }
 

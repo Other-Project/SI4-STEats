@@ -38,6 +38,7 @@ public class GroupOrder implements Order {
         this.groupCode = groupCode;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
+        getRestaurant().addOrder(this);
     }
 
     /**
