@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OrderStepDefs {
     STEats stEats;
     STEatsController steatsController;
-    Restaurant restaurant;
+    String restaurantId;
     LocalDateTime deliveryTime;
     List<Restaurant> restaurantListFiltered;
 
@@ -49,7 +49,8 @@ public class OrderStepDefs {
 
     @Given("a restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
-        restaurant = new Restaurant(restaurantName);
+        restaurantId = restaurantName;
+        Restaurant restaurant = new Restaurant(restaurantName);
         if (!RestaurantManager.getInstance().contains(restaurantName))
             RestaurantManager.getInstance().add(restaurantName, restaurant);
         Schedule schedule = new Schedule(LocalTime.of(20, 15), Duration.ofMinutes(30), 5, DayOfWeek.WEDNESDAY);
@@ -65,7 +66,7 @@ public class OrderStepDefs {
     @When("the user creates an order and specifies a date, an address and a restaurant")
     public void whenCreatesOrder() {
         deliveryTime = LocalDateTime.of(2024, 10, 16, 21, 0);
-        stEats.createOrder(deliveryTime, null, restaurant);
+        stEats.createOrder(deliveryTime, null, restaurantId);
     }
 
     @Then("the user can order")
@@ -125,17 +126,17 @@ public class OrderStepDefs {
     public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledTo(String deliveryTime, List<Map<String, String>> items) {
         LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
         for (Map<String, String> item : items) {
-            restaurant = new Restaurant(item.get("name"));
+            Restaurant restaurant = new Restaurant(item.get("name"));
+            RestaurantManager.getInstance().add(item.get("name"), restaurant);
             DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
             LocalTime localTimeParsed = LocalTime.parse(item.get("scheduleStart"), parser);
             Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
             restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
             restaurant.addSchedule(schedule);
-            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus Sophia Tech", restaurant);
+            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus Sophia Tech", item.get("name"));
             Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("preparationTime")));
             order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
             restaurant.addOrder(order);
-            RestaurantManager.getInstance().add(item.get("name"), restaurant);
         }
     }
 
@@ -164,7 +165,7 @@ public class OrderStepDefs {
 
     @Given("an order to be delivered at {string}")
     public void givenTheOrderTheUserCreated(String addressId) {
-        stEats.createOrder(deliveryTime, addressId, restaurant);
+        stEats.createOrder(deliveryTime, addressId, restaurantId);
     }
 
     @When("the user orders the following items from the given restaurant:")

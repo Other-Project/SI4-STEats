@@ -28,14 +28,13 @@ public class RestaurantStepDefs {
 
     @When("{string} add {string}")
     public void whenRestaurantAddMenuItem(String restaurantName, String menuItemName) {
-        if (restaurant.getName().equals(restaurantName) && menuItem.getName().equals(menuItemName)) {
+        if (restaurant.getName().equals(restaurantName) && menuItem.getName().equals(menuItemName))
             restaurant.addMenuItem(menuItem);
-        }
     }
 
     @Then("{string} is added to the menu")
     public void thenTheMenuItemIsAddedToTheMenu(String menuItemName) {
-        assertTrue(restaurant.getFullMenu().stream().anyMatch(menuItem -> menuItem.getName().equals(menuItemName)));
+        assertTrue(restaurant.getFullMenu().stream().anyMatch(item -> item.getName().equals(menuItemName)));
     }
 
     @When("{string} remove {string}")
@@ -47,6 +46,6 @@ public class RestaurantStepDefs {
 
     @Then("{string} is removed from the menu")
     public void thenTheMenuItemIsRemovedFromTheMenu(String menuItemName) {
-        assertFalse(restaurant.getFullMenu().stream().anyMatch(menuItem -> menuItem.getName().equals(menuItemName)));
+        assertFalse(restaurant.getFullMenu().stream().anyMatch(item -> item.getName().equals(menuItemName)));
     }
 }
