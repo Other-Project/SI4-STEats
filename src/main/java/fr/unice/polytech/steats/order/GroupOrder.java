@@ -32,6 +32,8 @@ public class GroupOrder implements Order {
      * @param restaurantId The id of the restaurant in which the group order is made
      */
     private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
+            throw new IllegalArgumentException("The time between now and the delivery date is too short");
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
@@ -165,7 +167,7 @@ public class GroupOrder implements Order {
      * @param order The single order of the user that wants to pay
      * @return if the payment was successful
      */
-    public boolean pay(SingleOrder order) throws NotFoundException {
+    public boolean pay(SingleOrder order) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
         return order.pay(false);
     }

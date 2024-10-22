@@ -123,6 +123,7 @@ public class STEats {
      * @param menuItem The menu item to add to the order
      */
     public void addMenuItem(MenuItem menuItem) {
+        if (!getAvailableMenu().contains(menuItem)) throw new IllegalStateException("Menu item not available");
         order.addMenuItem(menuItem);
     }
 
@@ -183,6 +184,7 @@ public class STEats {
         if (groupCode != null) {
             return GroupOrderManager.getInstance().get(groupCode).pay(order);
         }
+        if (order.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
         return order.pay(true);
     }
 
@@ -220,7 +222,6 @@ public class STEats {
      * @param deliveryTime The new delivery time
      */
     public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException {
-        if (groupCode == null) throw new IllegalStateException("Cannot change delivery time of a single order");
-        GroupOrderManager.getInstance().get(groupCode).setDeliveryTime(deliveryTime);
+        (groupCode == null ? order : GroupOrderManager.getInstance().get(groupCode)).setDeliveryTime(deliveryTime);
     }
 }

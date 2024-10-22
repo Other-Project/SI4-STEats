@@ -40,6 +40,8 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
+            throw new IllegalArgumentException("The time between now and the delivery date is too short");
         this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
