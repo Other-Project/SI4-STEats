@@ -6,6 +6,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 
 /**
  * @author Team C
@@ -55,9 +56,23 @@ public class Schedule implements Comparable<Schedule> {
     }
 
     /**
+     * The day of the week of the schedule
+     */
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    /**
+     * The number of person that works during the schedule
+     */
+    public int getNbPerson() {
+        return nbPerson;
+    }
+
+    /**
      * @return If the schedule corresponds to the delivery time given in args
      */
-    public Boolean contains(LocalDateTime deliveryTime) {
+    public boolean contains(LocalDateTime deliveryTime) {
         return deliveryTime.getDayOfWeek() == dayOfWeek && start.isBefore(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
     }
 
@@ -66,7 +81,7 @@ public class Schedule implements Comparable<Schedule> {
      *
      * @param order The order to check
      */
-    public Boolean contains(Order order) {
+    public boolean contains(Order order) {
         LocalDateTime deliveryTime = order.getDeliveryTime();
         return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
     }
@@ -106,6 +121,7 @@ public class Schedule implements Comparable<Schedule> {
      *
      * @param dateTime The date to compare
      */
+    @SuppressWarnings("java:S4351")
     public int compareTo(LocalDateTime dateTime) {
         int compareDayOfWeek = dayOfWeek.compareTo(dateTime.getDayOfWeek());
         if (compareDayOfWeek != 0) return compareDayOfWeek;
@@ -117,5 +133,17 @@ public class Schedule implements Comparable<Schedule> {
     @Override
     public String toString() {
         return start + " - " + getEnd() + " (" + dayOfWeek + ") [" + getTotalCapacity() + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Schedule schedule)) return false;
+        return nbPerson == schedule.nbPerson && dayOfWeek == schedule.dayOfWeek && Objects.equals(start, schedule.start) && Objects.equals(duration, schedule.duration);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dayOfWeek, start, duration, nbPerson);
     }
 }

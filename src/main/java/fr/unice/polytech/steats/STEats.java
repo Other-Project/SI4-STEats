@@ -2,13 +2,18 @@ package fr.unice.polytech.steats;
 
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents the entry point of the application.
@@ -123,6 +128,7 @@ public class STEats {
      * @param menuItem The menu item to add to the order
      */
     public void addMenuItem(MenuItem menuItem) {
+        if (!getAvailableMenu().contains(menuItem)) throw new IllegalStateException("Menu item not available");
         order.addMenuItem(menuItem);
     }
 
@@ -183,6 +189,7 @@ public class STEats {
         if (groupCode != null) {
             return GroupOrderManager.getInstance().get(groupCode).pay(order);
         }
+        if (order.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
         return order.pay(true);
     }
 
@@ -215,12 +222,20 @@ public class STEats {
     }
 
     /**
+     * Retrieve the opening times of a restaurant
+     *
+     * @param restaurant The restaurant
+     */
+    public Map<DayOfWeek, List<OpeningTime>> getOpeningTimes(Restaurant restaurant) {
+        return Arrays.stream(DayOfWeek.values()).collect(Collectors.toMap(day -> day, restaurant::getOpeningTimes));
+    }
+
+    /**
      * Change the delivery time of the group order
      *
      * @param deliveryTime The new delivery time
      */
     public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException {
-        if (groupCode == null) throw new IllegalStateException("Cannot change delivery time of a single order");
-        GroupOrderManager.getInstance().get(groupCode).setDeliveryTime(deliveryTime);
+        (groupCode == null ? order : GroupOrderManager.getInstance().get(groupCode)).setDeliveryTime(deliveryTime);
     }
 }
