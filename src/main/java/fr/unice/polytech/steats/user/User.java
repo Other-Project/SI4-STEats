@@ -1,11 +1,11 @@
 package fr.unice.polytech.steats.user;
 
 import fr.unice.polytech.steats.discounts.Discount;
-import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.Payment;
 import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.SingleOrderManager;
+import fr.unice.polytech.steats.order.Status;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,9 +16,8 @@ import java.util.List;
  */
 public class User {
     private String name;
-    private String userId;
+    private final String userId;
     private final Role role;
-    private final List<SingleOrder> ordersHistory = new ArrayList<>();
 
     /**
      * @param name   The name of the user
@@ -33,7 +32,6 @@ public class User {
 
     /**
      * Get username
-     *
      */
     public String getName() {
         return name;
@@ -41,7 +39,6 @@ public class User {
 
     /**
      * Get user id
-     *
      */
     public String getUserId() {
         return this.userId;
@@ -49,6 +46,7 @@ public class User {
 
     /**
      * Update username
+     *
      * @param name the new name
      */
     public void setName(String name) {
@@ -56,42 +54,17 @@ public class User {
     }
 
     /**
-     * Update user id
-     * @param userId the new id
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
      * Get the user's role
-     *
      */
     public Role getRole() {
         return role;
     }
 
     /**
-     * Add the order to the history of the user once it has been paid
-     *
-     * @param order The order that has been delivered to the user
-     */
-    public void addOrderToHistory(SingleOrder order) {
-        ordersHistory.add(order);
-    }
-
-    /**
      * Gets all the orders of the user
      */
-    public List<Order> getOrders() {
-        return Collections.unmodifiableList(ordersHistory);
-    }
-
-    /**
-     * Get all the payments of the user
-     */
-    public List<Payment> getPayments() {
-        return ordersHistory.stream().map(SingleOrder::getPayment).toList();
+    public List<SingleOrder> getOrders() {
+        return SingleOrderManager.getInstance().getOrdersByUser(userId);
     }
 
     /**
@@ -100,7 +73,17 @@ public class User {
      * @param restaurantId The id of the restaurant to filter the orders
      */
     public List<SingleOrder> getOrders(String restaurantId) {
-        return ordersHistory.stream().filter(order -> order.getRestaurantId().equals(restaurantId)).toList();
+        return getOrders().stream()
+                .filter(order -> order.getRestaurantId().equals(restaurantId))
+                .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0)
+                .toList();
+    }
+
+    /**
+     * Get all the payments of the user
+     */
+    public List<Payment> getPayments() {
+        return getOrders().stream().filter(order -> order.getStatus().compareTo(Status.PAID) >= 0).map(SingleOrder::getPayment).toList();
     }
 
     /**

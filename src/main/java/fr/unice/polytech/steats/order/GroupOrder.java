@@ -8,7 +8,10 @@ import fr.unice.polytech.steats.user.User;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * A group order is an order that contains multiples single order, each from a different user.
@@ -21,7 +24,6 @@ public class GroupOrder implements Order {
     private LocalDateTime deliveryTime;
     private final LocalDateTime orderTime;
     private final String groupCode;
-    private final List<SingleOrder> orders = new ArrayList<>();
     private final String addressId;
     private Status status = Status.INITIALISED;
     private final String restaurantId;
@@ -90,12 +92,12 @@ public class GroupOrder implements Order {
      */
     @Override
     public double getPrice() {
-        return orders.stream().mapToDouble(Order::getPrice).sum();
+        return getOrders().stream().mapToDouble(Order::getPrice).sum();
     }
 
     @Override
     public List<MenuItem> getItems() {
-        return orders.stream().map(Order::getItems).flatMap(Collection::stream).toList();
+        return getOrders().stream().map(Order::getItems).flatMap(Collection::stream).toList();
     }
 
     @Override
@@ -105,7 +107,7 @@ public class GroupOrder implements Order {
 
     @Override
     public List<User> getUsers() {
-        return orders.stream().map(Order::getUsers).flatMap(Collection::stream).toList();
+        return getOrders().stream().map(Order::getUsers).flatMap(Collection::stream).toList();
     }
 
     /**
@@ -113,7 +115,7 @@ public class GroupOrder implements Order {
      */
     @Override
     public Duration getPreparationTime() {
-        return orders.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+        return getOrders().stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
     @Override
@@ -137,10 +139,10 @@ public class GroupOrder implements Order {
      */
     public void setDeliveryTime(LocalDateTime deliveryTime) {
         if (this.deliveryTime != null) throw new IllegalStateException("Delivery time already set");
-        if (orders.stream().noneMatch(order -> order.getItems().isEmpty()) && !getRestaurant().canHandle(this, deliveryTime))
+        if (getOrders().stream().noneMatch(order -> order.getItems().isEmpty()) && !getRestaurant().canHandle(this, deliveryTime))
             throw new IllegalStateException("Delivery time not available");
         this.deliveryTime = deliveryTime;
-        for (SingleOrder order : orders) order.setDeliveryTime(deliveryTime);
+        for (SingleOrder order : getOrders()) order.setDeliveryTime(deliveryTime);
     }
 
     @Override
@@ -159,9 +161,7 @@ public class GroupOrder implements Order {
      */
     public SingleOrder createOrder(User user) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        SingleOrder order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurantId);
-        orders.add(order);
-        return order;
+        return new SingleOrder(user.getUserId(), groupCode, deliveryTime, addressId, restaurantId);
     }
 
     /**
@@ -170,14 +170,14 @@ public class GroupOrder implements Order {
      */
     public void closeOrder() {
         status = Status.PAID;
-        orders.forEach(SingleOrder::closeOrder);
+        getOrders().forEach(SingleOrder::closeOrder);
     }
 
     /**
      * @return The list of single orders in the group order
      */
     public List<SingleOrder> getOrders() {
-        return Collections.unmodifiableList(orders);
+        return SingleOrderManager.getInstance().getOrdersByGroup(groupCode);
     }
 
     /**
