@@ -61,7 +61,7 @@ public class OrderStepDefs {
 
     @When("the user creates an order and specifies a date, an address and a restaurant :")
     public void whenCreatesOrder(List<Map<String, String>> order) throws NotFoundException {
-        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.get(0).get("date"))), order.get(0).get("addressId"), RestaurantManager.getInstance().get(order.get(0).get("restaurant")));
+        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.getFirst().get("date"))), order.getFirst().get("addressId"), RestaurantManager.getInstance().get(order.getFirst().get("restaurant")));
     }
 
     @Then("the user can order")
