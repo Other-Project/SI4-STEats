@@ -19,6 +19,7 @@ class RestaurantTest {
 
     @BeforeAll
     public static void setUp() {
+        SingleOrderManager.getInstance().clear();
         AddressManager.getInstance().clear();
         AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
@@ -97,7 +98,7 @@ class RestaurantTest {
                     LocalTime.now().plusHours(1).plus(Duration.ofMinutes(30).multipliedBy(i)),
                     Duration.ofMinutes(30),
                     1,
-                    LocalDate.now().getDayOfWeek().plus(2)
+                    LocalDate.now().getDayOfWeek()
             ));
             restaurant.addSchedule(new Schedule(
                     LocalTime.now().plusHours(1).plus(Duration.ofMinutes(30).multipliedBy(i)),
