@@ -1,6 +1,8 @@
 package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
+import fr.unice.polytech.steats.order.Address;
+import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
@@ -31,8 +33,9 @@ public class DiscountStepdefs {
     public void before() {
         RestaurantManager.getInstance().clear();
         UserManager.getInstance().clear();
+        AddressManager.getInstance().clear();
+        AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
-
 
     @Given("a restaurant named {string} of type {string}")
     public void givenARestaurant(String restaurantName, String foodType) {
@@ -98,7 +101,7 @@ public class DiscountStepdefs {
     public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) throws NotFoundException {
         aClientNamedWithTheRole(name, role);
         for (int i = 0; i < orders; i++) {
-            SingleOrder singleOrder = new SingleOrder(username, null, null, restaurant);
+            SingleOrder singleOrder = new SingleOrder(username, null, "Campus SophiaTech", restaurant);
             for (int j = 0; j < items; j++)
                 singleOrder.addMenuItem(new MenuItem("P1", 5, Duration.ofMinutes(1)));
             UserManager.getInstance().get(username).addOrderToHistory(singleOrder);
@@ -113,7 +116,7 @@ public class DiscountStepdefs {
 
     @When("I place an order at {string} with the following items:")
     public void iPlaceAnOrderWithTheFollowingItems(String restaurant, List<Map<String, String>> items) {
-        order = new SingleOrder(username, null, null, restaurant);
+        order = new SingleOrder(username, null, "Campus SophiaTech", restaurant);
         items.forEach(item -> order.addMenuItem(new MenuItem(item.get("name"), 5, Duration.ofMinutes(1))));
     }
 

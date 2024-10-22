@@ -22,15 +22,15 @@ Feature: Manage GroupOrder
       | fries        | 3.0   | 05              |
       | icecream     | 4.0   | 02              |
       | salad        | 5.0   | 03              |
-    Given A group order with the group code "groupCode2" from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "292 Chemin de la Rigolade"
+    Given A group order with the group code "groupCode2" from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "Campus SophiaTech"
 
   Scenario: Create GroupOrder with a delivery time
-    When "Alexandre" creates a group order from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "292 Chemin de la Rigolade"
+    When "Alexandre" creates a group order from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "Campus SophiaTech"
     Then "Alexandre" receives a group code
     And "Alexandre" can't change the delivery time to tomorrow at "18:15:30" to the group order
 
   Scenario: Create GroupOrder without a delivery time
-    When "Alexandra" creates a group order from the restaurant "McDonald's" and to deliver at "292 Chemin de la Rigolade"
+    When "Alexandra" creates a group order from the restaurant "McDonald's" and to deliver at "Campus SophiaTech"
     Then "Alexandra" receives a group code
     And "Alexandra" can add tomorrow at "18:15:30" as delivery time to the group order
 
@@ -42,7 +42,7 @@ Feature: Manage GroupOrder
     Then "Alex" can't join the group order with the group code "groupCode3"
 
   Scenario: Multiple GroupOrder
-    Given A group order with the group code "groupCode89" from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "292 Chemin de la Rigolade"
+    Given A group order with the group code "groupCode89" from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "Campus SophiaTech"
     When "Alex" joins the group order with the group code "groupCode2"
     When "Alban" joins the group order with the group code "groupCode89"
     Then "Alex" is added to the group order with the group code "groupCode2"
@@ -105,7 +105,7 @@ Feature: Manage GroupOrder
       | fries        | 3.0   | 05              |
       | icecream     | 4.0   | 02              |
       | salad        | 5.0   | 03              |
-    Given A group order with the group code "groupCode6" from the restaurant "BurgerKing" at "292 Chemin de la Rigolade"
+    Given A group order with the group code "groupCode6" from the restaurant "BurgerKing" at "Campus SophiaTech"
     Given "Alex" joins the group order with the group code "groupCode6"
     Given "Alban" joins the group order with the group code "groupCode6"
     Given "Alexandra" joins the group order with the group code "groupCode6"

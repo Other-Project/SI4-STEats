@@ -5,8 +5,10 @@ import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.Status;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -94,6 +96,13 @@ public class Restaurant {
      */
     public List<Order> getOrders() {
         return new ArrayList<>(orders);
+    }
+
+    /**
+     * The duration of each schedule
+     */
+    public Duration getScheduleDuration() {
+        return scheduleDuration;
     }
 
     /**
@@ -231,6 +240,30 @@ public class Restaurant {
      */
     public void removeDiscount(Discount discount) {
         this.discounts.remove(discount);
+    }
+
+    /**
+     * Get the opening times of the restaurant for a given day
+     *
+     * @param day The day of the week
+     */
+    public List<OpeningTime> getOpeningTimes(DayOfWeek day) {
+        List<Schedule> scheduleList = schedules.stream()
+                .filter(schedule -> schedule.getDayOfWeek() == day)
+                .sorted(Comparator.comparing(Schedule::getStart))
+                .toList();
+        List<OpeningTime> intervals = new ArrayList<>();
+        OpeningTime currentInterval = null;
+        for (Schedule schedule : scheduleList) {
+            if (currentInterval != null && currentInterval.getEnd().equals(schedule.getStart())) {
+                currentInterval.setEnd(schedule.getEnd());
+                continue;
+            } else if (currentInterval != null) intervals.add(currentInterval);
+            currentInterval = new OpeningTime(schedule.getStart(), schedule.getEnd());
+        }
+        if (currentInterval != null && currentInterval.getEnd().equals(LocalTime.of(0, 0))) currentInterval.setEnd(LocalTime.of(23, 59, 59));
+        if (currentInterval != null) intervals.add(currentInterval);
+        return intervals;
     }
 
     /**

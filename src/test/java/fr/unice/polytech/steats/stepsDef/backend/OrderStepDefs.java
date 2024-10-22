@@ -33,6 +33,8 @@ public class OrderStepDefs {
     public void before() {
         RestaurantManager.getInstance().clear();
         UserManager.getInstance().clear();
+        AddressManager.getInstance().clear();
+        AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
 
     //region Background for order test
@@ -131,7 +133,7 @@ public class OrderStepDefs {
             Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
             restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
             restaurant.addSchedule(schedule);
-            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus Sophia Tech", item.get("name"));
+            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus SophiaTech", item.get("name"));
             Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("preparationTime")));
             order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
             restaurant.addOrder(order);
