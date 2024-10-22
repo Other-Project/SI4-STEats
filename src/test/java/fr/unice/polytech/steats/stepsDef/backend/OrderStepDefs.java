@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OrderStepDefs {
     STEats stEats;
     STEatsController steatsController;
-    Restaurant restaurant;
+    String restaurantId;
     LocalDateTime deliveryTime;
     List<Restaurant> restaurantListFiltered;
 
@@ -46,7 +46,8 @@ public class OrderStepDefs {
 
     @Given("a restaurant named {string}")
     public void givenARestaurant(String restaurantName) {
-        restaurant = new Restaurant(restaurantName);
+        restaurantId = restaurantName;
+        Restaurant restaurant = new Restaurant(restaurantName);
         if (!RestaurantManager.getInstance().contains(restaurantName))
             RestaurantManager.getInstance().add(restaurantName, restaurant);
         Schedule schedule = new Schedule(LocalTime.of(20, 15), Duration.ofMinutes(30), 5, DayOfWeek.WEDNESDAY);
@@ -60,8 +61,8 @@ public class OrderStepDefs {
     //region Test for scenario : Creating an order
 
     @When("the user creates an order and specifies a date, an address and a restaurant :")
-    public void whenCreatesOrder(List<Map<String, String>> order) throws NotFoundException {
-        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.getFirst().get("date"))), order.getFirst().get("addressId"), RestaurantManager.getInstance().get(order.getFirst().get("restaurant")));
+    public void whenCreatesOrder(List<Map<String, String>> order) {
+        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.getFirst().get("date"))), order.getFirst().get("addressId"), restaurantId);
     }
 
     @Then("the user can order")
@@ -123,17 +124,17 @@ public class OrderStepDefs {
         LocalDateTime deliveryTimeParsed = LocalDateTime.of(LocalDate.now().plusDays(1), localTime);
 
         for (Map<String, String> item : items) {
-            restaurant = new Restaurant(item.get("name"));
+            Restaurant restaurant = new Restaurant(item.get("name"));
+            RestaurantManager.getInstance().add(item.get("name"), restaurant);
             DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
             LocalTime localTimeParsed = LocalTime.parse(item.get("scheduleStart"), parser);
             Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
             restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
             restaurant.addSchedule(schedule);
-            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus Sophia Tech", restaurant);
+            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus Sophia Tech", item.get("name"));
             Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("preparationTime")));
             order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
             restaurant.addOrder(order);
-            RestaurantManager.getInstance().add(item.get("name"), restaurant);
         }
     }
 
@@ -161,14 +162,14 @@ public class OrderStepDefs {
     //endregion
 
     @Given("an order to be delivered at {string}")
-    public void givenTheOrderTheUserCreated(String addressId) {
+    public void givenTheOrderTheUserCreated(String addressId) throws NotFoundException {
         if (deliveryTime == null) deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(20, 15));
         try {
-            restaurant.addSchedule(new Schedule(LocalTime.of(19, 0), Duration.ofMinutes(30), 5, deliveryTime.getDayOfWeek()));
+            RestaurantManager.getInstance().get(restaurantId).addSchedule(new Schedule(LocalTime.of(19, 0), Duration.ofMinutes(30), 5, deliveryTime.getDayOfWeek()));
         } catch (IllegalArgumentException ignored) {
 
         }
-        stEats.createOrder(deliveryTime, addressId, restaurant);
+        stEats.createOrder(deliveryTime, addressId, restaurantId);
     }
 
     @When("the user orders the following items from the given restaurant:")

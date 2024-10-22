@@ -46,12 +46,11 @@ public class GroupOrderStepDefs {
     }
 
     @Given("A group order with the group code {string} from the restaurant {string} and to deliver for tomorrow at {string} at {string}")
-    public void a_group_order_is_created(String groupCode, String restaurant, String deliveryTime, String address) throws NotFoundException {
-        GroupOrder order = new GroupOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(deliveryTime)), address, RestaurantManager.getInstance().get(restaurant));
+    public void a_group_order_is_created(String groupCode, String restaurant, String deliveryTime, String address) {
+        GroupOrder order = new GroupOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(deliveryTime)), address, restaurant);
         String realGroupCode = order.getGroupCode();
         GroupOrderManager.getInstance().add(realGroupCode, order);
         groupCodeMap.put(groupCode, realGroupCode);
-
     }
 
     @Given("The user named {string} with the id {string} is logged in")
@@ -146,7 +145,7 @@ public class GroupOrderStepDefs {
 
     @When("{string} creates a group order from the restaurant {string} and to deliver for tomorrow at {string} at {string}")
     public void createsAGroupOrderFromTheRestaurantAndToDeliverForAt(String name, String restaurant, String time, String address) {
-        assertNotNull(steatsMap.get(name).createGroupOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time)), address, new Restaurant(restaurant)));
+        assertNotNull(steatsMap.get(name).createGroupOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time)), address, restaurant));
     }
 
     @Then("{string} receives a group code")
@@ -156,12 +155,15 @@ public class GroupOrderStepDefs {
 
     @When("{string} creates a group order from the restaurant {string} and to deliver at {string}")
     public void createsAGroupOrderFromTheRestaurantAndToDeliverAt(String name, String restaurant, String address) {
-        steatsMap.get(name).createGroupOrder(null, address, new Restaurant(restaurant));
+        steatsMap.get(name).createGroupOrder(null, address, restaurant);
     }
 
     @And("{string} can't change the delivery time to tomorrow at {string} to the group order")
     public void canTChangeTheDeliveryTimeToToTheGroupOrder(String name, String time) {
         assertThrows(IllegalStateException.class, () -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time))));
+        STEats stEats = steatsMap.get(name);
+        LocalDateTime deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time));
+        assertThrows(IllegalStateException.class, () -> stEats.changeDeliveryTime(deliveryTime));
     }
 
     @And("{string} can add tomorrow at {string} as delivery time to the group order")
@@ -198,8 +200,8 @@ public class GroupOrderStepDefs {
     }
 
     @Given("A group order with the group code {string} from the restaurant {string} at {string}")
-    public void aGroupOrderWithTheGroupCodeFromTheRestaurantAt(String groupCode, String restaurant, String address) throws NotFoundException {
-        GroupOrder order = new GroupOrder(null, address, RestaurantManager.getInstance().get(restaurant));
+    public void aGroupOrderWithTheGroupCodeFromTheRestaurantAt(String groupCode, String restaurant, String address) {
+        GroupOrder order = new GroupOrder(null, address, restaurant);
         String realGroupCode = order.getGroupCode();
         GroupOrderManager.getInstance().add(realGroupCode, order);
         groupCodeMap.put(groupCode, realGroupCode);
@@ -224,12 +226,13 @@ public class GroupOrderStepDefs {
     }
 
     @When("{string} close the group order that doesn't have a delivery time")
-    public void closeTheGroupOrderThatDoesnTHaveADeliveryTime(String name) {
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).closeGroupOrder());
+    public void closeTheGroupOrderThatDoesntHaveADeliveryTime(String name) {
+        STEats stEats = steatsMap.get(name);
+        assertThrows(IllegalStateException.class, stEats::closeGroupOrder);
     }
 
     @Then("{string} can't join the group order with the group code {string}")
-    public void canTJoinTheGroupOrderWithTheGroupCode(String name, String groupCode) {
+    public void cantJoinTheGroupOrderWithTheGroupCode(String name, String groupCode) {
         assertThrows(NotFoundException.class, () -> steatsMap.get(name).joinGroupOrder(groupCodeMap.get(groupCode)));
     }
 }
