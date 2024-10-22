@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.order;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
@@ -24,7 +25,7 @@ public class SingleOrder implements Order {
     private LocalDateTime deliveryTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final String addressId;
-    private final Restaurant restaurant;
+    private final String restaurantId;
 
     private Status status = Status.INITIALISED;
     private final List<Discount> appliedDiscounts = new ArrayList<>();
@@ -33,13 +34,13 @@ public class SingleOrder implements Order {
      * @param userId       The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param addressId    The label of the address the client wants the order to be delivered
-     * @param restaurant   The restaurant in which the order is made
+     * @param restaurantId   The restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+    public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
-        this.restaurant = restaurant;
+        this.restaurantId = restaurantId;
     }
 
     @Override
@@ -57,13 +58,22 @@ public class SingleOrder implements Order {
         try {
             return AddressManager.getInstance().get(addressId);
         } catch (NotFoundException e) {
-            throw new IllegalStateException("The address of the group order is not found.");
+            throw new IllegalStateException("The address of the order is not found.");
         }
     }
 
     @Override
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    @Override
     public Restaurant getRestaurant() {
-        return restaurant;
+        try {
+            return RestaurantManager.getInstance().get(restaurantId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The restaurant of the order is not found.");
+        }
     }
 
     /**
@@ -79,7 +89,7 @@ public class SingleOrder implements Order {
     public double getPrice() {
         List<Discount> oldDiscountsToApplied;
         try {
-            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurant);
+            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurantId);
         } catch (NotFoundException e) {
             oldDiscountsToApplied = Collections.emptyList();
         }
@@ -99,7 +109,7 @@ public class SingleOrder implements Order {
 
     @Override
     public List<MenuItem> getAvailableMenu(LocalDateTime time) {
-        return restaurant.getAvailableMenu(time);
+        return getRestaurant().getAvailableMenu(time);
     }
 
     @Override
@@ -157,14 +167,14 @@ public class SingleOrder implements Order {
 
     private void updateDiscounts() {
         appliedDiscounts.clear();
-        appliedDiscounts.addAll(restaurant.availableDiscounts(this));
+        appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
     }
 
     @Override
     public void closeOrder() {
         validateOrder();
         this.getUser().addOrderToHistory(this);
-        restaurant.addOrder(this);
+        getRestaurant().addOrder(this);
     }
 
     /**
