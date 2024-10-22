@@ -11,10 +11,7 @@ import fr.unice.polytech.steats.user.UserManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -23,7 +20,10 @@ import java.util.stream.Stream;
  * @author Team C
  */
 public class SingleOrder implements Order {
+    private final String id;
+
     private final String userId;
+    private final String groupCode;
     private LocalDateTime deliveryTime;
     private final LocalDateTime orderTime;
     private final List<MenuItem> items = new ArrayList<>();
@@ -41,12 +41,25 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this(userId, null, deliveryTime, addressId, restaurantId);
+    }
+
+    /**
+     * @param userId       The user that initialized the order
+     * @param groupCode    The group code of the order
+     * @param deliveryTime The time the client wants the order to be delivered
+     * @param addressId    The label of the address the client wants the order to be delivered
+     * @param restaurantId The id of the restaurant in which the order is made
+     */
+    SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
-        if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
+        if (deliveryTime != null && orderTime.plusHours(2).isAfter(deliveryTime))
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
         if (!AddressManager.getInstance().contains(addressId))
             throw new IllegalArgumentException("This address is unknown");
         this.userId = userId;
+        this.groupCode = groupCode;
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
@@ -83,6 +96,23 @@ public class SingleOrder implements Order {
         } catch (NotFoundException e) {
             throw new IllegalStateException("The restaurant of the order is not found.");
         }
+    }
+
+    /**
+     * Get the id of the order
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Get the group code of the order
+     *
+     * @return null if not in a group order
+     */
+    @Override
+    public String getGroupCode() {
+        return groupCode;
     }
 
     /**
@@ -189,7 +219,6 @@ public class SingleOrder implements Order {
     @Override
     public void closeOrder() {
         validateOrder();
-        this.getUser().addOrderToHistory(this);
         getRestaurant().addOrder(this);
     }
 
