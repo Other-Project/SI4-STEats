@@ -34,7 +34,7 @@ public class SingleOrder implements Order {
      * @param userId       The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param addressId    The label of the address the client wants the order to be delivered
-     * @param restaurantId   The restaurant in which the order is made
+     * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this.userId = userId;
