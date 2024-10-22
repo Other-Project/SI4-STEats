@@ -2,13 +2,18 @@ package fr.unice.polytech.steats;
 
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents the entry point of the application.
@@ -212,6 +217,15 @@ public class STEats {
      */
     public List<Restaurant> getAllRestaurants() {
         return RestaurantManager.getInstance().getAll();
+    }
+
+    /**
+     * Retrieve the opening times of a restaurant
+     *
+     * @param restaurant The restaurant
+     */
+    public Map<DayOfWeek, List<OpeningTime>> getOpeningTimes(Restaurant restaurant) {
+        return Arrays.stream(DayOfWeek.values()).collect(Collectors.toMap(day -> day, restaurant::getOpeningTimes));
     }
 
     /**
