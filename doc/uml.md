@@ -25,7 +25,7 @@
 
 # Use-Case Diagram
 
-![Plant UML preview](https://www.plantuml.com/plantuml/svg/TPFVQuCm4CVVyrSSVU_eQd_065BMXpqDoahtMeAUDg29N29RsVQ_xsAqQd45zVpU9zzSB-VEEackBWjHOER06I2LNnoaYZ1nocWX4sS8Pk_8P4rIEtYJMkP8Cv0MoX1FK4SdiwnXw2RsMAwiGy8KJhPrefjshctl-5hpwWR8VTJ91tajaNUnLrvJDlagIESW2L-_r7c1y2q0s3AH5c7sGkQJdtrDjbbysZzEKEnNj-dbC7sgKkaGJ8LQwHmkfgQRpM82z3uMJ9OXCT-Xon5wH0SLOIL9-hw3KoLsP3GYG__1K8gtRLSZub38f0KwXs5wJ-YhoidKrOXQ3QaFMQXqcbjFzEh2fsT89IsocRHgpwXbjk9Nj0C4y_bFF9oKFknIu_6uUmzG697cpeB_nSt9yWNF3xxby0JuvL2dLW3B4RG8wqedHPsYdR1kc1Nybza8dmrnD7JgDzXol0qrh0SrD2Axt0_l-E_7uO3xLiLXqCO2ZvE_XKsYnM0NiUE7_yR_0000)
+![Plant UML preview](https://www.plantuml.com/plantuml/svg/XPD1Yzim48Nl_XL3xYvfassWb6MR77egB5tIwp9hZns1BPdHgAtfzhzNigp6AgO9H4XlldaQnFE35MHnVLTqr0Y80LRjHQ1MJ9Keemkin31ilf8d7QCM-88QM-8De8K-xbUe9y6ccHZ-ArwnLbaXfXhEbdYcalRixDNni_FT4z26NP8VSUn92zZHz_HJVOZISvIAC3_gjYFuLG1uomejmUR8veUbnKnsQZwVtlwVWfSHDFQKw4-tSHa70jD0OqoTsewts_0xgWvVLATaJ6sdbRQUj9lhxvRbyr2Z49Y1jD8jN8nZctosAs3miM2QXjZpDbbcw1C934m3CePGWAYU4hdBo1WEC5mJ9sAV4OyTLZEG79Rb4rEOgcNZXepQBwblsAbwdRjRUQkBic9OLJFoViqg1MXc3iNlOautbENh_JB6rsqgvTdDpga_vdTQePn-zrFi_1y-lWbF3X-0VWhfsaRnjInZr9QdOtRomV3d7Sncta7fgdCrsPKX9cOFwvNmAg4Qzxkbq_M2GouVuk1tsU1Uz8R_VexPcyL1jkbzq_IP43CObdZ9RhkuvS6lhk_-0000)
 
 ```plantuml
 @startuml
@@ -37,6 +37,9 @@ actor "Guest" as guest
 actor "Payment system" as payment_system
 rectangle {
   usecase "Browse restaurants" as UC1
+  usecase "Browse restaurants by name" as UC1A
+  usecase "Browse restaurants by type of food" as UC1B
+  usecase "Browse restaurants by availability" as UC1C
   usecase "Browse menu" as UC2
   usecase "Update opening hours" as UC10
   usecase "Update menus offerings" as UC20
@@ -53,6 +56,9 @@ restaurant --|> registered_user
 registered_user --|> guest
 guest ------> UC1
 UC1 <. UC2 : extends
+UC1 <|-- UC1A
+UC1 <|-- UC1B
+UC1 <|-- UC1C
  
 UC3 --> UC1 : includes
 registered_user ---> UC4 
@@ -66,7 +72,6 @@ restaurant --> UC40
 manager --> UC10
 manager --> UC20
 UC20 <. UC30 : extends
-
 @enduml
 ```
 
