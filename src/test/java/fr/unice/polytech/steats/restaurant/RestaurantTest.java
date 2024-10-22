@@ -2,8 +2,8 @@ package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
-import fr.unice.polytech.steats.order.Order;
-import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.*;
+import fr.unice.polytech.steats.user.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +30,9 @@ class RestaurantTest {
     @BeforeEach
     public void setUp() {
         RestaurantManager.getInstance().clear();
+        AddressManager.getInstance().clear();
+        UserManager.getInstance().clear();
+        GroupOrderManager.getInstance().clear();
     }
 
     @Test
@@ -42,8 +45,10 @@ class RestaurantTest {
     void testGetOrders() {
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-        Order order1 = new SingleOrder("John", LocalDateTime.of(2025, 12, 24, 11, 20), "Campus Sophia Tech", restaurant.getName());
-        Order order2 = new SingleOrder("John", LocalDateTime.of(2025, 12, 24, 11, 20), "Campus Sophia Tech", restaurant.getName());
+        Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
+        AddressManager.getInstance().add(address.label(), address);
+        Order order1 = new SingleOrder("John", LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        Order order2 = new SingleOrder("John", LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         restaurant.addOrder(order1);
         restaurant.addOrder(order2);
         List<Order> orders = restaurant.getOrders();

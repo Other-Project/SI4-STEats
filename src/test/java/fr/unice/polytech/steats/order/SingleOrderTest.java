@@ -14,9 +14,10 @@ class SingleOrderTest {
 
     @BeforeEach
     public void setUp() {
+        RestaurantManager.getInstance().clear();
         AddressManager.getInstance().clear();
         UserManager.getInstance().clear();
-        RestaurantManager.getInstance().clear();
+        GroupOrderManager.getInstance().clear();
     }
 
     @Test
@@ -37,7 +38,9 @@ class SingleOrderTest {
         UserManager.getInstance().add(user.getName(), user);
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-        assertThrows(IllegalArgumentException.class, () -> new SingleOrder(user.getName(), null, "Campus Sophia Tech", restaurant.getName()));
+        String userName = user.getName();
+        String restaurantName = restaurant.getName();
+        assertThrows(IllegalArgumentException.class, () -> new SingleOrder(userName, null, "Campus Sophia Tech", restaurantName));
 
     }
 }

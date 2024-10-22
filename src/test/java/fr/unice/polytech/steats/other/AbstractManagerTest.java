@@ -1,5 +1,8 @@
 package fr.unice.polytech.steats.other;
 
+import fr.unice.polytech.steats.order.AddressManager;
+import fr.unice.polytech.steats.order.GroupOrderManager;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
@@ -14,7 +17,10 @@ class AbstractManagerTest {
 
     @BeforeEach
     public void setUp() {
+        RestaurantManager.getInstance().clear();
+        AddressManager.getInstance().clear();
         UserManager.getInstance().clear();
+        GroupOrderManager.getInstance().clear();
     }
 
     @Test

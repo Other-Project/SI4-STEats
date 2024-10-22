@@ -53,11 +53,12 @@ class DiscountBuilderTest {
     @Test
     void testSetItemsAmount() {
         Discount discount = new DiscountBuilder()
-                .setItemsAmount(2)
+                .setCurrentOrderItemsAmount(2)
                 .build();
         restaurant.addDiscount(discount);
         restaurant.addOrder(order);
         order.addMenuItem(new MenuItem("Burger", 5, Duration.ofMinutes(10)));
+        assertEquals(0, restaurant.availableDiscounts(order).size());
         order.addMenuItem(new MenuItem("Burger", 5, Duration.ofMinutes(10)));
         assertEquals(1, restaurant.availableDiscounts(order).size());
     }

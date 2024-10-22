@@ -159,9 +159,8 @@ public class GroupOrderStepDefs {
 
     @And("{string} can't change the delivery time to tomorrow at {string} to the group order")
     public void canTChangeTheDeliveryTimeToToTheGroupOrder(String name, String time) {
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time))));
-        STEats stEats = steatsMap.get(name);
         LocalDateTime deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time));
+        STEats stEats = steatsMap.get(name);
         assertThrows(IllegalStateException.class, () -> stEats.changeDeliveryTime(deliveryTime));
     }
 

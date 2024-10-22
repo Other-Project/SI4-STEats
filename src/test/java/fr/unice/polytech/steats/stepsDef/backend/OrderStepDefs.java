@@ -168,8 +168,8 @@ public class OrderStepDefs {
         if (deliveryTime == null) deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(20, 15));
         try {
             RestaurantManager.getInstance().get(restaurantId).addSchedule(new Schedule(LocalTime.of(19, 0), Duration.ofMinutes(30), 5, deliveryTime.getDayOfWeek()));
-        } catch (IllegalArgumentException ignored) {
-
+        } catch (NotFoundException e) {
+            throw new NotFoundException("The restaurant already has a schedule");
         }
         stEats.createOrder(deliveryTime, addressId, restaurantId);
     }
