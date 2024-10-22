@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.PaymentSystem;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -25,6 +27,7 @@ public class SingleOrder implements Order {
     private final List<MenuItem> items = new ArrayList<>();
     private final String addressId;
     private final Restaurant restaurant;
+    private Payment payment;
 
     private Status status = Status.INITIALISED;
     private final List<Discount> appliedDiscounts = new ArrayList<>();
@@ -126,6 +129,13 @@ public class SingleOrder implements Order {
     }
 
     /**
+     * Get the payment of the order
+     */
+    public Payment getPayment() {
+        return payment;
+    }
+
+    /**
      * Set the delivery time of the order
      * Can only be called by group orders
      *
@@ -205,10 +215,11 @@ public class SingleOrder implements Order {
      * @param closeOrder true if the order should be closed after the payment
      * @return true if the payment is successful, false otherwise
      */
-    public boolean pay(boolean closeOrder) throws NotFoundException {
+    public boolean pay(boolean closeOrder) {
         if (status == Status.PAID) throw new IllegalStateException("Order already paid");
-        User user = UserManager.getInstance().get(userId);
-        if (!user.pay(getPrice())) return false;
+        Optional<Payment> payment = PaymentSystem.pay(getPrice());
+        if (payment.isEmpty()) return false;
+        this.payment = payment.get();
         if (closeOrder) closeOrder();
         else validateOrder();
         return true;
