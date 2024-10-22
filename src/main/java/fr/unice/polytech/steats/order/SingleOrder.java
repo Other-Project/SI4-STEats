@@ -165,8 +165,8 @@ public class SingleOrder implements Order {
 
     @Override
     public void setStatus(Status status) {
-        if (status.compareTo(this.status) < 0)
-            throw new IllegalArgumentException("Cannot change the status to a lower one");
+        if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
+            throw new IllegalArgumentException("Can't change the status");
         this.status = status;
     }
 

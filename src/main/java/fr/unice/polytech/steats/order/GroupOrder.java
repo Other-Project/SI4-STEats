@@ -145,7 +145,7 @@ public class GroupOrder implements Order {
 
     @Override
     public void setStatus(Status status) {
-        if (status.compareTo(this.status) < 0 && status.compareTo(Status.PAID) < 0)
+        if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
             throw new IllegalArgumentException("Can't change the status");
         this.status = status;
         for (SingleOrder order : orders) order.setStatus(status);

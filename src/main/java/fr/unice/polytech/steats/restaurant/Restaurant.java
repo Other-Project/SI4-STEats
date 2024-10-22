@@ -29,7 +29,7 @@ public class Restaurant {
     private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
-    private static final int RELEVENT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION = 50;
+    private static final int RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION = 50;
 
     /**
      * Create a restaurant
@@ -139,33 +139,25 @@ public class Restaurant {
      */
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(order.getDeliveryTime());
+        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(order.getDeliveryTime(), maxCapacity);
     }
 
-    private boolean canAddOrder(LocalDateTime deliveryTime) {
+    private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
         if (deliveryTime == null) return true;
-        return getMaxCapacityLeft(deliveryTime).toMinutes() / getAveragePreparationTime().toMinutes() > orders.stream()
+        long maxNbOfOrder = (maxCapacity.toMinutes() / getAveragePreparationTime().toMinutes());
+        long currentNbOfOrder = orders.stream()
                 .filter(order -> order.getStatus() == Status.INITIALISED)
                 .count();
+        return currentNbOfOrder < maxNbOfOrder;
     }
 
     private Duration getAveragePreparationTime() {
         if (orders.isEmpty()) return Duration.ZERO;
         return orders.reversed().stream()
-                .limit(RELEVENT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
+                .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
                 .map(Order::getPreparationTime)
                 .reduce(Duration.ZERO, Duration::plus)
-                .dividedBy(Math.min(RELEVENT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION, orders.size()));
-    }
-
-    /**
-     * Change the status of an order
-     *
-     * @param order  The order to change
-     * @param status The new status of the order
-     */
-    public void changeStatusOfOrder(Order order, Status status) {
-        order.setStatus(status);
+                .dividedBy(Math.min(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION, orders.size()));
     }
 
     /**
@@ -185,8 +177,8 @@ public class Restaurant {
 
     private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
         List<Order> ordersTakenAccountSchedule = orders.stream()
-                .filter(order -> (order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
-                        && order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
+                .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
+                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
                 .filter(schedule::contains)
                 .toList();
         Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream()
