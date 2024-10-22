@@ -1,8 +1,8 @@
 package fr.unice.polytech.steats.user;
 
-import fr.unice.polytech.steats.PaymentSystem;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
+import fr.unice.polytech.steats.order.Payment;
 import fr.unice.polytech.steats.order.SingleOrder;
 
 import java.util.ArrayList;
@@ -81,20 +81,17 @@ public class User {
     }
 
     /**
-     * Pay the totalPrice
-     *
-     * @param totalPrice The total price of the order
-     * @return If the payment was successful
-     */
-    public boolean pay(double totalPrice) {
-        return PaymentSystem.pay(totalPrice);
-    }
-
-    /**
      * Gets all the orders of the user
      */
     public List<Order> getOrders() {
         return Collections.unmodifiableList(ordersHistory);
+    }
+
+    /**
+     * Get all the payments of the user
+     */
+    public List<Payment> getPayments() {
+        return ordersHistory.stream().map(SingleOrder::getPayment).toList();
     }
 
     /**
