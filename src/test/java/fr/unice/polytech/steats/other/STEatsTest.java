@@ -5,6 +5,7 @@ import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ public class STEatsTest {
     public void setUp() {
         AddressManager.getInstance().clear();
         UserManager.getInstance().clear();
+        RestaurantManager.getInstance().clear();
     }
 
     @Test
@@ -31,8 +33,9 @@ public class STEatsTest {
         UserManager.getInstance().add(user.getName(), user);
         STEats steats = new STEats(user);
         Restaurant restaurant = new Restaurant("Mcdo", null);
+        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         restaurant.addMenuItem(new MenuItem("Burger", 5, null));
-        steats.createOrder(null, null, restaurant);
+        steats.createOrder(null, null, restaurant.getName());
         assert steats.getFullMenu().size() == 1;
         assert steats.getFullMenu().getFirst().getName().equals("Burger");
     }

@@ -32,13 +32,13 @@ public class DiscountBuilderTest {
 
         RestaurantManager.getInstance().clear();
         restaurant = new Restaurant("Mcdo", TypeOfFood.FAST_FOOD);
-        RestaurantManager.getInstance().add("Mcdo", restaurant);
+        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
 
         UserManager.getInstance().clear();
         User user = new User("Alban", "Alban", Role.STUDENT);
         UserManager.getInstance().add("Alban", user);
 
-        order = new SingleOrder("Alban", LocalDateTime.of(2024, 1, 1, 12, 0), "Campus Sophia Tech", restaurant);
+        order = new SingleOrder("Alban", LocalDateTime.of(2024, 1, 1, 12, 0), "Campus Sophia Tech", restaurant.getName());
     }
 
 
