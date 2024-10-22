@@ -3,7 +3,6 @@ package fr.unice.polytech.steats.restaurant;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.user.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -24,8 +23,8 @@ public class Restaurant {
     private final List<Discount> discounts = new ArrayList<>();
     private final List<Order> orders = new ArrayList<>();
     private final Set<Schedule> schedules = new HashSet<>();
-    private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
-    private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
+    private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
+    private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
     /**
      * Create a restaurant
@@ -100,13 +99,7 @@ public class Restaurant {
      * @param order The order to check
      */
     public List<Discount> availableDiscounts(SingleOrder order) {
-        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> {
-            try {
-                return discount.isApplicable(order);
-            } catch (NotFoundException e) {
-                return false;
-            }
-        }).toList();
+        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
         List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
         applicableDiscounts.stream()
                 .filter(discount -> !discount.isStackable())
@@ -181,6 +174,7 @@ public class Restaurant {
      */
     public void addMenuItem(MenuItem menuItem) {
         this.menu.add(menuItem);
+        menuItem.setRestaurantName(name);
     }
 
     /**

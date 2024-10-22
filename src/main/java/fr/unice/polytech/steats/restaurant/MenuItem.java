@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.order.Saleable;
+import fr.unice.polytech.steats.user.NotFoundException;
 
 import java.time.Duration;
 
@@ -8,6 +9,7 @@ public class MenuItem implements Saleable {
     private final String name;
     private final double price;
     private final Duration preparationTime;
+    private String restaurantName;
 
     /**
      * Create a menu item
@@ -42,6 +44,23 @@ public class MenuItem implements Saleable {
      */
     public Duration getPreparationTime() {
         return this.preparationTime;
+    }
+
+    /**
+     * Links the menu item with a restaurant
+     *
+     * @param restaurantName The name of the restaurant
+     * @implNote This method is package-private because it should only be used by the Restaurant class.
+     */
+    void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+
+    /**
+     * Get the restaurant that serves the menu item
+     */
+    public Restaurant getRestaurant() throws NotFoundException {
+        return RestaurantManager.getInstance().get(restaurantName);
     }
 
     @Override

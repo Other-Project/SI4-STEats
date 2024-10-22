@@ -30,6 +30,11 @@ public interface Order extends Saleable {
     Address getAddress();
 
     /**
+     * The id of the restaurant in which the order is made
+     */
+    String getRestaurantId();
+
+    /**
      * @return The restaurant in which the order is made
      */
     Restaurant getRestaurant();

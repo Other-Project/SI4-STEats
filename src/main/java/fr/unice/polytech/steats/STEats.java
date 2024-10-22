@@ -45,12 +45,12 @@ public class STEats {
      * Create a single order.
      *
      * @param deliveryTime The time the user wants the order to be delivered
-     * @param addressId    The label of the address the user wants the order to be delivered
-     * @param restaurant   The restaurant in which the order is made
+     * @param addressId The label of the address the user wants the order to be delivered
+     * @param restaurantId The id of the restaurant in which the order is made
      */
-    public void createOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
+    public void createOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurant);
+        order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurantId);
         updateFullMenu(order);
     }
 
@@ -59,11 +59,11 @@ public class STEats {
      *
      * @param deliveryTime The time the group order must be delivered
      * @param addressId    The label of the address where the group order must be delivered
-     * @param restaurant   The restaurant in which the group order is made
+     * @param restaurantId The id of the restaurant in which the order is made
      */
-    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
+    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurant);
+        GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurantId);
         this.groupCode = groupOrder.getGroupCode();
         GroupOrderManager.getInstance().add(groupCode, groupOrder);
         order = groupOrder.createOrder(user);
