@@ -20,6 +20,13 @@ public interface Order extends Saleable {
     Status getStatus();
 
     /**
+     * Set the status of the order
+     *
+     * @param status The new status of the order
+     */
+    void setStatus(Status status);
+
+    /**
      * @return The time the user wants the order to be delivered
      */
     LocalDateTime getDeliveryTime();
@@ -61,14 +68,6 @@ public interface Order extends Saleable {
      * @return The List of users that have ordered
      */
     List<User> getUsers();
-
-    /**
-     * Close the order.
-     * Changes its status to {@link Status#PAID}.
-     * Send the order to the restaurant.
-     * Add the order to the user's history.
-     */
-    void closeOrder();
 
     /**
      * @return The time it takes to prepare the order

@@ -42,6 +42,6 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param groupCode The invitation code of the group
      */
     public List<SingleOrder> getOrdersByGroup(String groupCode) {
-        return getAll().stream().filter(singleOrder -> singleOrder.getGroupCode().equals(groupCode)).toList();
+        return getAll().stream().filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode())).toList();
     }
 }
