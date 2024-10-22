@@ -72,4 +72,11 @@ public interface Order extends Saleable {
      * @return The ordering time of the order
      */
     LocalDateTime getOrderTime();
+
+    /**
+     * Set the delivery time of the order
+     *
+     * @param deliveryTime The time the order must be delivered
+     */
+    void setDeliveryTime(LocalDateTime deliveryTime);
 }

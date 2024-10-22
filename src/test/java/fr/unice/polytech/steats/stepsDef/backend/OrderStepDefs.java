@@ -14,10 +14,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -56,22 +53,21 @@ public class OrderStepDefs {
         Schedule schedule = new Schedule(LocalTime.of(20, 15), Duration.ofMinutes(30), 5, DayOfWeek.WEDNESDAY);
         restaurant.addSchedule(schedule);
         restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
-        restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));
+        restaurant.addMenuItem(new MenuItem("Pave de saumon", 25, Duration.ofMinutes(20)));
     }
 
     //endregion
 
     //region Test for scenario : Creating an order
 
-    @When("the user creates an order and specifies a date, an address and a restaurant")
-    public void whenCreatesOrder() {
-        deliveryTime = LocalDateTime.of(2024, 10, 16, 21, 0);
-        stEats.createOrder(deliveryTime, null, restaurantId);
+    @When("the user creates an order and specifies a date, an address and a restaurant :")
+    public void whenCreatesOrder(List<Map<String, String>> order) {
+        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.getFirst().get("date"))), order.getFirst().get("addressId"), restaurantId);
     }
 
     @Then("the user can order")
     public void thenUserCanOrder() {
-        assertFalse(stEats.getAvailableMenu().isEmpty());
+        assertFalse(stEats.getFullMenu().isEmpty());
     }
 
     //endregion
@@ -122,9 +118,11 @@ public class OrderStepDefs {
 
     //region Test for scenario : Filtering restaurants by delivery time
 
-    @Given("The following restaurants with schedule and order duration and order scheduled to {string} :")
-    public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledTo(String deliveryTime, List<Map<String, String>> items) {
-        LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
+    @Given("The following restaurants with schedule and order duration and order scheduled to tomorrow at {string} :")
+    public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledToTomorrowAt(String deliveryTime, List<Map<String, String>> items) {
+        LocalTime localTime = LocalTime.parse(deliveryTime);
+        LocalDateTime deliveryTimeParsed = LocalDateTime.of(LocalDate.now().plusDays(1), localTime);
+
         for (Map<String, String> item : items) {
             Restaurant restaurant = new Restaurant(item.get("name"));
             RestaurantManager.getInstance().add(item.get("name"), restaurant);
@@ -164,7 +162,13 @@ public class OrderStepDefs {
     //endregion
 
     @Given("an order to be delivered at {string}")
-    public void givenTheOrderTheUserCreated(String addressId) {
+    public void givenTheOrderTheUserCreated(String addressId) throws NotFoundException {
+        if (deliveryTime == null) deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(20, 15));
+        try {
+            RestaurantManager.getInstance().get(restaurantId).addSchedule(new Schedule(LocalTime.of(19, 0), Duration.ofMinutes(30), 5, deliveryTime.getDayOfWeek()));
+        } catch (IllegalArgumentException ignored) {
+
+        }
         stEats.createOrder(deliveryTime, addressId, restaurantId);
     }
 
