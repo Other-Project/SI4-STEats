@@ -63,6 +63,7 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
+        SingleOrderManager.getInstance().add(getId(), this);
     }
 
     @Override
@@ -113,6 +114,18 @@ public class SingleOrder implements Order {
     @Override
     public String getGroupCode() {
         return groupCode;
+    }
+
+    /**
+     * Get the group order
+     */
+    public Optional<GroupOrder> getGroupOrder() {
+        if (groupCode == null) return Optional.empty();
+        try {
+            return Optional.ofNullable(GroupOrderManager.getInstance().get(groupCode));
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The group order of the order is not found.");
+        }
     }
 
     /**

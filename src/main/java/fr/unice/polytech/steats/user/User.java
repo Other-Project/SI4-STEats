@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class User {
     private String name;
-    private String userId;
+    private final String userId;
     private final Role role;
 
     /**
@@ -54,15 +54,6 @@ public class User {
     }
 
     /**
-     * Update user id
-     *
-     * @param userId the new id
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
      * Get the user's role
      */
     public Role getRole() {
@@ -82,7 +73,10 @@ public class User {
      * @param restaurantId The id of the restaurant to filter the orders
      */
     public List<SingleOrder> getOrders(String restaurantId) {
-        return getOrders().stream().filter(order -> order.getRestaurantId().equals(restaurantId)).toList();
+        return getOrders().stream()
+                .filter(order -> order.getRestaurantId().equals(restaurantId))
+                .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0)
+                .toList();
     }
 
     /**

@@ -4,6 +4,7 @@ import fr.unice.polytech.steats.discounts.DiscountBuilder;
 import fr.unice.polytech.steats.order.Address;
 import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.SingleOrderManager;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
@@ -33,6 +34,7 @@ public class DiscountStepdefs {
     public void before() {
         RestaurantManager.getInstance().clear();
         UserManager.getInstance().clear();
+        SingleOrderManager.getInstance().clear();
         AddressManager.getInstance().clear();
         AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
@@ -98,13 +100,13 @@ public class DiscountStepdefs {
     }
 
     @Given("I am {string} with the {string} role and {int} orders at {string} of {int} items")
-    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) throws NotFoundException {
+    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) {
         aClientNamedWithTheRole(name, role);
         for (int i = 0; i < orders; i++) {
             SingleOrder singleOrder = new SingleOrder(username, null, "Campus SophiaTech", restaurant);
             for (int j = 0; j < items; j++)
                 singleOrder.addMenuItem(new MenuItem("P1", 5, Duration.ofMinutes(1)));
-            singleOrder.pay(true);
+            assertTrue(singleOrder.pay(true));
         }
     }
 
