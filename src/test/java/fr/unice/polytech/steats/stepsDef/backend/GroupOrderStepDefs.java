@@ -2,10 +2,7 @@ package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
-import fr.unice.polytech.steats.order.GroupOrder;
-import fr.unice.polytech.steats.order.GroupOrderManager;
-import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.order.Status;
+import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
@@ -43,6 +40,8 @@ public class GroupOrderStepDefs {
         UserManager.getInstance().clear();
         RestaurantManager.getInstance().clear();
         groupCodeMap.clear();
+        AddressManager.getInstance().clear();
+        AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
 
     @Given("A group order with the group code {string} from the restaurant {string} and to deliver for tomorrow at {string} at {string}")

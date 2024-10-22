@@ -42,6 +42,8 @@ public class SingleOrder implements Order {
     public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
         if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
+        if (!AddressManager.getInstance().contains(addressId))
+            throw new IllegalArgumentException("This address is unknown");
         this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
