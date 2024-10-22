@@ -5,7 +5,9 @@ Feature: Order
     Given a restaurant named "La Cafet"
 
   Scenario: Creating an order
-    When the user creates an order and specifies a date, an address and a restaurant
+    When the user creates an order and specifies a date, an address and a restaurant :
+      | date     | addressId | restaurant |
+      | 10:15:30 | Sophia    | La Cafet   |
     Then the user can order
 
   Scenario: Filtering restaurants by name

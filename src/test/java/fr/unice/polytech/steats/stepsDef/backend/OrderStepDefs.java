@@ -14,10 +14,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -62,15 +59,14 @@ public class OrderStepDefs {
 
     //region Test for scenario : Creating an order
 
-    @When("the user creates an order and specifies a date, an address and a restaurant")
-    public void whenCreatesOrder() {
-        deliveryTime = LocalDateTime.of(2024, 10, 16, 21, 0);
-        stEats.createOrder(deliveryTime, null, restaurant);
+    @When("the user creates an order and specifies a date, an address and a restaurant :")
+    public void whenCreatesOrder(List<Map<String, String>> order) throws NotFoundException {
+        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.get(0).get("date"))), order.get(0).get("addressId"), RestaurantManager.getInstance().get(order.get(0).get("restaurant")));
     }
 
     @Then("the user can order")
     public void thenUserCanOrder() {
-        assertFalse(stEats.getAvailableMenu().isEmpty());
+        assertFalse(stEats.getFullMenu().isEmpty());
     }
 
     //endregion

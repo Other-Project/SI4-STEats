@@ -6,17 +6,33 @@ Feature: Manage GroupOrder
     Given The user named "Alban" with the id "4321" is logged in
     Given The user named "Alexandre" with the id "2323" is logged in
     Given The user named "Alexandra" with the id "3232" is logged in
-    Given A group order with the group code "groupCode2" from the restaurant "McDonald's" and to deliver for "2024-03-29T10:15:30" at "292 Chemin de la Rigolade"
+    Given A restaurant named "McDonald's" with the following schedules :
+      | start | duration | capacity |
+      | 08:20 | 30       | 5        |
+      | 08:50 | 30       | 5        |
+      | 09:20 | 30       | 5        |
+      | 09:50 | 30       | 5        |
+      | 10:20 | 30       | 5        |
+    Given The restaurant named "McDonald's" have the following menu :
+      | name         | price | preparationTime |
+      | Alban_Burger | 30.0  | 29              |
+      | bigmac       | 10.0  | 10              |
+      | bigmac++     | 20.0  | 20              |
+      | coke         | 2.0   | 01              |
+      | fries        | 3.0   | 05              |
+      | icecream     | 4.0   | 02              |
+      | salad        | 5.0   | 03              |
+    Given A group order with the group code "groupCode2" from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "292 Chemin de la Rigolade"
 
   Scenario: Create GroupOrder with a delivery time
-    When "Alexandre" creates a group order from the restaurant "McDonald's" and to deliver for "2024-03-29T10:15:30" at "292 Chemin de la Rigolade"
+    When "Alexandre" creates a group order from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "292 Chemin de la Rigolade"
     Then "Alexandre" receives a group code
-    And "Alexandre" can't change the delivery time to "2024-03-29T10:18:30" to the group order
+    And "Alexandre" can't change the delivery time to tomorrow at "18:15:30" to the group order
 
   Scenario: Create GroupOrder without a delivery time
     When "Alexandra" creates a group order from the restaurant "McDonald's" and to deliver at "292 Chemin de la Rigolade"
     Then "Alexandra" receives a group code
-    And "Alexandra" can add "2024-03-29T10:15:30" as delivery time to the group order
+    And "Alexandra" can add "2025-03-29T10:15:30" as delivery time to the group order
 
   Scenario: Join GroupOrder
     When "Alex" joins the group order with the group code "groupCode2"
@@ -26,7 +42,7 @@ Feature: Manage GroupOrder
     Then "Alex" can't join the group order with the group code "groupCode3"
 
   Scenario: Multiple GroupOrder
-    Given A group order with the group code "groupCode89" from the restaurant "McDonald's" and to deliver for "2024-03-29T10:15:30" at "292 Chemin de la Rigolade"
+    Given A group order with the group code "groupCode89" from the restaurant "McDonald's" and to deliver for tomorrow at "10:15:30" at "292 Chemin de la Rigolade"
     When "Alex" joins the group order with the group code "groupCode2"
     When "Alban" joins the group order with the group code "groupCode89"
     Then "Alex" is added to the group order with the group code "groupCode2"
@@ -65,13 +81,13 @@ Feature: Manage GroupOrder
     Given "Alban" pays
     When "Alex" close the group order
     Then the group order with the id "groupCode2" is closed
-    And The order is added to the history of "Alex"
-    And The order is added to the history of "Alban"
+    And The order containing the item "bigmac" is added to the history of "Alex"
+    And The order containing the item "bigmac++" is added to the history of "Alban"
     And "Alex" can't close the group order
     And "Alban" can't close the group order
 
   Scenario: Close Group order if delivery time not set
-    Given A restaurant named "McDonald's" with the following schedules :
+    Given A restaurant named "BurgerKing" with the following schedules :
       | start | duration | capacity | day    |
       | 11:20 | 30       | 2        | MONDAY |
       | 11:50 | 30       | 1        | MONDAY |
@@ -80,7 +96,7 @@ Feature: Manage GroupOrder
       | 13:20 | 30       | 3        | MONDAY |
       | 14:50 | 30       | 1        | MONDAY |
       | 15:20 | 30       | 3        | MONDAY |
-    Given The restaurant named "McDonald's" have the following menu :
+    Given The restaurant named "BurgerKing" have the following menu :
       | name         | price | preparationTime |
       | Alban_Burger | 30.0  | 29              |
       | bigmac       | 10.0  | 10              |
@@ -89,7 +105,7 @@ Feature: Manage GroupOrder
       | fries        | 3.0   | 05              |
       | icecream     | 4.0   | 02              |
       | salad        | 5.0   | 03              |
-    Given A group order with the group code "groupCode6" from the restaurant "McDonald's" at "292 Chemin de la Rigolade"
+    Given A group order with the group code "groupCode6" from the restaurant "BurgerKing" at "292 Chemin de la Rigolade"
     Given "Alex" joins the group order with the group code "groupCode6"
     Given "Alban" joins the group order with the group code "groupCode6"
     Given "Alexandra" joins the group order with the group code "groupCode6"
@@ -102,9 +118,9 @@ Feature: Manage GroupOrder
     Given "Alban" pays
     Given "Alexandra" pays
     When "Alex" close the group order that doesn't have a delivery time
-    Then "Alex" he need to choose the delivery time so he gets the next 2 delivery time from "2024-10-21T12:30:00" and gets :
-      | deliveryTime     |
-      | 2024-10-21T14:00 |
-      | 2024-10-21T14:30 |
-    And "Alex" can choose the following delivery time : "2024-10-21T14:00"
-          # also 2024-10-21T14:30 or 2024-10-21T15:00 are possible but he can only change the delivery time once
+    Then "Alex" he need to choose the delivery time so he gets the next 2 delivery time from tomorrow at "12:30:00" and gets :
+      | deliveryTime |
+      | 14:00        |
+      | 14:30        |
+    And "Alex" can choose the following delivery time : "14:00"
+          # also 14:30 or 15:00 are possible but he can only change the delivery time once

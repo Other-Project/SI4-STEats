@@ -31,6 +31,8 @@ public class GroupOrder implements Order {
      * @param restaurant   The restaurant in which the group order is made
      */
     private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+        if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
+            throw new IllegalArgumentException("Delivery time to short");
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
