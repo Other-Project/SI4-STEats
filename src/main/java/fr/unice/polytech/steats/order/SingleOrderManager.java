@@ -33,7 +33,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param userId The id of the user
      */
     public List<SingleOrder> getOrdersByUser(String userId) {
-        return getAll().stream().filter(singleOrder -> singleOrder.getUserId().equals(userId)).toList();
+        return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId())).toList();
     }
 
     /**
@@ -42,6 +42,6 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param groupCode The invitation code of the group
      */
     public List<SingleOrder> getOrdersByGroup(String groupCode) {
-        return getAll().stream().filter(singleOrder -> singleOrder.getGroupCode().equals(groupCode)).toList();
+        return getAll().stream().filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode())).toList();
     }
 }

@@ -28,6 +28,7 @@ class GroupOrderTest {
     public void setUp() {
         RestaurantManager.getInstance().clear();
         AddressManager.getInstance().clear();
+        GroupOrderManager.getInstance().clear();
         address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
         AddressManager.getInstance().add(address.label(), address);
     }
