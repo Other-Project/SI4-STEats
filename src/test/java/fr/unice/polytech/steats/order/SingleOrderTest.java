@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,7 @@ class SingleOrderTest {
     public void setUp() {
         AddressManager.getInstance().clear();
         UserManager.getInstance().clear();
+        RestaurantManager.getInstance().clear();
     }
 
     @Test
@@ -30,8 +33,9 @@ class SingleOrderTest {
     void testSingleOrderAddressNotFound() {
         User user = new User("John", "JohnID", null);
         UserManager.getInstance().add(user.getName(), user);
+        Restaurant restaurant = new Restaurant("McDonald's");
+        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
+        assertThrows(IllegalArgumentException.class, () -> new SingleOrder(user.getName(), null, "Campus Sophia Tech", restaurant.getName()));
 
-        SingleOrder singleOrder = new SingleOrder(user.getName(), null, "Campus Sophia Tech", null);
-        assertThrows(IllegalStateException.class, singleOrder::getAddress);
     }
 }

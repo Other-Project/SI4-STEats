@@ -37,7 +37,9 @@ class STEatsTest {
         Restaurant restaurant = new Restaurant("Mcdo", null);
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         restaurant.addMenuItem(new MenuItem("Burger", 5, null));
-        steats.createOrder(null, null, restaurant.getName());
+        Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
+        AddressManager.getInstance().add(address.label(), address);
+        steats.createOrder(null, address.label(), restaurant.getName());
         assertEquals(1, steats.getFullMenu().size());
         assertEquals("Burger", steats.getFullMenu().getFirst().getName());
     }

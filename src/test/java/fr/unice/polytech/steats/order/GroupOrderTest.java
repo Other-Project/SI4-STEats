@@ -22,24 +22,27 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GroupOrderTest {
 
+    private Address address;
+
     @BeforeEach
     public void setUp() {
         RestaurantManager.getInstance().clear();
         AddressManager.getInstance().clear();
+        address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
+        AddressManager.getInstance().add(address.label(), address);
     }
 
     @Test
     void testGroupOrderAddress() {
-        Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
-        AddressManager.getInstance().add(address.label(), address);
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", null);
+        Restaurant restaurant = new Restaurant("McDonald's");
+        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
+        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         assertEquals(groupOrder.getAddress(), address);
     }
 
     @Test
     void testGroupOrderAddressNull() {
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", null);
-        assertThrows(IllegalStateException.class, groupOrder::getAddress);
+        assertThrows(IllegalArgumentException.class, () -> new GroupOrder(LocalDateTime.now().plusDays(1), null, null));
     }
 
     @Test
