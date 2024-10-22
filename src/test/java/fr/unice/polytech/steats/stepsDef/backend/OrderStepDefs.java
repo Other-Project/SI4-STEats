@@ -52,7 +52,7 @@ public class OrderStepDefs {
         Schedule schedule = new Schedule(LocalTime.of(20, 15), Duration.ofMinutes(30), 5, DayOfWeek.WEDNESDAY);
         restaurant.addSchedule(schedule);
         restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
-        restaurant.addMenuItem(new MenuItem("Pavé de saumon", 25, Duration.ofMinutes(20)));
+        restaurant.addMenuItem(new MenuItem("Pave de saumon", 25, Duration.ofMinutes(20)));
     }
 
     //endregion
