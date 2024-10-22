@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.restaurant;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.Status;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,6 +26,8 @@ public class Restaurant {
     private final Set<Schedule> schedules = new HashSet<>();
     private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
+
+    private static final int RELEVENT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION = 50;
 
     /**
      * Create a restaurant
@@ -127,7 +130,33 @@ public class Restaurant {
      */
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(order.getPreparationTime()) >= 0;
+        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(order.getDeliveryTime());
+    }
+
+    private boolean canAddOrder(LocalDateTime deliveryTime) {
+        if (deliveryTime == null) return true;
+        return getMaxCapacityLeft(deliveryTime).toMinutes() / getAveragePreparationTime().toMinutes() > orders.stream()
+                .filter(order -> order.getStatus() == Status.INITIALISED)
+                .count();
+    }
+
+    private Duration getAveragePreparationTime() {
+        if (orders.isEmpty()) return Duration.ZERO;
+        return orders.stream()
+                .limit(RELEVENT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
+                .map(Order::getPreparationTime)
+                .reduce(Duration.ZERO, Duration::plus)
+                .dividedBy(orders.size());
+    }
+
+    /**
+     * Change the status of an order
+     *
+     * @param order  The order to change
+     * @param status The new status of the order
+     */
+    public void changeStatusOfOrder(Order order, Status status) {
+        order.setStatus(status);
     }
 
     /**

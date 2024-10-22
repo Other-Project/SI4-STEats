@@ -135,6 +135,13 @@ public class GroupOrder implements Order {
         for (SingleOrder order : orders) order.setDeliveryTime(deliveryTime);
     }
 
+    public void setStatus(Status status) {
+        if (status.compareTo(this.status) < 0 && status.compareTo(Status.PAID) < 0)
+            throw new IllegalArgumentException("Can't change the status");
+        this.status = status;
+        for (SingleOrder order : orders) order.setStatus(status);
+    }
+
     /**
      * Add a user to the group order.
      *
@@ -148,7 +155,6 @@ public class GroupOrder implements Order {
         return order;
     }
 
-    @Override
     public void closeOrder() {
         status = Status.PAID;
         orders.forEach(SingleOrder::closeOrder);

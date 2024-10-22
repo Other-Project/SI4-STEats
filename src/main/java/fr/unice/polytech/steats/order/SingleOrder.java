@@ -157,6 +157,12 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
     }
 
+    public void setStatus(Status status) {
+        if (status.compareTo(this.status) < 0)
+            throw new IllegalArgumentException("Cannot change the status to a lower one");
+        this.status = status;
+    }
+
     /**
      * Add a menu item to the items of the order
      *
@@ -164,6 +170,7 @@ public class SingleOrder implements Order {
      */
     public void addMenuItem(MenuItem item) {
         items.add(item);
+        getRestaurant().addMenuItem(item);
         updateDiscounts();
     }
 
@@ -182,11 +189,9 @@ public class SingleOrder implements Order {
         appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
     }
 
-    @Override
-    public void closeOrder() {
-        validateOrder();
+    void closeOrder() {
+        if (status == Status.PAID) throw new IllegalStateException("Order already closed");
         this.getUser().addOrderToHistory(this);
-        getRestaurant().addOrder(this);
     }
 
     /**
@@ -209,7 +214,7 @@ public class SingleOrder implements Order {
      *
      * @implNote only validate the payment, doesn't close the order
      */
-    public void validateOrder() {
+    private void validateOrder() {
         status = Status.PAID;
     }
 
