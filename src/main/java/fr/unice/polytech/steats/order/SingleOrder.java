@@ -245,11 +245,11 @@ public class SingleOrder implements Order {
      */
     public boolean pay(boolean closeOrder) {
         if (status == Status.PAID) throw new IllegalStateException("Order already paid");
-        Optional<Payment> payment = PaymentSystem.pay(getPrice());
-        if (payment.isEmpty()) return false;
-        this.payment = payment.get();
+        Optional<Payment> optionalPayment = PaymentSystem.pay(getPrice());
+        if (optionalPayment.isEmpty()) return false;
+        this.payment = optionalPayment.get();
+        validateOrder();
         if (closeOrder) closeOrder();
-        else validateOrder();
         return true;
     }
 }

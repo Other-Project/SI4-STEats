@@ -185,7 +185,8 @@ public class Restaurant {
 
     private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
         List<Order> ordersTakenAccountSchedule = orders.stream()
-                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
+                .filter(order -> (order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
+                        && order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
                 .filter(schedule::contains)
                 .toList();
         Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream()
