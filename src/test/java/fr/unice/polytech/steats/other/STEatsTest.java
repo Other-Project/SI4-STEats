@@ -11,7 +11,9 @@ import fr.unice.polytech.steats.user.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class STEatsTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class STEatsTest {
 
     @BeforeEach
     public void setUp() {
@@ -21,14 +23,14 @@ public class STEatsTest {
     }
 
     @Test
-    public void testSTEatsGetUser() {
+    void testSTEatsGetUser() {
         User user = new User("Clara", "ClaraId", null);
         STEats steats = new STEats(user);
-        assert steats.getUser().equals(user);
+        assertEquals(steats.getUser(), user);
     }
 
     @Test
-    public void testGetFullMenu() {
+    void testGetFullMenu() {
         User user = new User("Clara", "ClaraId", null);
         UserManager.getInstance().add(user.getName(), user);
         STEats steats = new STEats(user);
@@ -36,17 +38,17 @@ public class STEatsTest {
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         restaurant.addMenuItem(new MenuItem("Burger", 5, null));
         steats.createOrder(null, null, restaurant.getName());
-        assert steats.getFullMenu().size() == 1;
-        assert steats.getFullMenu().getFirst().getName().equals("Burger");
+        assertEquals(1, steats.getFullMenu().size());
+        assertEquals("Burger", steats.getFullMenu().getFirst().getName());
     }
 
     @Test
-    public void testGetAllAddresses() {
+    void testGetAllAddresses() {
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
         AddressManager.getInstance().add(address.label(), address);
         Address address2 = new Address("Campus Carlone", "28 Avenue de Valrose", "Nice", "06108", "Bâtiment 2");
         AddressManager.getInstance().add(address2.label(), address2);
         STEats steats = new STEats();
-        assert steats.getAddresses().size() == 2;
+        assertEquals(2, steats.getAddresses().size());
     }
 }

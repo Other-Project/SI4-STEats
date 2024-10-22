@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DiscountBuilderTest {
+class DiscountBuilderTest {
 
     private Restaurant restaurant;
     private SingleOrder order;
@@ -38,12 +38,12 @@ public class DiscountBuilderTest {
         User user = new User("Alban", "Alban", Role.STUDENT);
         UserManager.getInstance().add("Alban", user);
 
-        order = new SingleOrder("Alban", LocalDateTime.of(2024, 1, 1, 12, 0), "Campus Sophia Tech", restaurant.getName());
+        order = new SingleOrder("Alban", LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
     }
 
 
     @Test
-    public void testOneTimeOffer() {
+    void testOneTimeOffer() {
         Discount discount = new DiscountBuilder()
                 .oneTimeOffer()
                 .build();
@@ -51,7 +51,7 @@ public class DiscountBuilderTest {
     }
 
     @Test
-    public void testSetItemsAmount() {
+    void testSetItemsAmount() {
         Discount discount = new DiscountBuilder()
                 .setItemsAmount(2)
                 .build();
@@ -63,7 +63,7 @@ public class DiscountBuilderTest {
     }
 
     @Test
-    public void testExpiresAt() {
+    void testExpiresAt() {
         Discount discountExpired = new DiscountBuilder()
                 .expiresAt(LocalDateTime.of(2024, 10, 12, 12, 0))
                 .build();
@@ -75,7 +75,7 @@ public class DiscountBuilderTest {
     }
 
     @Test
-    public void testNeverExpires() {
+    void testNeverExpires() {
         Discount discount = new DiscountBuilder()
                 .neverExpires()
                 .build();

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SingleOrderTest {
+class SingleOrderTest {
 
     @BeforeEach
     public void setUp() {
@@ -17,7 +17,7 @@ public class SingleOrderTest {
     }
 
     @Test
-    public void testSingleOrderAddress() {
+    void testSingleOrderAddress() {
         User user = new User("John", "JohnID", null);
         UserManager.getInstance().add(user.getName(), user);
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
@@ -27,7 +27,7 @@ public class SingleOrderTest {
     }
 
     @Test
-    public void testSingleOrderAddressNotFound() {
+    void testSingleOrderAddressNotFound() {
         User user = new User("John", "JohnID", null);
         UserManager.getInstance().add(user.getName(), user);
 

@@ -8,8 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AbstractManagerTest {
+class AbstractManagerTest {
 
     @BeforeEach
     public void setUp() {
@@ -17,7 +18,7 @@ public class AbstractManagerTest {
     }
 
     @Test
-    public void testAbstractManagerRemove() throws NotFoundException {
+    void testAbstractManagerRemove() throws NotFoundException {
         User user = new User("John", "JohnID", Role.EXTERNAL);
         UserManager.getInstance().add(user.getName(), user);
         UserManager.getInstance().remove(user.getName());
@@ -25,12 +26,12 @@ public class AbstractManagerTest {
     }
 
     @Test
-    public void testAbstractManagerGetAll() {
+    void testAbstractManagerGetAll() {
         User user1 = new User("John", "JohnID", Role.EXTERNAL);
         User user2 = new User("Jane", "JohnID", Role.EXTERNAL);
         UserManager.getInstance().add(user1.getName(), user1);
         UserManager.getInstance().add(user2.getName(), user2);
-        assert UserManager.getInstance().getAll().contains(user1);
-        assert UserManager.getInstance().getAll().contains(user2);
+        assertTrue(UserManager.getInstance().getAll().contains(user1));
+        assertTrue(UserManager.getInstance().getAll().contains(user2));
     }
 }

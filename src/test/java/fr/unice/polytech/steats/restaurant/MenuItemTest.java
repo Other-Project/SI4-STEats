@@ -6,10 +6,10 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MenuItemTest {
+class MenuItemTest {
 
     @Test
-    public void testMenuItemNameHashed() {
+    void testMenuItemNameHashed() {
         MenuItem menuItem = new MenuItem("Big Mac", 5.0, null);
         MenuItem menuItem2 = new MenuItem("Big Mac", 5.0, null);
         assertEquals(menuItem, menuItem2);
@@ -17,7 +17,7 @@ public class MenuItemTest {
     }
 
     @Test
-    public void testMenuItemToString() {
+    void testMenuItemToString() {
         MenuItem menuItem = new MenuItem("Big Mac", 5.0, Duration.ofMinutes(15));
         assertEquals("Big Mac (5.0€) [PT15M]", menuItem.toString());
     }

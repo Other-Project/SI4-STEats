@@ -3,15 +3,17 @@ package fr.unice.polytech.steats.restaurant;
 import fr.unice.polytech.steats.order.Address;
 import org.junit.jupiter.api.Test;
 
-public class AddressTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class AddressTest {
 
     @Test
-    public void testAddress() {
+    void testAddress() {
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
-        assert (address.label().equals("Campus Sophia Tech"));
-        assert (address.street().equals("930 Route des Colles"));
-        assert (address.city().equals("Valbonne"));
-        assert (address.postal_code().equals("06560"));
-        assert (address.additional_address().equals("Bâtiment 1"));
+        assertEquals("Campus Sophia Tech", address.label());
+        assertEquals("930 Route des Colles", address.street());
+        assertEquals("Valbonne", address.city());
+        assertEquals("06560", address.postal_code());
+        assertEquals("Bâtiment 1", address.additional_address());
     }
 }

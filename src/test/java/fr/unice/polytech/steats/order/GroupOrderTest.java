@@ -20,7 +20,7 @@ import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GroupOrderTest {
+class GroupOrderTest {
 
     @BeforeEach
     public void setUp() {
@@ -29,81 +29,91 @@ public class GroupOrderTest {
     }
 
     @Test
-    public void testGroupOrderAddress() {
+    void testGroupOrderAddress() {
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
         AddressManager.getInstance().add(address.label(), address);
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.of(2024, 10, 12, 10, 30), "Campus Sophia Tech", null);
+        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", null);
         assertEquals(groupOrder.getAddress(), address);
     }
 
     @Test
-    public void testGroupOrderAddressNull() {
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.of(2024, 10, 12, 10, 30), "Campus Sophia Tech", null);
+    void testGroupOrderAddressNull() {
+        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", null);
         assertThrows(IllegalStateException.class, groupOrder::getAddress);
     }
 
     @Test
-    public void testGroupOrderRestaurant() {
+    void testGroupOrderRestaurant() {
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.of(2024, 10, 12, 10, 30), "Campus Sophia Tech", restaurant.getName());
+        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         assertEquals(groupOrder.getRestaurant(), restaurant);
     }
 
     @Test
-    public void testGetItems() throws NotFoundException {
+    void testGetItems() throws NotFoundException {
         STEats steats = new STEats(new User("John", "JohnID", Role.EXTERNAL));
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-        steats.createGroupOrder(LocalDateTime.of(2024, 10, 12, 10, 30), "Campus Sophia Tech", restaurant.getName());
-        assertEquals(GroupOrderManager.getInstance().get(steats.getGroupCode()).getItems().size(), 0);
-        steats.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10)));
-        steats.addMenuItem(new MenuItem("Pizza", 15.0, Duration.ofMinutes(30)));
-        assertEquals(GroupOrderManager.getInstance().get(steats.getGroupCode()).getItems().size(), 2);
-        steats.addMenuItem(new MenuItem("Coca-Cola", 2.5, Duration.ofMinutes(5)));
-        assertEquals(GroupOrderManager.getInstance().get(steats.getGroupCode()).getItems().size(), 3);
+        steats.createGroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        RestaurantManager.getInstance().get(restaurant.getName()).addSchedule(new Schedule(LocalTime.now().minusHours(1), Duration.ofMinutes(30), 1, LocalDateTime.now().plusDays(1).getDayOfWeek()));
+        assertEquals(0, GroupOrderManager.getInstance().get(steats.getGroupCode()).getItems().size());
+        MenuItem bigMac = new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10));
+        MenuItem pizza = new MenuItem("Pizza", 15.0, Duration.ofMinutes(30));
+        MenuItem cocaCola = new MenuItem("Coca-Cola", 2.5, Duration.ofMinutes(5));
+        RestaurantManager.getInstance().get(restaurant.getName()).addMenuItem(bigMac);
+        RestaurantManager.getInstance().get(restaurant.getName()).addMenuItem(pizza);
+        RestaurantManager.getInstance().get(restaurant.getName()).addMenuItem(cocaCola);
+        steats.addMenuItem(bigMac);
+        steats.addMenuItem(pizza);
+        assertEquals(2, GroupOrderManager.getInstance().get(steats.getGroupCode()).getItems().size());
+        steats.addMenuItem(cocaCola);
+        assertEquals(3, GroupOrderManager.getInstance().get(steats.getGroupCode()).getItems().size());
     }
 
     @Test
-    public void testGetFullMenu() {
+    void testGetFullMenu() {
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         restaurant.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10)));
         restaurant.addMenuItem(new MenuItem("Pizza", 15.0, Duration.ofMinutes(30)));
         restaurant.addMenuItem(new MenuItem("Coca-Cola", 2.5, Duration.ofMinutes(5)));
         restaurant.addMenuItem(new MenuItem("Fries", 3.0, Duration.ofMinutes(5)));
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.of(2024, 10, 12, 10, 30), "Campus Sophia Tech", restaurant.getName());
+        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         assertEquals(restaurant.getFullMenu(), groupOrder.getAvailableMenu(LocalDateTime.of(2024, 10, 12, 10, 30)));
     }
 
     @Test
-    public void testGetUsers() throws NotFoundException {
+    void testGetUsers() throws NotFoundException {
         User user1 = new User("John", "JohnID", Role.EXTERNAL);
         UserManager.getInstance().add(user1.getUserId(), user1);
         STEats steats1 = new STEats(user1);
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-        steats1.createGroupOrder(LocalDateTime.of(2024, 10, 12, 10, 30), "Campus Sophia Tech", restaurant.getName());
-        assertEquals(GroupOrderManager.getInstance().get(steats1.getGroupCode()).getUsers().size(), 1);
+        steats1.createGroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        assertEquals(1, GroupOrderManager.getInstance().get(steats1.getGroupCode()).getUsers().size());
         assertEquals(GroupOrderManager.getInstance().get(steats1.getGroupCode()).getUsers().getFirst(), user1);
     }
 
     @Test
-    public void testWrongSetDeliveryTime() throws NotFoundException {
+    void testWrongSetDeliveryTime() throws NotFoundException {
         STEats steats = new STEats(new User("John", "JohnID", Role.EXTERNAL));
         Restaurant restaurant = new Restaurant("McDonald's");
+        restaurant.addSchedule(new Schedule(LocalTime.now(), Duration.ofMinutes(30), 1, LocalDateTime.now().plusDays(1).getDayOfWeek()));
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         steats.createGroupOrder(null, "Campus Sophia Tech", restaurant.getName());
-        steats.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(40)));
-        GroupOrderManager.getInstance().get(steats.getGroupCode()).getRestaurant().addSchedule(new Schedule(LocalTime.of(9, 0), Duration.ofMinutes(30), 1, DayOfWeek.SATURDAY));
-        assertThrows(IllegalStateException.class, () -> GroupOrderManager.getInstance().get(steats.getGroupCode()).setDeliveryTime(LocalDateTime.of(2024, 10, 12, 10, 15)));
+        steats.changeDeliveryTime(LocalDateTime.now().plusDays(1).plusHours(1));
+        RestaurantManager.getInstance().get(restaurant.getName()).addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10)));
+        steats.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10)));
+        GroupOrderManager.getInstance().get(steats.getGroupCode()).getRestaurant().addSchedule(new Schedule(LocalTime.now(), Duration.ofMinutes(30), 1, DayOfWeek.SATURDAY));
+        assertThrows(IllegalStateException.class, () -> GroupOrderManager.getInstance().get(steats.getGroupCode()).setDeliveryTime(LocalDateTime.now().plusDays(1)));
     }
 
     @Test
-    public void testCreateOrderWhenGroupOrderIsPaid() {
+    void testCreateOrderWhenGroupOrderIsPaid() {
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.of(2024, 10, 12, 10, 30), "Campus Sophia Tech", restaurant.getName());
+        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         groupOrder.closeOrder();
         assertThrows(IllegalStateException.class, () -> groupOrder.createOrder(new User("John", "JohnID", Role.EXTERNAL)));
     }
