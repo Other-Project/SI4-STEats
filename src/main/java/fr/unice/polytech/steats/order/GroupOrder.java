@@ -143,6 +143,7 @@ public class GroupOrder implements Order {
         for (SingleOrder order : orders) order.setDeliveryTime(deliveryTime);
     }
 
+    @Override
     public void setStatus(Status status) {
         if (status.compareTo(this.status) < 0 && status.compareTo(Status.PAID) < 0)
             throw new IllegalArgumentException("Can't change the status");
@@ -163,6 +164,10 @@ public class GroupOrder implements Order {
         return order;
     }
 
+    /**
+     * Close the group order.
+     * All the single orders must be paid before the group order can be closed.
+     */
     public void closeOrder() {
         status = Status.PAID;
         orders.forEach(SingleOrder::closeOrder);

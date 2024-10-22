@@ -163,6 +163,7 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
     }
 
+    @Override
     public void setStatus(Status status) {
         if (status.compareTo(this.status) < 0)
             throw new IllegalArgumentException("Cannot change the status to a lower one");
@@ -176,7 +177,6 @@ public class SingleOrder implements Order {
      */
     public void addMenuItem(MenuItem item) {
         items.add(item);
-        getRestaurant().addMenuItem(item);
         updateDiscounts();
     }
 
