@@ -174,6 +174,7 @@ public class Restaurant {
      */
     public void addMenuItem(MenuItem menuItem) {
         this.menu.add(menuItem);
+        menuItem.setRestaurantName(name);
     }
 
     /**
