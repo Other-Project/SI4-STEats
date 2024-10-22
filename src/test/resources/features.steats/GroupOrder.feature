@@ -32,7 +32,7 @@ Feature: Manage GroupOrder
   Scenario: Create GroupOrder without a delivery time
     When "Alexandra" creates a group order from the restaurant "McDonald's" and to deliver at "292 Chemin de la Rigolade"
     Then "Alexandra" receives a group code
-    And "Alexandra" can add "2025-03-29T10:15:30" as delivery time to the group order
+    And "Alexandra" can add tomorrow at "18:15:30" as delivery time to the group order
 
   Scenario: Join GroupOrder
     When "Alex" joins the group order with the group code "groupCode2"

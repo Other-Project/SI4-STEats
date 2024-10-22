@@ -164,9 +164,9 @@ public class GroupOrderStepDefs {
         assertThrows(IllegalStateException.class, () -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time))));
     }
 
-    @And("{string} can add {string} as delivery time to the group order")
+    @And("{string} can add tomorrow at {string} as delivery time to the group order")
     public void canAddAsDeliveryTimeToTheGroupOrder(String name, String time) {
-        assertDoesNotThrow(() -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.parse(time)));
+        assertDoesNotThrow(() -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time))));
     }
 
     @Given("A restaurant named {string} with the following schedules :")
