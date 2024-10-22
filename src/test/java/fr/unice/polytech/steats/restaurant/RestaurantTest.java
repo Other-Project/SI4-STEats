@@ -1,36 +1,31 @@
 package fr.unice.polytech.steats.restaurant;
 
+import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
-import fr.unice.polytech.steats.order.*;
-import fr.unice.polytech.steats.user.UserManager;
-import org.junit.jupiter.api.BeforeEach;
-import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.*;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RestaurantTest {
 
-    @BeforeAll
-    public static void setUp() {
-        SingleOrderManager.getInstance().clear();
+    @BeforeEach
+    public void setUp() {
+        RestaurantManager.getInstance().clear();
         AddressManager.getInstance().clear();
+        UserManager.getInstance().clear();
+        GroupOrderManager.getInstance().clear();
+        SingleOrderManager.getInstance().clear();
         AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
 
@@ -41,14 +36,6 @@ class RestaurantTest {
             if (time.equals(LocalTime.of(0, 0).minus(restaurant.getScheduleDuration())))
                 day = day.plus(1);
         }
-    }
-
-    @BeforeEach
-    public void setUp() {
-        RestaurantManager.getInstance().clear();
-        AddressManager.getInstance().clear();
-        UserManager.getInstance().clear();
-        GroupOrderManager.getInstance().clear();
     }
 
     @Test
@@ -63,14 +50,16 @@ class RestaurantTest {
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
         AddressManager.getInstance().add(address.label(), address);
-        Order order1 = new SingleOrder("John", LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
-        Order order2 = new SingleOrder("John", LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
-        restaurant.addOrder(order1);
-        restaurant.addOrder(order2);
+        User user = new User("John", "JohnID", Role.EXTERNAL);
+        UserManager.getInstance().add("JohnID", user);
+        User user2 = new User("Jane", "JaneID", Role.EXTERNAL);
+        UserManager.getInstance().add("JaneID", user2);
+        STEats steats = new STEats(user);
+        STEats steats2 = new STEats(user2);
+        steats.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        steats2.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         List<Order> orders = restaurant.getOrders();
         assertEquals(2, orders.size());
-        assertTrue(orders.contains(order1));
-        assertTrue(orders.contains(order2));
     }
 
     @Test

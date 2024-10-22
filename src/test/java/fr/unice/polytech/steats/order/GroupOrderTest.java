@@ -60,8 +60,8 @@ class GroupOrderTest {
         STEats steats = new STEats(new User("John", "JohnID", Role.EXTERNAL));
         Restaurant restaurant = new Restaurant("McDonald's");
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-        steats.createGroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
-        RestaurantManager.getInstance().get(restaurant.getName()).addSchedule(new Schedule(LocalTime.now().minusHours(1), Duration.ofMinutes(30), 1, LocalDateTime.now().plusDays(1).getDayOfWeek()));
+        steats.createGroupOrder(LocalDateTime.now().plusHours(1).plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        RestaurantManager.getInstance().get(restaurant.getName()).addSchedule(new Schedule(LocalTime.now(), Duration.ofMinutes(30), 1, LocalDateTime.now().plusDays(1).getDayOfWeek()));
         assertEquals(0, GroupOrderManager.getInstance().get(steats.getGroupCode()).getItems().size());
         MenuItem bigMac = new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10));
         MenuItem pizza = new MenuItem("Pizza", 15.0, Duration.ofMinutes(30));
