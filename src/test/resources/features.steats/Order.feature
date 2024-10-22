@@ -69,30 +69,30 @@ Feature: Order
       | Mcdonalds |
 
   Scenario: Adding items to the cart
-    Given an order to be delivered at "123456"
+    Given an order to be delivered at "Campus sophiaTech Amphi A"
     When the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
+      | Pave de saumon    |
     Then the following items are in his cart:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
+      | Pave de saumon    |
 
   Scenario: Remove item from the cart
-    Given an order to be delivered at "123456"
+    Given an order to be delivered at "Campus sophiaTech Amphi A"
     Given the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
-    When the user deletes "Pavé de saumon"
-    Then "Pavé de saumon" doesn't appear in the cart anymore
+      | Pave de saumon    |
+    When the user deletes "Pave de saumon"
+    Then "Pave de saumon" doesn't appear in the cart anymore
 
   Scenario: Pay the order
-    Given an order to be delivered at "123456"
+    Given an order to be delivered at "Campus sophiaTech Amphi A"
     Given the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
+      | Pave de saumon    |
     When the user pays for the items in its cart
     Then the order has the "PAID" status

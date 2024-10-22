@@ -162,6 +162,12 @@ public class OrderStepDefs {
 
     @Given("an order to be delivered at {string}")
     public void givenTheOrderTheUserCreated(String addressId) {
+        if (deliveryTime == null) deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(20, 15));
+        try {
+            restaurant.addSchedule(new Schedule(LocalTime.of(19, 0), Duration.ofMinutes(30), 5, deliveryTime.getDayOfWeek()));
+        } catch (IllegalArgumentException ignored) {
+
+        }
         stEats.createOrder(deliveryTime, addressId, restaurant);
     }
 
