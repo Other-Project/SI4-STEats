@@ -39,7 +39,7 @@ Feature: Order
 
   Scenario: Filtering restaurants that can deliver during a certain time
     Given The address labelled "Campus Sophia Tech"
-    Given The following restaurants with schedule and order duration and order scheduled to "2024-03-29T10:15:30" :
+    Given The following restaurants with schedule and order duration and order scheduled to tomorrow at "10:15:30" :
       | name                  | scheduleStart | preparationTime |
       | Macdonald available 0 | 10:30:00      | 15              |
       | Macdonald available 1 | 10:00:00      | 15              |

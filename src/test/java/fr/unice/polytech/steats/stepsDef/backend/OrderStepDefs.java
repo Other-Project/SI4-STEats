@@ -117,9 +117,11 @@ public class OrderStepDefs {
 
     //region Test for scenario : Filtering restaurants by delivery time
 
-    @Given("The following restaurants with schedule and order duration and order scheduled to {string} :")
-    public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledTo(String deliveryTime, List<Map<String, String>> items) {
-        LocalDateTime deliveryTimeParsed = LocalDateTime.parse(deliveryTime);
+    @Given("The following restaurants with schedule and order duration and order scheduled to tomorrow at {string} :")
+    public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledToTomorrowAt(String deliveryTime, List<Map<String, String>> items) {
+        LocalTime localTime = LocalTime.parse(deliveryTime);
+        LocalDateTime deliveryTimeParsed = LocalDateTime.of(LocalDate.now().plusDays(1), localTime);
+
         for (Map<String, String> item : items) {
             restaurant = new Restaurant(item.get("name"));
             DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
