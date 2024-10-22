@@ -150,7 +150,7 @@ public class GroupOrder implements Order {
         if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
             throw new IllegalArgumentException("Can't change the status");
         this.status = status;
-        for (SingleOrder order : orders) order.setStatus(status);
+        for (SingleOrder order : getOrders()) order.setStatus(status);
     }
 
     /**
@@ -169,8 +169,9 @@ public class GroupOrder implements Order {
      * All the single orders must be paid before the group order can be closed.
      */
     public void closeOrder() {
+        if (getOrders().stream().anyMatch(order -> order.getStatus() != Status.PAID))
+            throw new IllegalStateException("All the orders must be paid.");
         status = Status.PAID;
-        getOrders().forEach(SingleOrder::closeOrder);
     }
 
     /**
@@ -188,7 +189,7 @@ public class GroupOrder implements Order {
      */
     public boolean pay(SingleOrder order) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        return order.pay(false);
+        return order.pay();
     }
 
     /**

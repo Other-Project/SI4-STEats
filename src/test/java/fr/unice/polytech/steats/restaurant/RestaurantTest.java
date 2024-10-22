@@ -93,14 +93,17 @@ class RestaurantTest {
                     1,
                     LocalDate.now().getDayOfWeek().plus(1)
             ));
-        }
-
-        for (int i = 0; i < 4; i++) {
             restaurant.addSchedule(new Schedule(
                     LocalTime.now().plusHours(1).plus(Duration.ofMinutes(30).multipliedBy(i)),
                     Duration.ofMinutes(30),
                     1,
-                    LocalDate.now().getDayOfWeek()
+                    LocalDate.now().getDayOfWeek().plus(2)
+            ));
+            restaurant.addSchedule(new Schedule(
+                    LocalTime.now().plusHours(1).plus(Duration.ofMinutes(30).multipliedBy(i)),
+                    Duration.ofMinutes(30),
+                    1,
+                    LocalDate.now().getDayOfWeek().plus(2)
             ));
         }
 

@@ -189,7 +189,7 @@ public class STEats {
         if (groupCode != null)
             return GroupOrderManager.getInstance().get(groupCode).pay(order);
         if (order.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
-        return order.pay(true);
+        return order.pay();
     }
 
     /**

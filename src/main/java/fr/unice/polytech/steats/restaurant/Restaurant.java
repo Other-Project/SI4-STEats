@@ -143,7 +143,7 @@ public class Restaurant {
     }
 
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
-        if (deliveryTime == null) return true;
+        if (deliveryTime == null || orders.isEmpty()) return true;
         long maxNbOfOrder = maxCapacity.toMinutes() / getAveragePreparationTime().toMinutes();
         long currentNbOfOrder = orders.stream()
                 .filter(order -> order.getStatus() == Status.INITIALISED)

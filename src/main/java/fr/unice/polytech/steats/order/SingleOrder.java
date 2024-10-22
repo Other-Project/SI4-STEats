@@ -64,8 +64,7 @@ public class SingleOrder implements Order {
         this.addressId = addressId;
         this.restaurantId = restaurantId;
         SingleOrderManager.getInstance().add(getId(), this);
-        if (GroupOrderManager.getInstance().getAll().stream().noneMatch((groupOrder -> groupOrder.getOrders().contains(this))))
-            getRestaurant().addOrder(this);
+        if (groupCode == null) getRestaurant().addOrder(this);
     }
 
     @Override
@@ -238,11 +237,6 @@ public class SingleOrder implements Order {
         appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
     }
 
-    void closeOrder() {
-        if (status != Status.PAID) throw new IllegalStateException("Order not paid");
-        this.getUser().addOrderToHistory(this);
-    }
-
     /**
      * Get the discounts to apply to the next order
      */
@@ -283,16 +277,14 @@ public class SingleOrder implements Order {
     /**
      * Pay the order
      *
-     * @param closeOrder true if the order should be closed after the payment
      * @return true if the payment is successful, false otherwise
      */
-    public boolean pay(boolean closeOrder) {
+    public boolean pay() {
         if (status == Status.PAID) throw new IllegalStateException("Order already paid");
         Optional<Payment> optionalPayment = PaymentSystem.pay(getPrice());
         if (optionalPayment.isEmpty()) return false;
         this.payment = optionalPayment.get();
         validateOrder();
-        if (closeOrder) closeOrder();
         return true;
     }
 }

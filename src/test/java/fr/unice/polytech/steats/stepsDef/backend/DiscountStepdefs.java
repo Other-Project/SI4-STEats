@@ -106,7 +106,7 @@ public class DiscountStepdefs {
             SingleOrder singleOrder = new SingleOrder(username, null, "Campus SophiaTech", restaurant);
             for (int j = 0; j < items; j++)
                 singleOrder.addMenuItem(new MenuItem("P1", 5, Duration.ofMinutes(1)));
-            assertTrue(singleOrder.pay(true));
+            assertTrue(singleOrder.pay());
         }
     }
 
