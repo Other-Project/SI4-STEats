@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 public class SingleOrder implements Order {
     private final String userId;
     private LocalDateTime deliveryTime;
+    private final LocalDateTime orderTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final String addressId;
     private final String restaurantId;
@@ -40,8 +41,11 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this.orderTime = LocalDateTime.now();
         if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
+        if (!AddressManager.getInstance().contains(addressId))
+            throw new IllegalArgumentException("This address is unknown");
         this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
@@ -219,6 +223,11 @@ public class SingleOrder implements Order {
     @Override
     public Duration getPreparationTime() {
         return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    @Override
+    public LocalDateTime getOrderTime() {
+        return orderTime;
     }
 
     /**

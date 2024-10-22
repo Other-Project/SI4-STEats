@@ -19,6 +19,7 @@ import java.util.*;
  */
 public class GroupOrder implements Order {
     private LocalDateTime deliveryTime;
+    private final LocalDateTime orderTime;
     private final String groupCode;
     private final List<SingleOrder> orders = new ArrayList<>();
     private final String addressId;
@@ -32,6 +33,7 @@ public class GroupOrder implements Order {
      * @param restaurantId The id of the restaurant in which the group order is made
      */
     private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this.orderTime = LocalDateTime.now();
         if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
         try {
@@ -117,6 +119,11 @@ public class GroupOrder implements Order {
     @Override
     public Duration getPreparationTime() {
         return orders.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    @Override
+    public LocalDateTime getOrderTime() {
+        return orderTime;
     }
 
     /**

@@ -69,6 +69,11 @@ public interface Order extends Saleable {
     Duration getPreparationTime();
 
     /**
+     * @return The ordering time of the order
+     */
+    LocalDateTime getOrderTime();
+
+    /**
      * Set the delivery time of the order
      *
      * @param deliveryTime The time the order must be delivered
