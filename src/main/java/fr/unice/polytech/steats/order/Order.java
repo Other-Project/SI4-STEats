@@ -57,7 +57,7 @@ public interface Order extends Saleable {
      * Add the order to the user's history.
      */
     void closeOrder();
-      
+
     /**
      * @return The time it takes to prepare the order
      */

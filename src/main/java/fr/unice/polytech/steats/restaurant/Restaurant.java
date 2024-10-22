@@ -27,16 +27,34 @@ public class Restaurant {
     private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
+    /**
+     * Create a restaurant
+     *
+     * @param name             The name of the restaurant
+     * @param typeOfFood       The type of food the restaurant serves
+     * @param scheduleDuration The duration of the schedule
+     */
     public Restaurant(String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
         this.name = name;
         this.typeOfFood = typeOfFood;
         this.scheduleDuration = scheduleDuration;
     }
 
+    /**
+     * Create a restaurant
+     *
+     * @param name The name of the restaurant
+     */
     public Restaurant(String name) {
         this(name, TypeOfFood.CLASSIC);
     }
 
+    /**
+     * Create a restaurant
+     *
+     * @param name       The name of the restaurant
+     * @param typeOfFood The type of food the restaurant serves
+     */
     public Restaurant(String name, TypeOfFood typeOfFood) {
         this(name, typeOfFood, Duration.ofMinutes(30));
     }
@@ -117,6 +135,21 @@ public class Restaurant {
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
         return maxCapacity.compareTo(order.getPreparationTime()) >= 0;
+    }
+
+    /**
+     * Check if the restaurant can deliver at a given time
+     *
+     * @param deliveryTime The time of delivery
+     * @return True if the restaurant can deliver at the given time, false otherwise
+     */
+    public boolean canDeliverAt(LocalDateTime deliveryTime) {
+        try {
+            Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
+            return menu.stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
