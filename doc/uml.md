@@ -58,7 +58,7 @@ UC3 --> UC1 : includes
 registered_user ---> UC4 
 registered_user ---> UC6
 UC4 --> UC3 : includes
-UC3 --> UC7
+UC3 --> UC7 : includes
 UC7 <. UC5 : extends
 UC7 <--- payment_system
 
