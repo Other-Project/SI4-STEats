@@ -34,6 +34,12 @@ public class GroupOrder implements Order {
     private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
         if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
+        try {
+            AddressManager.getInstance().get(addressId);
+            RestaurantManager.getInstance().get(restaurantId);
+        } catch (NotFoundException e) {
+            throw new IllegalArgumentException("The address has not been found");
+        }
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
@@ -43,7 +49,7 @@ public class GroupOrder implements Order {
     /**
      * @param deliveryTime The time the group order must be delivered
      * @param addressId    The label of the address where the group order must be delivered
-     * @param restaurantId   The id of the restaurant in which the group order is made
+     * @param restaurantId The id of the restaurant in which the group order is made
      */
     public GroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurantId);
