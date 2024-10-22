@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 public class SingleOrder implements Order {
     private final String userId;
     private LocalDateTime deliveryTime;
+    private final LocalDateTime orderTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final String addressId;
     private final String restaurantId;
@@ -40,6 +41,7 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this.orderTime = LocalDateTime.now();
         this.userId = userId;
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
@@ -217,6 +219,11 @@ public class SingleOrder implements Order {
     @Override
     public Duration getPreparationTime() {
         return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    @Override
+    public LocalDateTime getOrderTime() {
+        return orderTime;
     }
 
     /**

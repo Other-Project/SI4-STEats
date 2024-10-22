@@ -19,6 +19,7 @@ import java.util.*;
  */
 public class GroupOrder implements Order {
     private LocalDateTime deliveryTime;
+    private final LocalDateTime orderTime;
     private final String groupCode;
     private final List<SingleOrder> orders = new ArrayList<>();
     private final String addressId;
@@ -32,6 +33,7 @@ public class GroupOrder implements Order {
      * @param restaurantId The id of the restaurant in which the group order is made
      */
     private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this.orderTime = LocalDateTime.now();
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
@@ -41,7 +43,7 @@ public class GroupOrder implements Order {
     /**
      * @param deliveryTime The time the group order must be delivered
      * @param addressId    The label of the address where the group order must be delivered
-     * @param restaurantId   The id of the restaurant in which the group order is made
+     * @param restaurantId The id of the restaurant in which the group order is made
      */
     public GroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurantId);
@@ -111,6 +113,11 @@ public class GroupOrder implements Order {
         return orders.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
+    @Override
+    public LocalDateTime getOrderTime() {
+        return orderTime;
+    }
+
     /**
      * @return The invitation code for the group order
      */
@@ -165,7 +172,7 @@ public class GroupOrder implements Order {
      * @param order The single order of the user that wants to pay
      * @return if the payment was successful
      */
-    public boolean pay(SingleOrder order) throws NotFoundException {
+    public boolean pay(SingleOrder order) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
         return order.pay(false);
     }

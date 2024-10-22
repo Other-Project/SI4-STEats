@@ -67,4 +67,9 @@ public interface Order extends Saleable {
      * @return The time it takes to prepare the order
      */
     Duration getPreparationTime();
+
+    /**
+     * @return The ordering time of the order
+     */
+    LocalDateTime getOrderTime();
 }
