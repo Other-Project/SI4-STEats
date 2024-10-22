@@ -46,6 +46,7 @@ public class GroupOrder implements Order {
         this.groupCode = groupCode;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
+        getRestaurant().addOrder(this);
     }
 
     /**
@@ -148,6 +149,14 @@ public class GroupOrder implements Order {
         for (SingleOrder order : getOrders()) order.setDeliveryTime(deliveryTime);
     }
 
+    @Override
+    public void setStatus(Status status) {
+        if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
+            throw new IllegalArgumentException("Can't change the status");
+        this.status = status;
+        for (SingleOrder order : getOrders()) order.setStatus(status);
+    }
+
     /**
      * Add a user to the group order.
      *
@@ -159,10 +168,14 @@ public class GroupOrder implements Order {
         return new SingleOrder(user.getUserId(), groupCode, deliveryTime, addressId, restaurantId);
     }
 
-    @Override
+    /**
+     * Close the group order.
+     * All the single orders must be paid before the group order can be closed.
+     */
     public void closeOrder() {
+        if (getOrders().stream().anyMatch(order -> order.getStatus() != Status.PAID))
+            throw new IllegalStateException("All the orders must be paid.");
         status = Status.PAID;
-        getOrders().forEach(SingleOrder::closeOrder);
     }
 
     /**
@@ -180,7 +193,7 @@ public class GroupOrder implements Order {
      */
     public boolean pay(SingleOrder order) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        return order.pay(false);
+        return order.pay();
     }
 
     /**

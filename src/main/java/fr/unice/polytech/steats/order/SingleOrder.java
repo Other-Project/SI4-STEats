@@ -66,6 +66,7 @@ public class SingleOrder implements Order {
         this.addressId = addressId;
         this.restaurantId = restaurantId;
         SingleOrderManager.getInstance().add(getId(), this);
+        if (groupCode == null) getRestaurant().addOrder(this);
     }
 
     @Override
@@ -206,6 +207,13 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
     }
 
+    @Override
+    public void setStatus(Status status) {
+        if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
+            throw new IllegalArgumentException("Can't change the status");
+        this.status = status;
+    }
+
     /**
      * Add a menu item to the items of the order
      *
@@ -231,12 +239,6 @@ public class SingleOrder implements Order {
         appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
     }
 
-    @Override
-    public void closeOrder() {
-        validateOrder();
-        getRestaurant().addOrder(this);
-    }
-
     /**
      * Get the discounts to apply to the next order
      */
@@ -249,16 +251,6 @@ public class SingleOrder implements Order {
      */
     public List<Discount> getDiscounts() {
         return Collections.unmodifiableList(appliedDiscounts);
-    }
-
-    /**
-     * Validate the order
-     * Changes its status to {@link Status#PAID}.
-     *
-     * @implNote only validate the payment, doesn't close the order
-     */
-    public void validateOrder() {
-        status = Status.PAID;
     }
 
     /**
@@ -277,16 +269,14 @@ public class SingleOrder implements Order {
     /**
      * Pay the order
      *
-     * @param closeOrder true if the order should be closed after the payment
      * @return true if the payment is successful, false otherwise
      */
-    public boolean pay(boolean closeOrder) {
+    public boolean pay() {
         if (status == Status.PAID) throw new IllegalStateException("Order already paid");
-        Optional<Payment> payment = PaymentSystem.pay(getPrice());
-        if (payment.isEmpty()) return false;
-        this.payment = payment.get();
-        if (closeOrder) closeOrder();
-        else validateOrder();
+        Optional<Payment> optionalPayment = PaymentSystem.pay(getPrice());
+        if (optionalPayment.isEmpty()) return false;
+        this.payment = optionalPayment.get();
+        status = Status.PAID;
         return true;
     }
 }
