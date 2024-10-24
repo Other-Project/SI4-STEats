@@ -124,6 +124,6 @@ class GroupOrderTest {
         GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         groupOrder.closeOrder();
         User user = new User("John", "JohnID", Role.EXTERNAL);
-        assertThrows(IllegalStateException.class, () -> groupOrder.createOrder(user));
+        assertThrows(IllegalStateException.class, () -> groupOrder.createOrder(user.getUserId()));
     }
 }

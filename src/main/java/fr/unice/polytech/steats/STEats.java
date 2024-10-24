@@ -42,7 +42,7 @@ public class STEats {
     public STEats() {
     }
 
-    private void updateFullMenu(Order order) {
+    private void updateFullMenu() {
         this.fullMenu = order.getRestaurant().getFullMenu();
     }
 
@@ -56,7 +56,7 @@ public class STEats {
     public void createOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurantId);
-        updateFullMenu(order);
+        updateFullMenu();
     }
 
     /**
@@ -71,8 +71,8 @@ public class STEats {
         GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurantId);
         this.groupCode = groupOrder.getGroupCode();
         GroupOrderManager.getInstance().add(groupCode, groupOrder);
-        order = groupOrder.createOrder(user);
-        updateFullMenu(order);
+        order = groupOrder.createOrder(user.getUserId());
+        updateFullMenu();
         return groupCode;
     }
 
@@ -104,8 +104,8 @@ public class STEats {
         GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
         if (groupOrder.getStatus() == Status.PAID) throw new IllegalStateException(GROUP_ORDER_ALREADY_CLOSED);
         this.groupCode = groupOrder.getGroupCode();
-        order = groupOrder.createOrder(user);
-        updateFullMenu(order);
+        order = groupOrder.createOrder(user.getUserId());
+        updateFullMenu();
     }
 
     /**
