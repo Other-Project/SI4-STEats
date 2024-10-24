@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.PaymentSystem;
+import fr.unice.polytech.steats.payment.Payment;
+import fr.unice.polytech.steats.payment.PaymentSystem;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
