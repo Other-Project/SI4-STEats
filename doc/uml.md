@@ -14,7 +14,7 @@
 # Glossary
 
 * **Guest :** A person browsing the platform without being authenticated
-* **Registered User :** Any registered member of the campus (students, staff, ...)
+* **Registered Client :** Any registered member of the campus (students, staff, ...)
 * **Restaurant Staff :** A person employed by the restaurant to prepare meal
 * **Restaurant Manager :** A restaurant staff that can update menus offering and opening hours
 
@@ -32,7 +32,7 @@
 left to right direction
 actor "Restaurant Manager" as manager
 actor "Restaurant Staff" as restaurant
-actor "Registered User" as registered_user
+actor "Registered Client" as registered_user
 actor "Guest" as guest
 actor "Payment system" as payment_system
 rectangle {
@@ -132,14 +132,14 @@ class DiscountBuilder {
 }
 class GroupOrder {
   + pay(SingleOrder) boolean
-  + createOrder(User) SingleOrder
+    + createOrder(Client) SingleOrder
   + getAvailableDeliveryTimes(LocalDateTime, int) List~LocalDateTime~
   + getAvailableMenu(LocalDateTime) List~MenuItem~
   + closeOrder() void
    LocalDateTime orderTime
    double price
    List~SingleOrder~ orders
-   List~User~ users
+    List~Client~ users
    Restaurant restaurant
    Duration preparationTime
    String groupCode
@@ -174,7 +174,7 @@ class Order {
 <<Interface>>
   + getAvailableMenu(LocalDateTime) List~MenuItem~
    LocalDateTime orderTime
-   List~User~ users
+    List~Client~ users
    Restaurant restaurant
    Duration preparationTime
    String groupCode
@@ -249,7 +249,7 @@ class STEats {
    List~MenuItem~ cart
    String groupCode
    double totalPrice
-   User user
+    Client Client
    List~String~ addresses
 }
 class STEatsController {
@@ -288,10 +288,10 @@ class SingleOrder {
    Address address
    String restaurantId
    String id
-   User user
+    Client Client
    LocalDateTime orderTime
    double price
-   List~User~ users
+    List~Client~ users
    Restaurant restaurant
    Duration preparationTime
    List~Discount~ discountsToApplyNext
@@ -317,7 +317,7 @@ class TypeOfFood {
   + values() TypeOfFood[]
   + valueOf(String) TypeOfFood
 }
-class User {
+    class Client {
   + getDiscountsToApplyNext(String) List~Discount~
   + getOrders(String) List~SingleOrder~
    String name
@@ -352,17 +352,17 @@ STEats  ..>  GroupOrder : «create»
 STEats "1" *--> "fullMenu *" MenuItem 
 STEats "1" *--> "order 1" SingleOrder 
 STEats  ..>  SingleOrder : «create»
-STEats "1" *--> "user 1" User 
-STEatsController  ..>  STEats : «create»
+    STEats "1" *--> "Client 1" Client
+    STEatsController  ..>  STEats : «create»
 SingleOrder "1" *--> "appliedDiscounts *" Discount 
 SingleOrder "1" *--> "items *" MenuItem 
 SingleOrder  ..>  Order 
 SingleOrder "1" *--> "payment 1" Payment 
 SingleOrder "1" *--> "status 1" Status 
-SingleOrderManager  -->  AbstractManager~T~ 
-User "1" *--> "role 1" Role 
-UserManager  -->  AbstractManager~T~ 
-UserManager  ..>  User : «create»
+SingleOrderManager  -->  AbstractManager~T~
+    Client "1" *--> "role 1" Role
+    UserManager  -->  AbstractManager~T~
+    UserManager ..> Client: «create»
 ```
 
 # Sequence Diagram
@@ -392,7 +392,6 @@ sequenceDiagram
     SingleOrderManager -->> SingleOrder: #32;
     deactivate SingleOrderManager
     SingleOrder -->> GroupOrder: SingleOrder
-    deactivate SingleOrder
     GroupOrder -->> STEats: SingleOrder
     deactivate GroupOrder
     STEats ->> STEats: updateFullMenu()
@@ -402,8 +401,189 @@ sequenceDiagram
     deactivate Order
     STEats ->> Restaurant: getFullMenu()
     activate Restaurant
-    Restaurant -->> STEats: #32;
+    Restaurant -->> STEats: List<MenuItem>
     deactivate Restaurant
+
+
+# -------------------------------#
+# TODO: Appel à getAvailableMenu #
+# -------------------------------#
+    Client ->> STEats: getAvailableMenu
+    activate STEats
+    STEats ->> SingleOrder: getDeliveryTime
+    activate SingleOrder
+    SingleOrder -->> STEats: #32;
+    deactivate SingleOrder
+    STEats ->> SingleOrder: getAvailableMenu
+    activate SingleOrder
+    SingleOrder ->> SingleOrder: getRestaurant
+    activate SingleOrder
+    SingleOrder ->> RestaurantManager: getInstance
+    activate RestaurantManager
+    RestaurantManager -->> SingleOrder: #32;
+    deactivate RestaurantManager
+    SingleOrder ->> AbstractManager: get
+    activate AbstractManager
+    alt !items.containsKey(key)
+        AbstractManager ->> NotFoundException: new
+        activate NotFoundException
+        NotFoundException -->> AbstractManager: #32;
+        deactivate NotFoundException
+    end
+    AbstractManager -->> SingleOrder: #32;
+    deactivate AbstractManager
+    SingleOrder -->> SingleOrder: #32;
+    deactivate SingleOrder
+    SingleOrder ->> Restaurant: getAvailableMenu
+    activate Restaurant
+    alt arrivalTime == null
+        note right of Restaurant: Empty
+    end
+    Restaurant ->> Restaurant: getMaxCapacityLeft
+    activate Restaurant
+    Restaurant ->> Restaurant: schedule -&gt;
+    activate Restaurant
+    Restaurant ->> Schedule: isBetween
+    activate Schedule
+    Schedule ->> Schedule: compareTo
+    activate Schedule
+    alt compareDayOfWeek != 0
+        note right of Schedule: Empty
+    end
+    alt start.isAfter(dateTime.toLocalTime())
+        note right of Schedule: Empty
+    end
+    Schedule ->> Schedule: getEnd
+    activate Schedule
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    alt !getEnd().isAfter(dateTime.toLocalTime())
+        note right of Schedule: Empty
+    end
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    alt compareTo(start) >= 0
+        note right of Schedule: Empty
+    end
+    Schedule ->> Schedule: compareTo
+    activate Schedule
+    alt compareDayOfWeek != 0
+        note right of Schedule: Empty
+    end
+    alt start.isAfter(dateTime.toLocalTime())
+        note right of Schedule: Empty
+    end
+    Schedule ->> Schedule: getEnd
+    activate Schedule
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    alt !getEnd().isAfter(dateTime.toLocalTime())
+        note right of Schedule: Empty
+    end
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    alt compareTo(end) < 0
+        note right of Schedule: Empty
+    end
+    Schedule ->> Schedule: contains
+    activate Schedule
+    Schedule ->> Schedule: getEnd
+    activate Schedule
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    alt contains(end)
+        note right of Schedule: Empty
+    end
+    Schedule ->> Schedule: contains
+    activate Schedule
+    Schedule ->> Schedule: getEnd
+    activate Schedule
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    Schedule -->> Restaurant: #32;
+    deactivate Schedule
+    Restaurant ->> Restaurant: schedule -&gt;
+    activate Restaurant
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant ->> Restaurant: capacityLeft
+    activate Restaurant
+    Restaurant ->> Restaurant: order -&gt;
+    activate Restaurant
+    Restaurant ->> Order: getStatus
+    activate Order
+    Order -->> Restaurant: #32;
+    deactivate Order
+    Restaurant ->> Order: getStatus
+    activate Order
+    Order -->> Restaurant: #32;
+    deactivate Order
+    Restaurant ->> Order: getDeliveryTime
+    activate Order
+    Order -->> Restaurant: #32;
+    deactivate Order
+    Restaurant ->> Restaurant: order -&gt;
+    activate Restaurant
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant ->> Order: getDeliveryTime
+    activate Order
+    Order -->> Restaurant: #32;
+    deactivate Order
+    Restaurant ->> Schedule: schedule::contains
+    activate Schedule
+    Schedule ->> Order: getDeliveryTime
+    activate Order
+    Order -->> Schedule: #32;
+    deactivate Order
+    Schedule ->> Schedule: getEnd
+    activate Schedule
+    Schedule -->> Schedule: #32;
+    deactivate Schedule
+    Schedule -->> Restaurant: #32;
+    deactivate Schedule
+    Restaurant ->> Order: Order::getPreparationTime
+    activate Order
+    Order -->> Restaurant: #32;
+    deactivate Order
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant ->> Schedule: getTotalCapacity
+    activate Schedule
+    Schedule -->> Restaurant: #32;
+    deactivate Schedule
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant ->> Restaurant: () -&gt;
+    activate Restaurant
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant ->> Restaurant: menuItem -&gt;
+    activate Restaurant
+    Restaurant ->> MenuItem: getPreparationTime
+    activate MenuItem
+    MenuItem -->> Restaurant: #32;
+    deactivate MenuItem
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant -->> Restaurant: #32;
+    deactivate Restaurant
+    Restaurant -->> SingleOrder: #32;
+    deactivate Restaurant
+    SingleOrder -->> STEats: #32;
+    deactivate SingleOrder
+    Client ->> STEats: addMenuItem(menuItem)
+    STEats ->> SingleOrder: addMenuItem(menuItem)
+    SingleOrder ->> SingleOrder: updateDiscounts()
+    note right of SingleOrder: updateDiscounts does multiple calls<br/>which are not shown here for clarity
+    SingleOrder -->> STEats: #32;
+    deactivate SingleOrder
     deactivate STEats
 ```
 
@@ -411,15 +591,15 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    actor User
+    actor Client
     activate STEats
-    opt 
-        User ->> STEats : Select type of food
+    opt
+        Client ->> STEats: Select type of food
     end
-    opt 
-        User ->> STEats : Enter a restaurant
+    opt
+        Client ->> STEats: Enter a restaurant
     end
-    User->> STEats : Choose a restaurant
+    Client ->> STEats: Choose a restaurant
     STEats->>Restaurant : getMenuItems()
     activate Restaurant
     Restaurant-->>STEats : MenuItem[]
@@ -429,4 +609,4 @@ sequenceDiagram
 
 # Mockup
 
-![Mockup](https://github.com/user-attachments/assets/bcb43945-4bc5-4c89-8ac2-69bbf8f75c29)
+![Mockup](https://github.com/Client-attachments/assets/bcb43945-4bc5-4c89-8ac2-69bbf8f75c29)
