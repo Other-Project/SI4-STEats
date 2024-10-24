@@ -371,55 +371,39 @@ UserManager  ..>  User : «create»
 
 ```mermaid
 sequenceDiagram
-    actor User
+    actor Client
+    Client ->> STEats: joinGroupOrder(groupCode)
     activate STEats
+    STEats ->> GroupOrderManager: <<static>><br />getInstance()
+    activate GroupOrderManager
+    GroupOrderManager -->> STEats: GroupOrderManager
+    STEats ->> GroupOrderManager: get(groupCode)
+    GroupOrderManager -->> STEats: GroupOrder
+    deactivate GroupOrderManager
+    STEats ->> GroupOrder: createOrder(userId)
     activate GroupOrder
-    STEats->>GroupOrder : createOrder(userId)
-    create participant Order
-    GroupOrder-->>Order: <<create>>
-    activate Order
-    GroupOrder-->>STEats: Order
-    STEats->>GroupOrder: getMenu()
-    GroupOrder->>Restaurant: getMenu(time)
-    activate Restaurant
-    activate Schedule
-    loop
-        Restaurant->>MenuItem : getPreparationTime()
-        MenuItem -->> Restaurant : Time
-        loop
-            Restaurant->>Schedule : canCook(time)
-            Schedule-->>Restaurant: bool
-        end
-    end
-    Restaurant-->>GroupOrder: MenuItem[]
-    deactivate Restaurant
-    note right of GroupOrder : Returns only menu items that can be delivered in time
-    GroupOrder-->>STEats: MenuItem[]
-    loop
-        User->>STEats:Choose menu item
-        STEats->>Order:addMenuItem(menuItem)
-    end
-    User->>STEats:Proceed to payment
-    opt
-        User->>STEats: Use discount
-        STEats->>Order: useDiscount()
-    end
-    STEats->>Order: getTotalPrice()
-    Order-->>STEats: price
-    STEats->>Order: pay()
-    Order->>PaymentSystem: pay()
-    PaymentSystem-->>Order: PaymentStatus
-    Order->>Order:checkIfDiscount()
-    alt hasDiscount
-        Order->>Order: addDiscountToUser()
-    end
-    Order-->>STEats: PaymentStatus
-    deactivate Order
-    opt
-        User->>STEats: Validate Group Order
-        STEats->>GroupOrder: closeGroupOrder()
-    end
+    create participant SingleOrder
+    GroupOrder ->> SingleOrder: <<create>>
+    activate SingleOrder
+    SingleOrder ->> SingleOrderManager: <<static>><br />getInstance()
+    activate SingleOrderManager
+    SingleOrderManager -->> SingleOrder: SingleOrderManager
+    SingleOrder ->> SingleOrderManager: add(singleOrderId, this)
+    SingleOrderManager -->> SingleOrder: #32;
+    deactivate SingleOrderManager
+    SingleOrder -->> GroupOrder: SingleOrder
+    deactivate SingleOrder
+    GroupOrder -->> STEats: SingleOrder
     deactivate GroupOrder
+    STEats ->> STEats: updateFullMenu()
+    STEats ->> Order: getRestaurant()
+    activate Order
+    Order -->> STEats: Restaurant
+    deactivate Order
+    STEats ->> Restaurant: getFullMenu()
+    activate Restaurant
+    Restaurant -->> STEats: #32;
+    deactivate Restaurant
     deactivate STEats
 ```
 
