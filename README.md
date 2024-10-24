@@ -1,4 +1,4 @@
-# SopiaTech Eats-Team-C-24-25
+# SophiaTech Eats-Team-C-24-25
 
 ## Team members and roles
 
@@ -12,8 +12,8 @@
 **[US] Make an order inside a group order #26** :
 
 * **As a** Client
-* **I want** to be able to make a order while being in a group order
-* **So that** i can enjoy meals with my friends
+* **I want** to be able to make an order while being in a group order
+* **So that** I can enjoy meals with my friends
 
 ## How to install and run the project
 
