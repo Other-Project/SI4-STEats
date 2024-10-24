@@ -25,7 +25,7 @@
 
 # Use-Case Diagram
 
-![Plant UML preview](https://www.plantuml.com/plantuml/svg/XPD1Yzim48Nl_XL3xYvfassWb6MR77egB5tIwp9hZns1BPdHgAtfzhzNigp6AgO9H4XlldaQnFE35MHnVLTqr0Y80LRjHQ1MJ9Keemkin31ilf8d7QCM-88QM-8De8K-xbUe9y6ccHZ-ArwnLbaXfXhEbdYcalRixDNni_FT4z26NP8VSUn92zZHz_HJVOZISvIAC3_gjYFuLG1uomejmUR8veUbnKnsQZwVtlwVWfSHDFQKw4-tSHa70jD0OqoTsewts_0xgWvVLATaJ6sdbRQUj9lhxvRbyr2Z49Y1jD8jN8nZctosAs3miM2QXjZpDbbcw1C934m3CePGWAYU4hdBo1WEC5mJ9sAV4OyTLZEG79Rb4rEOgcNZXepQBwblsAbwdRjRUQkBic9OLJFoViqg1MXc3iNlOautbENh_JB6rsqgvTdDpga_vdTQePn-zrFi_1y-lWbF3X-0VWhfsaRnjInZr9QdOtRomV3d7Sncta7fgdCrsPKX9cOFwvNmAg4Qzxkbq_M2GouVuk1tsU1Uz8R_VexPcyL1jkbzq_IP43CObdZ9RhkuvS6lhk_-0000)
+![Plant UML preview](https://www.plantuml.com/plantuml/svg/XPDHQzim4CVV_IcEl6TaJTh06ALB7WQ3GLd9Nil5FZi2Mp8dQPjPzzqdMLOh3NKDH4Z_-ztfplxxJXjaOuU-wgarO1Imw2u66i5K6w5aXRLH3Ajlv4ZBA0ryHOaTyGfGmn3s1Uh1ODlE33-BBrWdj26c1awQUA6YzcYT5j7FrcNFGETtKRx7QI1tYvvSpZ37no0z1gdo_QFiUeBV5O0hMQCcM1rO_TIKzAJdvDFn_VyfE4yWSQ18VteRDzD8e5febMfYsk7jDFo1eiUpw8MPOjgnaEQ6jKlyAWsVnWODWHf92jd1HLb-dd5J07qT3QfjYHqVqQiCVI038zE8ZDuKOCH0aTncP307A6w88x7BYFiUwmM85TBmaSbtrR6oOqRjKkgB4hB4d5FeE_QYAHUxBZpGYz16iQWNvAPKAhfiOVRLdshv162zVhfDlVwoZQ7SuDavvWUJpwiJ_EzszgRxmyTt_ht01w1VXcIZW_YqNWS_fgT3TdBkSUSjBCLS1I7htZQa2qtCp0vUZPnVYznKFY_ij-aTFgcinvRskRmFervdephHNVJlLvuzvT3W9hwHE6yc16lx9LootIIttBdL3lrV)
 
 ```plantuml
 @startuml
@@ -47,6 +47,7 @@ rectangle {
   usecase "Manage orders" as UC40
   usecase "Place order" as UC3
   usecase "Create group order" as UC4
+  usecase "Join group order" as UC4b
   usecase "Validate group order" as UC5
   usecase "Browse historic" as UC6
   usecase "Validate payment" as UC7
@@ -62,8 +63,10 @@ UC1 <|-- UC1C
  
 UC3 --> UC1 : includes
 registered_user ---> UC4 
+registered_user ---> UC4b
 registered_user ---> UC6
 UC4 --> UC3 : includes
+UC4b --> UC3 : includes
 UC3 --> UC7 : includes
 UC7 <. UC5 : extends
 UC7 <--- payment_system
