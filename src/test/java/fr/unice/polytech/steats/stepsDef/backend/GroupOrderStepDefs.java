@@ -2,10 +2,7 @@ package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
-import fr.unice.polytech.steats.order.GroupOrder;
-import fr.unice.polytech.steats.order.GroupOrderManager;
-import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.order.Status;
+import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
@@ -20,8 +17,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -41,16 +38,18 @@ public class GroupOrderStepDefs {
     public void before() {
         GroupOrderManager.getInstance().clear();
         UserManager.getInstance().clear();
+        RestaurantManager.getInstance().clear();
         groupCodeMap.clear();
+        AddressManager.getInstance().clear();
+        AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
 
-    @Given("A group order with the group code {string} from the restaurant {string} and to deliver for {string} at {string}")
+    @Given("A group order with the group code {string} from the restaurant {string} and to deliver for tomorrow at {string} at {string}")
     public void a_group_order_is_created(String groupCode, String restaurant, String deliveryTime, String address) {
-        GroupOrder order = new GroupOrder(LocalDateTime.parse(deliveryTime), address, new Restaurant(restaurant));
+        GroupOrder order = new GroupOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(deliveryTime)), address, restaurant);
         String realGroupCode = order.getGroupCode();
         GroupOrderManager.getInstance().add(realGroupCode, order);
         groupCodeMap.put(groupCode, realGroupCode);
-
     }
 
     @Given("The user named {string} with the id {string} is logged in")
@@ -108,9 +107,10 @@ public class GroupOrderStepDefs {
         assertSame(Status.PAID, steatsMap.get(name).getOrder().getStatus());
     }
 
-    @And("The order is added to the history of {string}")
-    public void theOrderIsAddedToTheHistoryOfTheUserWithTheId(String name) throws NotFoundException {
+    @And("The order containing the item {string} is added to the history of {string}")
+    public void theOrderIsAddedToTheHistoryOfTheUserWithTheId(String menuItemName, String name) throws NotFoundException {
         assertEquals(1, UserManager.getInstance().get(steatsMap.get(name).getOrder().getUserId()).getOrders().size());
+        assertTrue(menuItemName, steatsMap.get(name).getOrder().getItems().stream().anyMatch(item -> Objects.equals(item.getName(), menuItemName)));
     }
 
     @And("The group order with the group code {string} is payed")
@@ -142,9 +142,9 @@ public class GroupOrderStepDefs {
         assertSame(Status.PAID, GroupOrderManager.getInstance().get(groupCodeMap.get(groupCode)).getStatus());
     }
 
-    @When("{string} creates a group order from the restaurant {string} and to deliver for {string} at {string}")
+    @When("{string} creates a group order from the restaurant {string} and to deliver for tomorrow at {string} at {string}")
     public void createsAGroupOrderFromTheRestaurantAndToDeliverForAt(String name, String restaurant, String time, String address) {
-        assertNotNull(steatsMap.get(name).createGroupOrder(LocalDateTime.parse(time), address, new Restaurant(restaurant)));
+        assertNotNull(steatsMap.get(name).createGroupOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time)), address, restaurant));
     }
 
     @Then("{string} receives a group code")
@@ -154,17 +154,19 @@ public class GroupOrderStepDefs {
 
     @When("{string} creates a group order from the restaurant {string} and to deliver at {string}")
     public void createsAGroupOrderFromTheRestaurantAndToDeliverAt(String name, String restaurant, String address) {
-        steatsMap.get(name).createGroupOrder(null, address, new Restaurant(restaurant));
+        steatsMap.get(name).createGroupOrder(null, address, restaurant);
     }
 
-    @And("{string} can't change the delivery time to {string} to the group order")
+    @And("{string} can't change the delivery time to tomorrow at {string} to the group order")
     public void canTChangeTheDeliveryTimeToToTheGroupOrder(String name, String time) {
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.parse(time)));
+        LocalDateTime deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time));
+        STEats stEats = steatsMap.get(name);
+        assertThrows(IllegalStateException.class, () -> stEats.changeDeliveryTime(deliveryTime));
     }
 
-    @And("{string} can add {string} as delivery time to the group order")
+    @And("{string} can add tomorrow at {string} as delivery time to the group order")
     public void canAddAsDeliveryTimeToTheGroupOrder(String name, String time) {
-        assertDoesNotThrow(() -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.parse(time)));
+        assertDoesNotThrow(() -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time))));
     }
 
     @Given("A restaurant named {string} with the following schedules :")
@@ -176,7 +178,7 @@ public class GroupOrderStepDefs {
                         LocalTime.parse(schedule.get("start")),
                         Duration.ofMinutes(Long.parseLong(schedule.get("duration"))),
                         Integer.parseInt(schedule.get("capacity")),
-                        DayOfWeek.valueOf(schedule.get("day"))
+                        LocalDate.now().getDayOfWeek().plus(1)
                 ));
             } catch (NotFoundException e) {
                 throw new RuntimeException(e);
@@ -196,8 +198,8 @@ public class GroupOrderStepDefs {
     }
 
     @Given("A group order with the group code {string} from the restaurant {string} at {string}")
-    public void aGroupOrderWithTheGroupCodeFromTheRestaurantAt(String groupCode, String restaurant, String address) throws NotFoundException {
-        GroupOrder order = new GroupOrder(null, address, RestaurantManager.getInstance().get(restaurant));
+    public void aGroupOrderWithTheGroupCodeFromTheRestaurantAt(String groupCode, String restaurant, String address) {
+        GroupOrder order = new GroupOrder(null, address, restaurant);
         String realGroupCode = order.getGroupCode();
         GroupOrderManager.getInstance().add(realGroupCode, order);
         groupCodeMap.put(groupCode, realGroupCode);
@@ -208,26 +210,27 @@ public class GroupOrderStepDefs {
         steatsMap.get(name).addMenuItem(new MenuItem(menu, price, Duration.ofHours(hours).plusMinutes(minutes)));
     }
 
-    @Then("{string} he need to choose the delivery time so he gets the next {int} delivery time from {string} and gets :")
+    @Then("{string} he need to choose the delivery time so he gets the next {int} delivery time from tomorrow at {string} and gets :")
     public void heNeedToChooseTheDeliveryTimeSoHeGetsTheNextDeliveryTimeFromAndGets(String name, int numberOfTimes, String from, List<Map<String, String>> deliveryTime) throws NotFoundException {
         assertEquals(
-                deliveryTime.stream().map(item -> LocalDateTime.parse(item.get("deliveryTime"))).toList(),
-                steatsMap.get(name).getAvailableDeliveryTimes(LocalDateTime.parse(from), numberOfTimes));
+                deliveryTime.stream().map(item -> LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(item.get("deliveryTime")))).toList(),
+                steatsMap.get(name).getAvailableDeliveryTimes(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(from)), numberOfTimes));
     }
 
 
     @And("{string} can choose the following delivery time : {string}")
     public void canChooseTheFollowingDeliveryTime(String name, String time) {
-        assertDoesNotThrow(() -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.parse(time)));
+        assertDoesNotThrow(() -> steatsMap.get(name).changeDeliveryTime(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(time))));
     }
 
     @When("{string} close the group order that doesn't have a delivery time")
-    public void closeTheGroupOrderThatDoesnTHaveADeliveryTime(String name) {
-        assertThrows(IllegalStateException.class, () -> steatsMap.get(name).closeGroupOrder());
+    public void closeTheGroupOrderThatDoesntHaveADeliveryTime(String name) {
+        STEats stEats = steatsMap.get(name);
+        assertThrows(IllegalStateException.class, stEats::closeGroupOrder);
     }
 
     @Then("{string} can't join the group order with the group code {string}")
-    public void canTJoinTheGroupOrderWithTheGroupCode(String name, String groupCode) {
+    public void cantJoinTheGroupOrderWithTheGroupCode(String name, String groupCode) {
         assertThrows(NotFoundException.class, () -> steatsMap.get(name).joinGroupOrder(groupCodeMap.get(groupCode)));
     }
 }

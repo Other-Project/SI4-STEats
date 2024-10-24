@@ -2,13 +2,18 @@ package fr.unice.polytech.steats;
 
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Represents the entry point of the application.
@@ -45,12 +50,12 @@ public class STEats {
      * Create a single order.
      *
      * @param deliveryTime The time the user wants the order to be delivered
-     * @param addressId    The label of the address the user wants the order to be delivered
-     * @param restaurant   The restaurant in which the order is made
+     * @param addressId The label of the address the user wants the order to be delivered
+     * @param restaurantId The id of the restaurant in which the order is made
      */
-    public void createOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
+    public void createOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurant);
+        order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurantId);
         updateFullMenu(order);
     }
 
@@ -59,11 +64,11 @@ public class STEats {
      *
      * @param deliveryTime The time the group order must be delivered
      * @param addressId    The label of the address where the group order must be delivered
-     * @param restaurant   The restaurant in which the group order is made
+     * @param restaurantId The id of the restaurant in which the order is made
      */
-    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) throws IllegalStateException {
+    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
-        GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurant);
+        GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurantId);
         this.groupCode = groupOrder.getGroupCode();
         GroupOrderManager.getInstance().add(groupCode, groupOrder);
         order = groupOrder.createOrder(user);
@@ -123,6 +128,7 @@ public class STEats {
      * @param menuItem The menu item to add to the order
      */
     public void addMenuItem(MenuItem menuItem) {
+        if (!getAvailableMenu().contains(menuItem)) throw new IllegalStateException("Menu item not available");
         order.addMenuItem(menuItem);
     }
 
@@ -180,10 +186,10 @@ public class STEats {
      * @return If the payment was successful
      */
     public boolean payOrder() throws NotFoundException {
-        if (groupCode != null) {
+        if (groupCode != null)
             return GroupOrderManager.getInstance().get(groupCode).pay(order);
-        }
-        return order.pay(true);
+        if (order.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
+        return order.pay();
     }
 
     /**
@@ -215,12 +221,20 @@ public class STEats {
     }
 
     /**
+     * Retrieve the opening times of a restaurant
+     *
+     * @param restaurant The restaurant
+     */
+    public Map<DayOfWeek, List<OpeningTime>> getOpeningTimes(Restaurant restaurant) {
+        return Arrays.stream(DayOfWeek.values()).collect(Collectors.toMap(day -> day, restaurant::getOpeningTimes));
+    }
+
+    /**
      * Change the delivery time of the group order
      *
      * @param deliveryTime The new delivery time
      */
     public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException {
-        if (groupCode == null) throw new IllegalStateException("Cannot change delivery time of a single order");
-        GroupOrderManager.getInstance().get(groupCode).setDeliveryTime(deliveryTime);
+        (groupCode == null ? order : GroupOrderManager.getInstance().get(groupCode)).setDeliveryTime(deliveryTime);
     }
 }

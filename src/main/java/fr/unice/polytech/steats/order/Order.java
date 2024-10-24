@@ -20,6 +20,13 @@ public interface Order extends Saleable {
     Status getStatus();
 
     /**
+     * Set the status of the order
+     *
+     * @param status The new status of the order
+     */
+    void setStatus(Status status);
+
+    /**
      * @return The time the user wants the order to be delivered
      */
     LocalDateTime getDeliveryTime();
@@ -30,9 +37,21 @@ public interface Order extends Saleable {
     Address getAddress();
 
     /**
+     * The id of the restaurant in which the order is made
+     */
+    String getRestaurantId();
+
+    /**
      * @return The restaurant in which the order is made
      */
     Restaurant getRestaurant();
+
+    /**
+     * Get the group code of the order
+     *
+     * @return null if not applicable
+     */
+    String getGroupCode();
 
     /**
      * @return A copy of the items of the order
@@ -51,15 +70,19 @@ public interface Order extends Saleable {
     List<User> getUsers();
 
     /**
-     * Close the order.
-     * Changes its status to {@link Status#PAID}.
-     * Send the order to the restaurant.
-     * Add the order to the user's history.
-     */
-    void closeOrder();
-
-    /**
      * @return The time it takes to prepare the order
      */
     Duration getPreparationTime();
+
+    /**
+     * @return The ordering time of the order
+     */
+    LocalDateTime getOrderTime();
+
+    /**
+     * Set the delivery time of the order
+     *
+     * @param deliveryTime The time the order must be delivered
+     */
+    void setDeliveryTime(LocalDateTime deliveryTime);
 }

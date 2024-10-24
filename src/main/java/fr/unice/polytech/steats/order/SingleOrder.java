@@ -1,17 +1,17 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.PaymentSystem;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -20,11 +20,16 @@ import java.util.stream.Stream;
  * @author Team C
  */
 public class SingleOrder implements Order {
+    private final String id;
+
     private final String userId;
+    private final String groupCode;
     private LocalDateTime deliveryTime;
+    private final LocalDateTime orderTime;
     private final List<MenuItem> items = new ArrayList<>();
     private final String addressId;
-    private final Restaurant restaurant;
+    private final String restaurantId;
+    private Payment payment;
 
     private Status status = Status.INITIALISED;
     private final List<Discount> appliedDiscounts = new ArrayList<>();
@@ -33,13 +38,35 @@ public class SingleOrder implements Order {
      * @param userId       The user that initialized the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param addressId    The label of the address the client wants the order to be delivered
-     * @param restaurant   The restaurant in which the order is made
+     * @param restaurantId The id of the restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+    public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this(userId, null, deliveryTime, addressId, restaurantId);
+    }
+
+    /**
+     * @param userId       The user that initialized the order
+     * @param groupCode    The group code of the order
+     * @param deliveryTime The time the client wants the order to be delivered
+     * @param addressId    The label of the address the client wants the order to be delivered
+     * @param restaurantId The id of the restaurant in which the order is made
+     */
+    SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this.id = UUID.randomUUID().toString();
+        this.orderTime = LocalDateTime.now();
+        if (deliveryTime != null && orderTime.plusHours(2).isAfter(deliveryTime))
+            throw new IllegalArgumentException("The time between now and the delivery date is too short");
+        if (!AddressManager.getInstance().contains(addressId))
+            throw new IllegalArgumentException("This address is unknown");
+        if (!RestaurantManager.getInstance().contains(restaurantId))
+            throw new IllegalArgumentException("This restaurant is unknown");
         this.userId = userId;
+        this.groupCode = groupCode;
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
-        this.restaurant = restaurant;
+        this.restaurantId = restaurantId;
+        SingleOrderManager.getInstance().add(getId(), this);
+        if (groupCode == null) getRestaurant().addOrder(this);
     }
 
     @Override
@@ -57,13 +84,51 @@ public class SingleOrder implements Order {
         try {
             return AddressManager.getInstance().get(addressId);
         } catch (NotFoundException e) {
-            throw new IllegalStateException("The address of the group order is not found.");
+            throw new IllegalStateException("The address of the order is not found.");
         }
     }
 
     @Override
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    @Override
     public Restaurant getRestaurant() {
-        return restaurant;
+        try {
+            return RestaurantManager.getInstance().get(restaurantId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The restaurant of the order is not found.");
+        }
+    }
+
+    /**
+     * Get the id of the order
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Get the group code of the order
+     *
+     * @return null if not in a group order
+     */
+    @Override
+    public String getGroupCode() {
+        return groupCode;
+    }
+
+    /**
+     * Get the group order
+     */
+    public Optional<GroupOrder> getGroupOrder() {
+        if (groupCode == null) return Optional.empty();
+        try {
+            return Optional.ofNullable(GroupOrderManager.getInstance().get(groupCode));
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The group order of the order is not found.");
+        }
     }
 
     /**
@@ -79,7 +144,7 @@ public class SingleOrder implements Order {
     public double getPrice() {
         List<Discount> oldDiscountsToApplied;
         try {
-            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurant);
+            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurantId);
         } catch (NotFoundException e) {
             oldDiscountsToApplied = Collections.emptyList();
         }
@@ -99,7 +164,7 @@ public class SingleOrder implements Order {
 
     @Override
     public List<MenuItem> getAvailableMenu(LocalDateTime time) {
-        return restaurant.getAvailableMenu(time);
+        return getRestaurant().getAvailableMenu(time);
     }
 
     @Override
@@ -126,6 +191,13 @@ public class SingleOrder implements Order {
     }
 
     /**
+     * Get the payment of the order
+     */
+    public Payment getPayment() {
+        return payment;
+    }
+
+    /**
      * Set the delivery time of the order
      * Can only be called by group orders
      *
@@ -133,6 +205,13 @@ public class SingleOrder implements Order {
      */
     public void setDeliveryTime(LocalDateTime deliveryTime) {
         this.deliveryTime = deliveryTime;
+    }
+
+    @Override
+    public void setStatus(Status status) {
+        if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
+            throw new IllegalArgumentException("Can't change the status");
+        this.status = status;
     }
 
     /**
@@ -157,14 +236,7 @@ public class SingleOrder implements Order {
 
     private void updateDiscounts() {
         appliedDiscounts.clear();
-        appliedDiscounts.addAll(restaurant.availableDiscounts(this));
-    }
-
-    @Override
-    public void closeOrder() {
-        validateOrder();
-        this.getUser().addOrderToHistory(this);
-        restaurant.addOrder(this);
+        appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
     }
 
     /**
@@ -182,16 +254,6 @@ public class SingleOrder implements Order {
     }
 
     /**
-     * Validate the order
-     * Changes its status to {@link Status#PAID}.
-     *
-     * @implNote only validate the payment, doesn't close the order
-     */
-    public void validateOrder() {
-        status = Status.PAID;
-    }
-
-    /**
      * @implNote The total preparation time of all the items in the order
      */
     @Override
@@ -199,18 +261,22 @@ public class SingleOrder implements Order {
         return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
+    @Override
+    public LocalDateTime getOrderTime() {
+        return orderTime;
+    }
+
     /**
      * Pay the order
      *
-     * @param closeOrder true if the order should be closed after the payment
      * @return true if the payment is successful, false otherwise
      */
-    public boolean pay(boolean closeOrder) throws NotFoundException {
+    public boolean pay() {
         if (status == Status.PAID) throw new IllegalStateException("Order already paid");
-        User user = UserManager.getInstance().get(userId);
-        if (!user.pay(getPrice())) return false;
-        if (closeOrder) closeOrder();
-        else validateOrder();
+        Optional<Payment> optionalPayment = PaymentSystem.pay(getPrice());
+        if (optionalPayment.isEmpty()) return false;
+        this.payment = optionalPayment.get();
+        status = Status.PAID;
         return true;
     }
 }

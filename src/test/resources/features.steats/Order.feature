@@ -5,7 +5,9 @@ Feature: Order
     Given a restaurant named "La Cafet"
 
   Scenario: Creating an order
-    When the user creates an order and specifies a date, an address and a restaurant
+    When the user creates an order and specifies a date, an address and a restaurant :
+      | date     | addressId         | restaurant |
+      | 10:15:30 | Campus SophiaTech | La Cafet   |
     Then the user can order
 
   Scenario: Filtering restaurants by name
@@ -36,8 +38,8 @@ Feature: Order
       | McDonald    |
 
   Scenario: Filtering restaurants that can deliver during a certain time
-    Given The address labelled "Campus Sophia Tech"
-    Given The following restaurants with schedule and order duration and order scheduled to "2024-03-29T10:15:30" :
+    Given The address labelled "Campus SophiaTech"
+    Given The following restaurants with schedule and order duration and order scheduled to tomorrow at "10:15:30" :
       | name                  | scheduleStart | preparationTime |
       | Macdonald available 0 | 10:30:00      | 15              |
       | Macdonald available 1 | 10:00:00      | 15              |
@@ -67,30 +69,30 @@ Feature: Order
       | Mcdonalds |
 
   Scenario: Adding items to the cart
-    Given an order to be delivered at "123456"
+    Given an order to be delivered at "Campus SophiaTech"
     When the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
+      | Pave de saumon    |
     Then the following items are in his cart:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
+      | Pave de saumon    |
 
   Scenario: Remove item from the cart
-    Given an order to be delivered at "123456"
+    Given an order to be delivered at "Campus SophiaTech"
     Given the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
-    When the user deletes "Pavé de saumon"
-    Then "Pavé de saumon" doesn't appear in the cart anymore
+      | Pave de saumon    |
+    When the user deletes "Pave de saumon"
+    Then "Pave de saumon" doesn't appear in the cart anymore
 
   Scenario: Pay the order
-    Given an order to be delivered at "123456"
+    Given an order to be delivered at "Campus SophiaTech"
     Given the user orders the following items from the given restaurant:
       | menuItems         |
       | Boeuf Bourguignon |
-      | Pavé de saumon    |
+      | Pave de saumon    |
     When the user pays for the items in its cart
     Then the order has the "PAID" status

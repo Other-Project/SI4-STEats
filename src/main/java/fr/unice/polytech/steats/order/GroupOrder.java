@@ -2,12 +2,16 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * A group order is an order that contains multiples single order, each from a different user.
@@ -18,32 +22,40 @@ import java.util.*;
  */
 public class GroupOrder implements Order {
     private LocalDateTime deliveryTime;
+    private final LocalDateTime orderTime;
     private final String groupCode;
-    private final List<SingleOrder> orders = new ArrayList<>();
     private final String addressId;
     private Status status = Status.INITIALISED;
-    private final Restaurant restaurant;
+    private final String restaurantId;
 
     /**
      * @param groupCode    The invitation code for the group order
      * @param deliveryTime The time the group order must be delivered
      * @param addressId    The label of the address where the group order must be delivered
-     * @param restaurant   The restaurant in which the group order is made
+     * @param restaurantId The id of the restaurant in which the group order is made
      */
-    private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
+    private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this.orderTime = LocalDateTime.now();
+        if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
+            throw new IllegalArgumentException("The time between now and the delivery date is too short");
+        if (!AddressManager.getInstance().contains(addressId))
+            throw new IllegalArgumentException("This address is unknown");
+        if (!RestaurantManager.getInstance().contains(restaurantId))
+            throw new IllegalArgumentException("This restaurant is unknown");
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
-        this.restaurant = restaurant;
+        this.restaurantId = restaurantId;
+        getRestaurant().addOrder(this);
     }
 
     /**
      * @param deliveryTime The time the group order must be delivered
      * @param addressId    The label of the address where the group order must be delivered
-     * @param restaurant   The restaurant in which the group order is made
+     * @param restaurantId The id of the restaurant in which the group order is made
      */
-    public GroupOrder(LocalDateTime deliveryTime, String addressId, Restaurant restaurant) {
-        this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurant);
+    public GroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurantId);
     }
 
     @Override
@@ -61,13 +73,22 @@ public class GroupOrder implements Order {
         try {
             return AddressManager.getInstance().get(addressId);
         } catch (NotFoundException e) {
-            throw new IllegalStateException("The address of the group order is not found.");
+            throw new IllegalStateException("The address of the order is not found.");
         }
     }
 
     @Override
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    @Override
     public Restaurant getRestaurant() {
-        return restaurant;
+        try {
+            return RestaurantManager.getInstance().get(restaurantId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The restaurant of the order is not found.");
+        }
     }
 
     /**
@@ -75,22 +96,22 @@ public class GroupOrder implements Order {
      */
     @Override
     public double getPrice() {
-        return orders.stream().mapToDouble(Order::getPrice).sum();
+        return getOrders().stream().mapToDouble(Order::getPrice).sum();
     }
 
     @Override
     public List<MenuItem> getItems() {
-        return orders.stream().map(Order::getItems).flatMap(Collection::stream).toList();
+        return getOrders().stream().map(Order::getItems).flatMap(Collection::stream).toList();
     }
 
     @Override
     public List<MenuItem> getAvailableMenu(LocalDateTime time) {
-        return restaurant.getFullMenu();
+        return getRestaurant().getFullMenu();
     }
 
     @Override
     public List<User> getUsers() {
-        return orders.stream().map(Order::getUsers).flatMap(Collection::stream).toList();
+        return getOrders().stream().map(Order::getUsers).flatMap(Collection::stream).toList();
     }
 
     /**
@@ -98,7 +119,12 @@ public class GroupOrder implements Order {
      */
     @Override
     public Duration getPreparationTime() {
-        return orders.stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+        return getOrders().stream().map(Order::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+    }
+
+    @Override
+    public LocalDateTime getOrderTime() {
+        return orderTime;
     }
 
     /**
@@ -117,10 +143,18 @@ public class GroupOrder implements Order {
      */
     public void setDeliveryTime(LocalDateTime deliveryTime) {
         if (this.deliveryTime != null) throw new IllegalStateException("Delivery time already set");
-        if (orders.stream().noneMatch(order -> order.getItems().isEmpty()) && !restaurant.canHandle(this, deliveryTime))
+        if (getOrders().stream().noneMatch(order -> order.getItems().isEmpty()) && !getRestaurant().canHandle(this, deliveryTime))
             throw new IllegalStateException("Delivery time not available");
         this.deliveryTime = deliveryTime;
-        for (SingleOrder order : orders) order.setDeliveryTime(deliveryTime);
+        for (SingleOrder order : getOrders()) order.setDeliveryTime(deliveryTime);
+    }
+
+    @Override
+    public void setStatus(Status status) {
+        if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
+            throw new IllegalArgumentException("Can't change the status");
+        this.status = status;
+        for (SingleOrder order : getOrders()) order.setStatus(status);
     }
 
     /**
@@ -131,22 +165,24 @@ public class GroupOrder implements Order {
      */
     public SingleOrder createOrder(User user) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        SingleOrder order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurant);
-        orders.add(order);
-        return order;
+        return new SingleOrder(user.getUserId(), groupCode, deliveryTime, addressId, restaurantId);
     }
 
-    @Override
+    /**
+     * Close the group order.
+     * All the single orders must be paid before the group order can be closed.
+     */
     public void closeOrder() {
+        if (getOrders().stream().anyMatch(order -> order.getStatus() != Status.PAID))
+            throw new IllegalStateException("All the orders must be paid.");
         status = Status.PAID;
-        orders.forEach(SingleOrder::closeOrder);
     }
 
     /**
      * @return The list of single orders in the group order
      */
     public List<SingleOrder> getOrders() {
-        return Collections.unmodifiableList(orders);
+        return SingleOrderManager.getInstance().getOrdersByGroup(groupCode);
     }
 
     /**
@@ -155,9 +191,9 @@ public class GroupOrder implements Order {
      * @param order The single order of the user that wants to pay
      * @return if the payment was successful
      */
-    public boolean pay(SingleOrder order) throws NotFoundException {
+    public boolean pay(SingleOrder order) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        return order.pay(false);
+        return order.pay();
     }
 
     /**
@@ -171,7 +207,7 @@ public class GroupOrder implements Order {
         List<LocalDateTime> availableTimes = new ArrayList<>();
         LocalDateTime time = from;
         while (availableTimes.size() < numberOfTimes) {
-            if (restaurant.canHandle(this, time)) availableTimes.add(time);
+            if (getRestaurant().canHandle(this, time)) availableTimes.add(time);
             time = time.plusMinutes(30);
         }
         return availableTimes;

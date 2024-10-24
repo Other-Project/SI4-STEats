@@ -3,10 +3,12 @@ package fr.unice.polytech.steats.restaurant;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.user.NotFoundException;
+import fr.unice.polytech.steats.order.Status;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -24,8 +26,10 @@ public class Restaurant {
     private final List<Discount> discounts = new ArrayList<>();
     private final List<Order> orders = new ArrayList<>();
     private final Set<Schedule> schedules = new HashSet<>();
-    private final static Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
-    private final static Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
+    private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
+    private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
+
+    private static final int RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION = 50;
 
     /**
      * Create a restaurant
@@ -95,18 +99,19 @@ public class Restaurant {
     }
 
     /**
+     * The duration of each schedule
+     */
+    public Duration getScheduleDuration() {
+        return scheduleDuration;
+    }
+
+    /**
      * The discounts that can be applied to an order
      *
      * @param order The order to check
      */
     public List<Discount> availableDiscounts(SingleOrder order) {
-        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> {
-            try {
-                return discount.isApplicable(order);
-            } catch (NotFoundException e) {
-                return false;
-            }
-        }).toList();
+        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
         List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
         applicableDiscounts.stream()
                 .filter(discount -> !discount.isStackable())
@@ -134,7 +139,25 @@ public class Restaurant {
      */
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(order.getPreparationTime()) >= 0;
+        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(order.getDeliveryTime(), maxCapacity);
+    }
+
+    private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
+        if (deliveryTime == null || orders.isEmpty()) return true;
+        long maxNbOfOrder = maxCapacity.toMinutes() / getAveragePreparationTime().toMinutes();
+        long currentNbOfOrder = orders.stream()
+                .filter(order -> order.getStatus() == Status.INITIALISED)
+                .count();
+        return currentNbOfOrder < maxNbOfOrder;
+    }
+
+    private Duration getAveragePreparationTime() {
+        if (orders.isEmpty()) return Duration.ZERO;
+        return orders.reversed().stream()
+                .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
+                .map(Order::getPreparationTime)
+                .reduce(Duration.ZERO, Duration::plus)
+                .dividedBy(Math.min(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION, orders.size()));
     }
 
     /**
@@ -154,6 +177,7 @@ public class Restaurant {
 
     private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
         List<Order> ordersTakenAccountSchedule = orders.stream()
+                .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
                 .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
                 .filter(schedule::contains)
                 .toList();
@@ -181,6 +205,7 @@ public class Restaurant {
      */
     public void addMenuItem(MenuItem menuItem) {
         this.menu.add(menuItem);
+        menuItem.setRestaurantName(name);
     }
 
     /**
@@ -208,6 +233,30 @@ public class Restaurant {
      */
     public void removeDiscount(Discount discount) {
         this.discounts.remove(discount);
+    }
+
+    /**
+     * Get the opening times of the restaurant for a given day
+     *
+     * @param day The day of the week
+     */
+    public List<OpeningTime> getOpeningTimes(DayOfWeek day) {
+        List<Schedule> scheduleList = schedules.stream()
+                .filter(schedule -> schedule.getDayOfWeek() == day)
+                .sorted(Comparator.comparing(Schedule::getStart))
+                .toList();
+        List<OpeningTime> intervals = new ArrayList<>();
+        OpeningTime currentInterval = null;
+        for (Schedule schedule : scheduleList) {
+            if (currentInterval != null && currentInterval.getEnd().equals(schedule.getStart())) {
+                currentInterval.setEnd(schedule.getEnd());
+                continue;
+            } else if (currentInterval != null) intervals.add(currentInterval);
+            currentInterval = new OpeningTime(schedule.getStart(), schedule.getEnd());
+        }
+        if (currentInterval != null && currentInterval.getEnd().equals(LocalTime.of(0, 0))) currentInterval.setEnd(LocalTime.of(23, 59, 59));
+        if (currentInterval != null) intervals.add(currentInterval);
+        return intervals;
     }
 
     /**
