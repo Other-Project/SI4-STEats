@@ -497,4 +497,4 @@ sequenceDiagram
 
 # Mockup
 
-![Mockup](https://github.com/user-attachments/assets/bcb43945-4bc5-4c89-8ac2-69bbf8f75c29)
+![Mockup](mockup.jpg)
