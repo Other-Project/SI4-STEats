@@ -14,7 +14,7 @@
 # Glossary
 
 * **Guest :** A person browsing the platform without being authenticated
-* **Registered Client :** Any registered member of the campus (students, staff, ...)
+* **Registered User :** Any registered member of the campus (students, staff, ...)
 * **Restaurant Staff :** A person employed by the restaurant to prepare meal
 * **Restaurant Manager :** A restaurant staff that can update menus offering and opening hours
 
@@ -32,7 +32,7 @@
 left to right direction
 actor "Restaurant Manager" as manager
 actor "Restaurant Staff" as restaurant
-actor "Registered Client" as registered_user
+actor "Registered User" as registered_user
 actor "Guest" as guest
 actor "Payment system" as payment_system
 rectangle {
@@ -497,4 +497,4 @@ sequenceDiagram
 
 # Mockup
 
-![Mockup](https://github.com/Client-attachments/assets/bcb43945-4bc5-4c89-8ac2-69bbf8f75c29)
+![Mockup](https://github.com/user-attachments/assets/bcb43945-4bc5-4c89-8ac2-69bbf8f75c29)
