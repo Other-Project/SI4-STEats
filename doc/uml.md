@@ -401,23 +401,29 @@ sequenceDiagram
     activate Restaurant
     Restaurant -->> STEats: List<MenuItem>
     deactivate Restaurant
-
     Client ->> STEats: getAvailableMenu()
     STEats ->> SingleOrder: getAvailableMenu()
     SingleOrder ->> Restaurant: getAvailableMenu(deliveryTime)
     activate Restaurant
     Restaurant ->> Restaurant: getMaxCapacityLeft(deliveryTime)
-    Restaurant ->> Schedule: isBetween(deliveryTime, deliveryTime - 2h)
-    activate Schedule
-    note right of Schedule: Calls inside isBetween<br/>are not shown here for clarity
-    Schedule -->> Restaurant: boolean
-    deactivate Schedule
+    loop For each schedule
+        Restaurant ->> Schedule: isBetween(deliveryTime, deliveryTime - 2h)
+        activate Schedule
+        note right of Schedule: Calls inside isBetween<br/>are not shown here for clarity
+        Schedule -->> Restaurant: boolean
+        deactivate Schedule
+    end
+    note right of Restaurant: Only schedules that<br/>are at most 2 hours before<br/>the delivery time are considered
+    loop For each kept schedule
     Restaurant ->> Restaurant: capacityLeft(schedule, deliveryTime)
     note right of Restaurant: Calls inside capacityLeft<br/>are not shown here for clarity
+        loop For each item ordered during the schedule
     Restaurant ->> MenuItem: getPreparationTime()
     activate MenuItem
     MenuItem -->> Restaurant: Duration
     deactivate MenuItem
+        end
+    end
     Restaurant -->> SingleOrder: List<MenuItem>
     deactivate Restaurant
     SingleOrder -->> STEats: List<MenuItem>
@@ -425,7 +431,6 @@ sequenceDiagram
     STEats ->> SingleOrder: addMenuItem(menuItem)
     SingleOrder ->> SingleOrder: updateDiscounts()
     note right of SingleOrder: updateDiscounts is represented<br/>in another chart for clarity
-    SingleOrder -->> STEats: #32;
     deactivate SingleOrder
     deactivate STEats
 ```
