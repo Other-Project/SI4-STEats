@@ -292,9 +292,10 @@ public class Restaurant {
      */
     public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
         DayOfWeek day = startDay;
-        for (LocalTime time = startTime; day != endDay || time.isBefore(endTime); time = time.plus(getScheduleDuration())) {
+        LocalTime time = LocalTime.ofSecondOfDay(Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds()); // round the start time to the nearest schedule
+        for (; day != endDay || !time.plus(getScheduleDuration()).isAfter(endTime); time = time.plus(getScheduleDuration())) {
             addSchedule(new Schedule(time, getScheduleDuration(), nbPersons, day));
-            if (time.isAfter(LocalTime.MAX.minus(getScheduleDuration())) && !time.plus(getScheduleDuration()).isAfter(LocalTime.MIDNIGHT.plus(getScheduleDuration())))
+            if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
                 day = day.plus(1);
         }
     }
