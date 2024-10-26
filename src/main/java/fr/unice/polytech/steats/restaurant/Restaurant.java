@@ -190,7 +190,7 @@ public class Restaurant {
     private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) {
         LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
         Set<Schedule> schedulesBefore2Hours = schedules.stream()
-                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY)))
+                .filter(schedule -> schedule.isBetween(deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY), deliveryTime))
                 .collect(Collectors.toSet());
         return schedulesBefore2Hours.stream()
                 .map(schedule -> capacityLeft(schedule, deliveryTime))

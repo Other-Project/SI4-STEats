@@ -93,8 +93,8 @@ public class Schedule implements Comparable<Schedule> {
      * @param end   The end of the period
      */
     public boolean isBetween(LocalDateTime start, LocalDateTime end) {
-        if (compareTo(start) >= 0) return false;
-        if (compareTo(end) < 0) return false;
+        if (compareTo(start) < 0) return false;
+        if (compareTo(end) >= 0) return false;
         if (contains(end)) return false;
         return !contains(start);
     }

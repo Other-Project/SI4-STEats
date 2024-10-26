@@ -35,7 +35,7 @@ public class ScheduleTest {
         assertEquals(DayOfWeek.FRIDAY, deliveryTime.getDayOfWeek());
         List<Schedule> schedulesSorted = scheduleList
                 .stream()
-                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(Duration.ofHours(2))))
+                .filter(schedule -> schedule.isBetween(deliveryTime.minus(Duration.ofHours(2)), deliveryTime))
                 .toList();
         assertEquals(4, schedulesSorted.size());
         assertTrue(schedulesSorted.stream()
@@ -49,7 +49,7 @@ public class ScheduleTest {
         assertEquals(DayOfWeek.FRIDAY, deliveryTime.getDayOfWeek());
         List<Schedule> schedulesSorted = scheduleList
                 .stream()
-                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(Duration.ofHours(2))))
+                .filter(schedule -> schedule.isBetween(deliveryTime.minus(Duration.ofHours(2)), deliveryTime))
                 .toList();
         assertEquals(3, schedulesSorted.size());
         assertTrue(schedulesSorted.stream()
