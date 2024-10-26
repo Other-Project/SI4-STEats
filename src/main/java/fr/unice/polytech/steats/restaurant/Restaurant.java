@@ -25,7 +25,7 @@ public class Restaurant {
     private final List<MenuItem> menu = new ArrayList<>();
     private final List<Discount> discounts = new ArrayList<>();
     private final List<Order> orders = new ArrayList<>();
-    private final Set<Schedule> schedules = new HashSet<>();
+    private final Set<Schedule> schedules = new TreeSet<>();
     private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
@@ -294,7 +294,7 @@ public class Restaurant {
         DayOfWeek day = startDay;
         for (LocalTime time = startTime; day != endDay || time.isBefore(endTime); time = time.plus(getScheduleDuration())) {
             addSchedule(new Schedule(time, getScheduleDuration(), nbPersons, day));
-            if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
+            if (time.isAfter(LocalTime.MAX.minus(getScheduleDuration())) && !time.plus(getScheduleDuration()).isAfter(LocalTime.MIDNIGHT.plus(getScheduleDuration())))
                 day = day.plus(1);
         }
     }

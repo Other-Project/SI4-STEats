@@ -95,7 +95,7 @@ class RestaurantTest {
                 DayOfWeek.SATURDAY, List.of(new OpeningTime(LocalTime.of(0, 0), LocalTime.of(23, 59, 59))),
                 DayOfWeek.SUNDAY, List.of(new OpeningTime(LocalTime.of(0, 0), LocalTime.of(23, 59, 59)))
         );
-        openingByDays.forEach((day, intervals) -> assertEquals(intervals, restaurant.getOpeningTimes(day)));
+        openingByDays.forEach((day, intervals) -> assertEquals(intervals, restaurant.getOpeningTimes(day), day + " opening times"));
     }
 
     @Test
