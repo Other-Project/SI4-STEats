@@ -29,15 +29,6 @@ class RestaurantTest {
         AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
 
-    private void addScheduleForPeriod(Restaurant restaurant, int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
-        DayOfWeek day = startDay;
-        for (LocalTime time = startTime; day != endDay || time.isBefore(endTime); time = time.plus(restaurant.getScheduleDuration())) {
-            restaurant.addSchedule(new Schedule(time, restaurant.getScheduleDuration(), nbPersons, day));
-            if (time.equals(LocalTime.of(0, 0).minus(restaurant.getScheduleDuration())))
-                day = day.plus(1);
-        }
-    }
-
     @Test
     void testGetTypeOfFood() {
         Restaurant restaurant = new Restaurant("McDonald's", TypeOfFood.FAST_FOOD);
@@ -88,11 +79,11 @@ class RestaurantTest {
     @Test
     void getOpeningTimes() {
         Restaurant restaurant = new Restaurant("");
-        addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(10, 0), DayOfWeek.MONDAY, LocalTime.of(14, 30));
-        addScheduleForPeriod(restaurant, 3, DayOfWeek.MONDAY, LocalTime.of(16, 0), DayOfWeek.MONDAY, LocalTime.of(17, 30));
-        addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(17, 30), DayOfWeek.MONDAY, LocalTime.of(19, 0));
-        addScheduleForPeriod(restaurant, 10, DayOfWeek.MONDAY, LocalTime.of(19, 0), DayOfWeek.TUESDAY, LocalTime.of(1, 0));
-        addScheduleForPeriod(restaurant, 10, DayOfWeek.FRIDAY, LocalTime.of(18, 0), DayOfWeek.MONDAY, LocalTime.of(3, 0));
+        restaurant.addScheduleForPeriod(5, DayOfWeek.MONDAY, LocalTime.of(10, 0), DayOfWeek.MONDAY, LocalTime.of(14, 30));
+        restaurant.addScheduleForPeriod(3, DayOfWeek.MONDAY, LocalTime.of(16, 0), DayOfWeek.MONDAY, LocalTime.of(17, 30));
+        restaurant.addScheduleForPeriod(5, DayOfWeek.MONDAY, LocalTime.of(17, 30), DayOfWeek.MONDAY, LocalTime.of(19, 0));
+        restaurant.addScheduleForPeriod(10, DayOfWeek.MONDAY, LocalTime.of(19, 0), DayOfWeek.TUESDAY, LocalTime.of(1, 0));
+        restaurant.addScheduleForPeriod(10, DayOfWeek.FRIDAY, LocalTime.of(18, 0), DayOfWeek.MONDAY, LocalTime.of(3, 0));
         Map<DayOfWeek, List<OpeningTime>> openingByDays = Map.of(
                 DayOfWeek.MONDAY, List.of(
                         new OpeningTime(LocalTime.of(0, 0), LocalTime.of(3, 0)),

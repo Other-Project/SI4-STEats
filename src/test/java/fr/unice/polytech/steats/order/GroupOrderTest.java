@@ -85,7 +85,10 @@ class GroupOrderTest {
         restaurant.addMenuItem(new MenuItem("Coca-Cola", 2.5, Duration.ofMinutes(5)));
         restaurant.addMenuItem(new MenuItem("Fries", 3.0, Duration.ofMinutes(5)));
         GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
-        assertEquals(restaurant.getFullMenu(), groupOrder.getAvailableMenu(LocalDateTime.now().plusDays(1).plusHours(1)));
+        restaurant.addScheduleForPeriod(1,
+                groupOrder.getDeliveryTime().minusHours(5).getDayOfWeek(), groupOrder.getDeliveryTime().minusHours(5).toLocalTime(), //from
+                groupOrder.getDeliveryTime().plusHours(5).getDayOfWeek(), groupOrder.getDeliveryTime().plusHours(5).toLocalTime()); //to
+        assertEquals(restaurant.getFullMenu(), groupOrder.getAvailableMenu());
     }
 
     @Test
@@ -124,6 +127,7 @@ class GroupOrderTest {
         GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
         groupOrder.closeOrder();
         User user = new User("John", "JohnID", Role.EXTERNAL);
-        assertThrows(IllegalStateException.class, () -> groupOrder.createOrder(user.getUserId()));
+        String userId = user.getUserId();
+        assertThrows(IllegalStateException.class, () -> groupOrder.createOrder(userId));
     }
 }

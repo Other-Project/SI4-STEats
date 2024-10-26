@@ -105,8 +105,8 @@ public class GroupOrder implements Order {
     }
 
     @Override
-        return getRestaurant().getFullMenu();
     public List<MenuItem> getAvailableMenu() {
+        return getRestaurant().getAvailableMenu(deliveryTime);
     }
 
     @Override

@@ -268,6 +268,37 @@ public class Restaurant {
         this.orders.add(order);
     }
 
+    /**
+     * Add a schedule to the restaurant
+     *
+     * @param schedule The schedule to add
+     */
+    public void addSchedule(Schedule schedule) {
+        if (!schedule.getDuration().equals(scheduleDuration))
+            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
+        if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
+            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
+        schedules.add(schedule);
+    }
+
+    /**
+     * Add schedules for a period of time
+     *
+     * @param nbPersons The number of working persons for the schedule
+     * @param startDay  The day of the week to start the period
+     * @param startTime The time to start the period
+     * @param endDay    The day of the week to end the period
+     * @param endTime   The time to end the period
+     */
+    public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
+        DayOfWeek day = startDay;
+        for (LocalTime time = startTime; day != endDay || time.isBefore(endTime); time = time.plus(getScheduleDuration())) {
+            addSchedule(new Schedule(time, getScheduleDuration(), nbPersons, day));
+            if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
+                day = day.plus(1);
+        }
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -287,18 +318,5 @@ public class Restaurant {
     @Override
     public String toString() {
         return name + " [" + typeOfFood + "]";
-    }
-
-    /**
-     * Add a schedule to the restaurant
-     *
-     * @param schedule The schedule to add
-     */
-    public void addSchedule(Schedule schedule) {
-        if (!schedule.getDuration().equals(scheduleDuration))
-            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
-        if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
-            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
-        schedules.add(schedule);
     }
 }
