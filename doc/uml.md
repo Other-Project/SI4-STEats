@@ -395,10 +395,6 @@ sequenceDiagram
     GroupOrder -->> STEats: SingleOrder
     deactivate GroupOrder
     STEats ->> STEats: updateFullMenu()
-    STEats ->> Order: getRestaurant()
-    activate Order
-    Order -->> STEats: Restaurant
-    deactivate Order
     STEats ->> Restaurant: getFullMenu()
     activate Restaurant
     Restaurant -->> STEats: List<MenuItem>
@@ -408,176 +404,25 @@ sequenceDiagram
 # -------------------------------#
 # TODO: Appel à getAvailableMenu #
 # -------------------------------#
-    Client ->> STEats: getAvailableMenu
-    activate STEats
-    STEats ->> SingleOrder: getDeliveryTime
-    activate SingleOrder
-    SingleOrder -->> STEats: #32;
-    deactivate SingleOrder
-    STEats ->> SingleOrder: getAvailableMenu
-    activate SingleOrder
-    SingleOrder ->> SingleOrder: getRestaurant
-    activate SingleOrder
-    SingleOrder ->> RestaurantManager: getInstance
-    activate RestaurantManager
-    RestaurantManager -->> SingleOrder: #32;
-    deactivate RestaurantManager
-    SingleOrder ->> AbstractManager: get
-    activate AbstractManager
-    alt !items.containsKey(key)
-        AbstractManager ->> NotFoundException: new
-        activate NotFoundException
-        NotFoundException -->> AbstractManager: #32;
-        deactivate NotFoundException
-    end
-    AbstractManager -->> SingleOrder: #32;
-    deactivate AbstractManager
-    SingleOrder -->> SingleOrder: #32;
-    deactivate SingleOrder
-    SingleOrder ->> Restaurant: getAvailableMenu
+    Client ->> STEats: getAvailableMenu()
+    STEats ->> SingleOrder: getAvailableMenu()
+    SingleOrder ->> Restaurant: getAvailableMenu(deliveryTime)
     activate Restaurant
-    alt arrivalTime == null
-        note right of Restaurant: Empty
-    end
-    Restaurant ->> Restaurant: getMaxCapacityLeft
-    activate Restaurant
-    Restaurant ->> Restaurant: schedule -&gt;
-    activate Restaurant
-    Restaurant ->> Schedule: isBetween
+    Restaurant ->> Restaurant: getMaxCapacityLeft(deliveryTime)
+    Restaurant ->> Schedule: isBetween(deliveryTime, deliveryTime - 2h)
     activate Schedule
-    Schedule ->> Schedule: compareTo
-    activate Schedule
-    alt compareDayOfWeek != 0
-        note right of Schedule: Empty
-    end
-    alt start.isAfter(dateTime.toLocalTime())
-        note right of Schedule: Empty
-    end
-    Schedule ->> Schedule: getEnd
-    activate Schedule
-    Schedule -->> Schedule: #32;
+    note right of Schedule: Calls inside isBetween are not shown here for clarity
+    Schedule -->> Restaurant: boolean
     deactivate Schedule
-    alt !getEnd().isAfter(dateTime.toLocalTime())
-        note right of Schedule: Empty
-    end
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    alt compareTo(start) >= 0
-        note right of Schedule: Empty
-    end
-    Schedule ->> Schedule: compareTo
-    activate Schedule
-    alt compareDayOfWeek != 0
-        note right of Schedule: Empty
-    end
-    alt start.isAfter(dateTime.toLocalTime())
-        note right of Schedule: Empty
-    end
-    Schedule ->> Schedule: getEnd
-    activate Schedule
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    alt !getEnd().isAfter(dateTime.toLocalTime())
-        note right of Schedule: Empty
-    end
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    alt compareTo(end) < 0
-        note right of Schedule: Empty
-    end
-    Schedule ->> Schedule: contains
-    activate Schedule
-    Schedule ->> Schedule: getEnd
-    activate Schedule
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    alt contains(end)
-        note right of Schedule: Empty
-    end
-    Schedule ->> Schedule: contains
-    activate Schedule
-    Schedule ->> Schedule: getEnd
-    activate Schedule
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    Schedule -->> Restaurant: #32;
-    deactivate Schedule
-    Restaurant ->> Restaurant: schedule -&gt;
-    activate Restaurant
-    Restaurant -->> Restaurant: #32;
-    deactivate Restaurant
-    Restaurant ->> Restaurant: capacityLeft
-    activate Restaurant
-    Restaurant ->> Restaurant: order -&gt;
-    activate Restaurant
-    Restaurant ->> Order: getStatus
-    activate Order
-    Order -->> Restaurant: #32;
-    deactivate Order
-    Restaurant ->> Order: getStatus
-    activate Order
-    Order -->> Restaurant: #32;
-    deactivate Order
-    Restaurant ->> Order: getDeliveryTime
-    activate Order
-    Order -->> Restaurant: #32;
-    deactivate Order
-    Restaurant ->> Restaurant: order -&gt;
-    activate Restaurant
-    Restaurant -->> Restaurant: #32;
-    deactivate Restaurant
-    Restaurant ->> Order: getDeliveryTime
-    activate Order
-    Order -->> Restaurant: #32;
-    deactivate Order
-    Restaurant ->> Schedule: schedule::contains
-    activate Schedule
-    Schedule ->> Order: getDeliveryTime
-    activate Order
-    Order -->> Schedule: #32;
-    deactivate Order
-    Schedule ->> Schedule: getEnd
-    activate Schedule
-    Schedule -->> Schedule: #32;
-    deactivate Schedule
-    Schedule -->> Restaurant: #32;
-    deactivate Schedule
-    Restaurant ->> Order: Order::getPreparationTime
-    activate Order
-    Order -->> Restaurant: #32;
-    deactivate Order
-    Restaurant -->> Restaurant: #32;
-    deactivate Restaurant
-    Restaurant ->> Schedule: getTotalCapacity
-    activate Schedule
-    Schedule -->> Restaurant: #32;
-    deactivate Schedule
-    Restaurant -->> Restaurant: #32;
-    deactivate Restaurant
-    Restaurant ->> Restaurant: () -&gt;
-    activate Restaurant
-    Restaurant -->> Restaurant: #32;
-    deactivate Restaurant
-    Restaurant -->> Restaurant: #32;
-    deactivate Restaurant
-    Restaurant ->> Restaurant: menuItem -&gt;
-    activate Restaurant
-    Restaurant ->> MenuItem: getPreparationTime
+    Restaurant ->> Restaurant: capacityLeft(schedule, deliveryTime)
+    note right of Restaurant: Calls inside capacityLeft are not shown here for clarity
+    Restaurant ->> MenuItem: getPreparationTime()
     activate MenuItem
-    MenuItem -->> Restaurant: #32;
+    MenuItem -->> Restaurant: Duration
     deactivate MenuItem
-    Restaurant -->> Restaurant: #32;
+    Restaurant -->> SingleOrder: List<MenuItem>
     deactivate Restaurant
-    Restaurant -->> Restaurant: #32;
-    deactivate Restaurant
-    Restaurant -->> SingleOrder: #32;
-    deactivate Restaurant
-    SingleOrder -->> STEats: #32;
-    deactivate SingleOrder
+    SingleOrder -->> STEats: List<MenuItem>
     Client ->> STEats: addMenuItem(menuItem)
     STEats ->> SingleOrder: addMenuItem(menuItem)
     SingleOrder ->> SingleOrder: updateDiscounts()
