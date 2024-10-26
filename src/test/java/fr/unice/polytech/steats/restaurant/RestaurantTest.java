@@ -38,6 +38,10 @@ class RestaurantTest {
     @Test
     void testGetOrders() {
         Restaurant restaurant = new Restaurant("McDonald's");
+        LocalDateTime deliveryTime = LocalDateTime.now().plusDays(1);
+        restaurant.addScheduleForPeriod(1,
+                deliveryTime.minusHours(2).getDayOfWeek(), deliveryTime.minusHours(2).toLocalTime(),
+                deliveryTime.getDayOfWeek(), deliveryTime.toLocalTime());
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
         AddressManager.getInstance().add(address.label(), address);
@@ -47,8 +51,8 @@ class RestaurantTest {
         UserManager.getInstance().add("JaneID", user2);
         STEats steats = new STEats(user);
         STEats steats2 = new STEats(user2);
-        steats.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
-        steats2.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        steats.createOrder(deliveryTime, "Campus Sophia Tech", restaurant.getName());
+        steats2.createOrder(deliveryTime, "Campus Sophia Tech", restaurant.getName());
         List<Order> orders = restaurant.getOrders();
         assertEquals(2, orders.size());
     }
@@ -101,19 +105,23 @@ class RestaurantTest {
     @Test
     void setStatusOfOrder() throws NotFoundException {
         Restaurant restaurant = new Restaurant("McDonald's");
+        LocalDateTime deliveryTime = LocalDateTime.now().plusDays(1);
+        restaurant.addScheduleForPeriod(1,
+                deliveryTime.minusHours(2).getDayOfWeek(), deliveryTime.minusHours(2).toLocalTime(),
+                deliveryTime.getDayOfWeek(), deliveryTime.toLocalTime());
         RestaurantManager.getInstance().add("McDonald's", restaurant);
-        Order order = new SingleOrder("1", LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
+        Order order = new SingleOrder("1", deliveryTime, "Campus SophiaTech", restaurant.getName());
         assertThrows(IllegalArgumentException.class, () -> order.setStatus(Status.PAID));
         assertThrows(IllegalArgumentException.class, () -> order.setStatus(Status.DELIVERED));
 
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
+        GroupOrder groupOrder = new GroupOrder(deliveryTime, "Campus SophiaTech", restaurant.getName());
         assertThrows(IllegalArgumentException.class, () -> groupOrder.setStatus(Status.PAID));
         assertThrows(IllegalArgumentException.class, () -> groupOrder.setStatus(Status.DELIVERED));
 
         User user = new User("Alex", "1", Role.STUDENT);
         UserManager.getInstance().add("1", user);
         STEats stEats = new STEats(user);
-        String groupCode = stEats.createGroupOrder(LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
+        String groupCode = stEats.createGroupOrder(deliveryTime, "Campus SophiaTech", restaurant.getName());
         stEats.payOrder();
         assertEquals(Status.PAID, GroupOrderManager.getInstance().get(groupCode).getOrders().getFirst().getStatus());
         assertThrows(IllegalArgumentException.class, () -> groupOrder.setStatus(Status.IN_PREPARATION));

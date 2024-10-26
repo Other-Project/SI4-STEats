@@ -138,13 +138,16 @@ public class Restaurant {
      * @param deliveryTime The time of delivery
      */
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
+        if (deliveryTime == null) return true;
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
         return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(order.getDeliveryTime(), maxCapacity);
     }
 
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
         if (deliveryTime == null || orders.isEmpty()) return true;
-        long maxNbOfOrder = maxCapacity.toMinutes() / getAveragePreparationTime().toMinutes();
+        long averagePreparationTime = getAveragePreparationTime().toMinutes();
+        if (averagePreparationTime == 0) return true;
+        long maxNbOfOrder = maxCapacity.toMinutes() / averagePreparationTime;
         long currentNbOfOrder = orders.stream()
                 .filter(order -> order.getStatus() == Status.INITIALISED)
                 .count();
@@ -293,7 +296,7 @@ public class Restaurant {
     public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
         DayOfWeek day = startDay;
         LocalTime time = LocalTime.ofSecondOfDay(Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds()); // round the start time to the nearest schedule
-        for (; day != endDay || !time.plus(getScheduleDuration()).isAfter(endTime); time = time.plus(getScheduleDuration())) {
+        for (; day != endDay || (!time.plus(getScheduleDuration()).isAfter(endTime) && !time.plus(getScheduleDuration()).equals(LocalTime.MIN)); time = time.plus(getScheduleDuration())) {
             addSchedule(new Schedule(time, getScheduleDuration(), nbPersons, day));
             if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
                 day = day.plus(1);
