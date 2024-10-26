@@ -402,10 +402,6 @@ sequenceDiagram
     Restaurant -->> STEats: List<MenuItem>
     deactivate Restaurant
 
-
-# -------------------------------#
-# TODO: Appel à getAvailableMenu #
-# -------------------------------#
     Client ->> STEats: getAvailableMenu()
     STEats ->> SingleOrder: getAvailableMenu()
     SingleOrder ->> Restaurant: getAvailableMenu(deliveryTime)
@@ -413,11 +409,11 @@ sequenceDiagram
     Restaurant ->> Restaurant: getMaxCapacityLeft(deliveryTime)
     Restaurant ->> Schedule: isBetween(deliveryTime, deliveryTime - 2h)
     activate Schedule
-    note right of Schedule: Calls inside isBetween are not shown here for clarity
+    note right of Schedule: Calls inside isBetween<br/>are not shown here for clarity
     Schedule -->> Restaurant: boolean
     deactivate Schedule
     Restaurant ->> Restaurant: capacityLeft(schedule, deliveryTime)
-    note right of Restaurant: Calls inside capacityLeft are not shown here for clarity
+    note right of Restaurant: Calls inside capacityLeft<br/>are not shown here for clarity
     Restaurant ->> MenuItem: getPreparationTime()
     activate MenuItem
     MenuItem -->> Restaurant: Duration
@@ -428,30 +424,70 @@ sequenceDiagram
     Client ->> STEats: addMenuItem(menuItem)
     STEats ->> SingleOrder: addMenuItem(menuItem)
     SingleOrder ->> SingleOrder: updateDiscounts()
-    note right of SingleOrder: updateDiscounts does multiple calls<br/>which are not shown here for clarity
+    note right of SingleOrder: updateDiscounts is represented<br/>in another chart for clarity
     SingleOrder -->> STEats: #32;
     deactivate SingleOrder
     deactivate STEats
 ```
 
-## Search for a meal
+## Discounts
 
 ```mermaid
 sequenceDiagram
-    actor Client
-    activate STEats
-    opt
-        Client ->> STEats: Select type of food
-    end
-    opt
-        Client ->> STEats: Enter a restaurant
-    end
-    Client ->> STEats: Choose a restaurant
-    STEats->>Restaurant : getMenuItems()
+    activate SingleOrder
+    SingleOrder ->> SingleOrder: updateDiscounts()
+    SingleOrder ->> Restaurant: availableDiscounts(order)
     activate Restaurant
-    Restaurant-->>STEats : MenuItem[]
+    loop For each discount of the restaurant
+        Restaurant ->> Discount: isApplicable(order)
+        activate Discount
+        Discount ->> SingleOrder: getItems()
+        SingleOrder -->> Discount: List<MenuItem>
+        Discount ->> User: getOrders(restaurantId)
+        activate User
+        note right of User: Returns orders that<br/>are at least paid<br/>and placed at<br/>the same restaurant
+        User -->> Discount: List<SingleOrder>
+        deactivate User
+        note right of Discount: Check criteria like number of items<br/>in cart and amount of orders
+        loop For each returned order
+            Discount ->> SingleOrder: getItems()
+            SingleOrder -->> Discount: List<MenuItem>
+            note right of Discount: Used to count the<br/>total number of ordered items
+        end
+        Discount ->> User: getRole
+        activate User
+        User -->> Discount: Role
+        deactivate User
+        note right of Discount: Check the role criteria
+        Discount -->> Restaurant: boolean
+        deactivate Discount
+    end
+    loop For each applicable discount
+        Restaurant ->> Discount: isStackable()
+        activate Discount
+        Discount -->> Restaurant: boolean
+        deactivate Discount
+        note right of Restaurant: every stackable discounts will be applied
+    end
+    loop For each un-stackable discount
+        Restaurant ->> SingleOrder: getSubPrice()
+        loop For each menu item in the order
+            SingleOrder ->> MenuItem: getPrice()
+            activate MenuItem
+            MenuItem -->> SingleOrder: double
+            deactivate MenuItem
+        end
+        SingleOrder -->> Restaurant: double
+        Restaurant ->> Discount: value(subPrice)
+        activate Discount
+        note right of Discount: Calculates the new price<br/>after applying the discount
+        Discount -->> Restaurant: double
+        deactivate Discount
+        note right of Restaurant: Only the best un-stackable discount is applied
+    end
+    Restaurant -->> SingleOrder: List<Discount>
     deactivate Restaurant
-    deactivate STEats
+    deactivate SingleOrder
 ```
 
 # Mockup
