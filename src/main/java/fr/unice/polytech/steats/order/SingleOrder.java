@@ -163,8 +163,8 @@ public class SingleOrder implements Order {
     }
 
     @Override
-    public List<MenuItem> getAvailableMenu(LocalDateTime time) {
-        return getRestaurant().getAvailableMenu(time);
+    public List<MenuItem> getAvailableMenu() {
+        return getRestaurant().getAvailableMenu(deliveryTime);
     }
 
     @Override

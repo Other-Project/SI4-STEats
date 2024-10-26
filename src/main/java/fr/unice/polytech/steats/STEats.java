@@ -112,7 +112,7 @@ public class STEats {
      * Get all the menu items available at the time of the delivery.
      */
     public List<MenuItem> getAvailableMenu() {
-        return order.getAvailableMenu(order.getDeliveryTime());
+        return order.getAvailableMenu();
     }
 
     /**
