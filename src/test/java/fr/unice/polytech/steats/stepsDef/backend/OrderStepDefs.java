@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.stepsDef.backend;
 
+import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.order.Address;
@@ -7,7 +8,6 @@ import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.Status;
 import fr.unice.polytech.steats.restaurant.*;
-import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;

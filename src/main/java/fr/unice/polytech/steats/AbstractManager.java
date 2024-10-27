@@ -1,7 +1,5 @@
 package fr.unice.polytech.steats;
 
-import fr.unice.polytech.steats.user.NotFoundException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

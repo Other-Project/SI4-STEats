@@ -1,7 +1,7 @@
 package fr.unice.polytech.steats.restaurant;
 
+import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.order.Saleable;
-import fr.unice.polytech.steats.user.NotFoundException;
 
 import java.time.Duration;
 

@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats;
 
-import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.UserManager;
 
 /**

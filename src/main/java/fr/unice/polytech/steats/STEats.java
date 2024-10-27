@@ -5,7 +5,6 @@ import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 
 import java.time.DayOfWeek;

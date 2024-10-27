@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.user;
+package fr.unice.polytech.steats;
 
 /**
  * UserNotFoundException is a custom exception that is thrown when a user is not found in the user registry

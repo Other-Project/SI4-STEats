@@ -1,12 +1,12 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.NotFoundException;
+import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.payment.Payment;
 import fr.unice.polytech.steats.payment.PaymentSystem;
-import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.user.NotFoundException;
 import fr.unice.polytech.steats.user.User;
 import fr.unice.polytech.steats.user.UserManager;
 
