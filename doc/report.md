@@ -1,8 +1,8 @@
 ## Team Members and Roles
 
-* Lassaunière Théo (PO)
+* LASSAUNIÈRE Théo (PO)
 * FALCOZ Alban (SA)
-* Galli Evan (QA)
+* GALLI Evan (QA)
 * GRIPARI Alexandre (Ops)
 
 ## Functional scope
