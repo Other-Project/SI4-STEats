@@ -4,7 +4,7 @@
 
 * FALCOZ Alban : SA (Software Architect)
 * GALLI Evan : QA (Quality Assurance)
-* GRIPARI Alexandre : Ops (Operations)
+* GRIPARI Alexandre : Ops (Continuous Integration and Repository Manager)
 * LASSAUNIERE Théo : PO (Product Owner)
 
 ## User stories
