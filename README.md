@@ -42,3 +42,7 @@ The project is divided into 5 different packages :
 * **discounts :** The classes related to the discounts feature. The Discount class represents a discount that can be
   applied to an order. It has options, criteria and discounts, and it's build with a DiscountBuilder.
 * **payment :** The classes related to the payment feature. The PaymentSystem should call an external payment system to validate the payment.
+
+## Documentation
+
+See the [doc folder](doc).
