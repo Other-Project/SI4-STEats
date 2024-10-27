@@ -387,6 +387,45 @@ sequenceDiagram
     create participant SingleOrder
     GroupOrder ->> SingleOrder: <<create>>
     activate SingleOrder
+    SingleOrder ->> Restaurant: canHandle(order, deliveryTime)
+    activate Restaurant
+    Restaurant ->> Restaurant: getMaxCapacityLeft(deliveryTime)
+    loop For each schedule
+        Restaurant ->> Schedule: isBetween(deliveryTime - 2h, deliveryTime)
+        activate Schedule
+        note right of Schedule: Calls inside isBetween<br/>are not shown here for clarity
+        Schedule -->> Restaurant: boolean
+        deactivate Schedule
+    end
+    note right of Restaurant: Keep only schedules that are at<br/>most 2 hours before the delivery time
+    loop For each kept schedule
+        Restaurant ->> Restaurant: capacityLeft(schedule, deliveryDate)
+        loop For each, at least paid, order of the schedule at the given date
+            Restaurant ->> Order: getPreparationTime()
+            activate Order
+            Order -->> Restaurant: Duration
+            deactivate Order
+            note right of Restaurant: Durations are summed up
+        end
+        Restaurant ->> Schedule: getTotalCapacity()
+        activate Schedule
+        Schedule -->> Restaurant: Duration
+        deactivate Schedule
+        note right of Restaurant: Capacity is obtained by<br/>substracting the sum of the preparation<br/>times from the total capacity
+    end
+    note right of Restaurant: Keep the max obtained capacity
+    Restaurant ->> Restaurant: canAddOrder(deliveryTime, maxCapacity)
+    Restaurant ->> Restaurant: getAveragePreparationTime()
+    loop For each last 50 orders
+        Restaurant ->> Order: getPreparationTime()
+        activate Order
+        Order -->> Restaurant: Duration
+        deactivate Order
+        note right of Restaurant: Averages durations
+    end
+    note right of Restaurant: Check if the current number of orders<br/>is not too high compared to the average<br/>preparation time
+    Restaurant -->> SingleOrder: boolean
+    deactivate Restaurant
     SingleOrder ->> SingleOrderManager: <<static>><br />getInstance()
     activate SingleOrderManager
     SingleOrderManager -->> SingleOrder: SingleOrderManager
