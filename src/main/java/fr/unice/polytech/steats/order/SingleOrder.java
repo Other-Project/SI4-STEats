@@ -65,6 +65,8 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
+        if (!getRestaurant().canHandle(this, deliveryTime))
+            throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
         SingleOrderManager.getInstance().add(getId(), this);
         if (groupCode == null) getRestaurant().addOrder(this);
     }
@@ -163,8 +165,8 @@ public class SingleOrder implements Order {
     }
 
     @Override
-    public List<MenuItem> getAvailableMenu(LocalDateTime time) {
-        return getRestaurant().getAvailableMenu(time);
+    public List<MenuItem> getAvailableMenu() {
+        return getRestaurant().getAvailableMenu(deliveryTime);
     }
 
     @Override

@@ -105,8 +105,8 @@ public class GroupOrder implements Order {
     }
 
     @Override
-    public List<MenuItem> getAvailableMenu(LocalDateTime time) {
-        return getRestaurant().getFullMenu();
+    public List<MenuItem> getAvailableMenu() {
+        return getRestaurant().getAvailableMenu(deliveryTime);
     }
 
     @Override
@@ -160,12 +160,12 @@ public class GroupOrder implements Order {
     /**
      * Add a user to the group order.
      *
-     * @param user The user that joined the group order
+     * @param userId The id of the user that joined the group order
      * @return The order created with the user ID, and with the delivery time and the address of the group order.
      */
-    public SingleOrder createOrder(User user) {
+    public SingleOrder createOrder(String userId) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
-        return new SingleOrder(user.getUserId(), groupCode, deliveryTime, addressId, restaurantId);
+        return new SingleOrder(userId, groupCode, deliveryTime, addressId, restaurantId);
     }
 
     /**
@@ -206,7 +206,7 @@ public class GroupOrder implements Order {
     public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) {
         List<LocalDateTime> availableTimes = new ArrayList<>();
         LocalDateTime time = from;
-        while (availableTimes.size() < numberOfTimes) {
+        while (availableTimes.size() < numberOfTimes && time.isBefore(from.plusMonths(1))) {
             if (getRestaurant().canHandle(this, time)) availableTimes.add(time);
             time = time.plusMinutes(30);
         }

@@ -59,10 +59,9 @@ public interface Order extends Saleable {
     List<MenuItem> getItems();
 
     /**
-     * @param time The time at which the menu must be available
      * @return The menu that can be ordered at the given time
      */
-    List<MenuItem> getAvailableMenu(LocalDateTime time);
+    List<MenuItem> getAvailableMenu();
 
     /**
      * @return The List of users that have ordered

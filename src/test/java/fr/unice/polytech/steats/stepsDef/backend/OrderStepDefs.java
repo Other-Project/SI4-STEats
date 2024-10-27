@@ -16,6 +16,7 @@ import io.cucumber.java.en.When;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,8 @@ public class OrderStepDefs {
 
     @When("the user creates an order and specifies a date, an address and a restaurant :")
     public void whenCreatesOrder(List<Map<String, String>> order) {
-        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.getFirst().get("date"))), order.getFirst().get("addressId"), restaurantId);
+        LocalDateTime nextWednesday = LocalDateTime.of(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY)), LocalTime.parse(order.getFirst().get("date")));
+        stEats.createOrder(nextWednesday, order.getFirst().get("addressId"), restaurantId);
     }
 
     @Then("the user can order")
@@ -91,7 +93,7 @@ public class OrderStepDefs {
     @Given("The following restaurants :")
     public void theFollowingRestaurants(List<Map<String, String>> items) {
         for (Map<String, String> item : items) {
-            RestaurantManager.getInstance().add(item.get("name"), new Restaurant(item.get("name")));
+            givenARestaurant(item.get("name"));
         }
     }
 
@@ -121,19 +123,22 @@ public class OrderStepDefs {
     //region Test for scenario : Filtering restaurants by delivery time
 
     @Given("The following restaurants with schedule and order duration and order scheduled to tomorrow at {string} :")
-    public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledToTomorrowAt(String deliveryTime, List<Map<String, String>> items) {
-        LocalTime localTime = LocalTime.parse(deliveryTime);
-        LocalDateTime deliveryTimeParsed = LocalDateTime.of(LocalDate.now().plusDays(1), localTime);
+    public void theFollowingRestaurantsWithScheduleAndOrderDurationAndOrderScheduledToTomorrowAt(String deliveryTimeS, List<Map<String, String>> items) {
+        LocalTime localTime = LocalTime.parse(deliveryTimeS);
+        LocalDateTime deliveryTime = LocalDateTime.of(LocalDate.now().plusDays(1), localTime);
 
         for (Map<String, String> item : items) {
             Restaurant restaurant = new Restaurant(item.get("name"));
+            restaurant.addScheduleForPeriod(1,
+                    deliveryTime.minusHours(2).getDayOfWeek(), deliveryTime.minusHours(2).toLocalTime(),
+                    deliveryTime.getDayOfWeek(), deliveryTime.toLocalTime());
             RestaurantManager.getInstance().add(item.get("name"), restaurant);
             DateTimeFormatter parser = DateTimeFormatter.ofPattern("H:mm:ss");
             LocalTime localTimeParsed = LocalTime.parse(item.get("scheduleStart"), parser);
             Schedule schedule = new Schedule(localTimeParsed, Duration.ofMinutes(30), 1, DayOfWeek.FRIDAY);
             restaurant.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, Duration.ofMinutes(20)));
             restaurant.addSchedule(schedule);
-            SingleOrder order = new SingleOrder("1", deliveryTimeParsed, "Campus SophiaTech", item.get("name"));
+            SingleOrder order = new SingleOrder("1", deliveryTime, "Campus SophiaTech", item.get("name"));
             Duration durationOrder = Duration.ofMinutes(Long.parseLong(item.get("preparationTime")));
             order.addMenuItem(new MenuItem("Boeuf Bourguignon", 25, durationOrder));
             restaurant.addOrder(order);

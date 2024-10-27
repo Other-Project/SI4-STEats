@@ -5,10 +5,7 @@ import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.Status;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,7 +22,7 @@ public class Restaurant {
     private final List<MenuItem> menu = new ArrayList<>();
     private final List<Discount> discounts = new ArrayList<>();
     private final List<Order> orders = new ArrayList<>();
-    private final Set<Schedule> schedules = new HashSet<>();
+    private final Set<Schedule> schedules = new TreeSet<>();
     private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
@@ -138,13 +135,16 @@ public class Restaurant {
      * @param deliveryTime The time of delivery
      */
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
+        if (deliveryTime == null) return true;
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(order.getDeliveryTime(), maxCapacity);
+        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(deliveryTime, maxCapacity);
     }
 
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
         if (deliveryTime == null || orders.isEmpty()) return true;
-        long maxNbOfOrder = maxCapacity.toMinutes() / getAveragePreparationTime().toMinutes();
+        long averagePreparationTime = getAveragePreparationTime().toMinutes();
+        if (averagePreparationTime == 0) return true;
+        long maxNbOfOrder = maxCapacity.toMinutes() / averagePreparationTime;
         long currentNbOfOrder = orders.stream()
                 .filter(order -> order.getStatus() == Status.INITIALISED)
                 .count();
@@ -152,12 +152,15 @@ public class Restaurant {
     }
 
     private Duration getAveragePreparationTime() {
-        if (orders.isEmpty()) return Duration.ZERO;
-        return orders.reversed().stream()
+        List<Duration> lastOrderDurations = orders.reversed().stream()
+                .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0 && order.getDeliveryTime() != null)
                 .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
                 .map(Order::getPreparationTime)
+                .toList();
+        if (lastOrderDurations.isEmpty()) return Duration.ZERO;
+        return lastOrderDurations.stream()
                 .reduce(Duration.ZERO, Duration::plus)
-                .dividedBy(Math.min(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION, orders.size()));
+                .dividedBy(lastOrderDurations.size());
     }
 
     /**
@@ -175,10 +178,10 @@ public class Restaurant {
         }
     }
 
-    private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
+    private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
         List<Order> ordersTakenAccountSchedule = orders.stream()
                 .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
-                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
+                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryDate.getDayOfYear())
                 .filter(schedule::contains)
                 .toList();
         Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream()
@@ -190,12 +193,12 @@ public class Restaurant {
     private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) {
         LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
         Set<Schedule> schedulesBefore2Hours = schedules.stream()
-                .filter(schedule -> schedule.isBetween(deliveryTime, deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY)))
+                .filter(schedule -> schedule.isBetween(deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY), deliveryTime))
                 .collect(Collectors.toSet());
         return schedulesBefore2Hours.stream()
-                .map(schedule -> capacityLeft(schedule, deliveryTime))
+                .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
                 .max(Comparator.comparing(Function.identity()))
-                .orElseThrow(() -> new IllegalArgumentException("This restaurant can't deliver at this time"));
+                .orElse(Duration.ZERO);
     }
 
     /**
@@ -268,6 +271,43 @@ public class Restaurant {
         this.orders.add(order);
     }
 
+    /**
+     * Add a schedule to the restaurant
+     *
+     * @param schedule The schedule to add
+     */
+    public void addSchedule(Schedule schedule) {
+        if (!schedule.getDuration().equals(scheduleDuration))
+            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
+        if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
+            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
+        schedules.add(schedule);
+    }
+
+    /**
+     * Add schedules for a period of time
+     *
+     * @param nbPersons The number of working persons for the schedule
+     * @param startDay  The day of the week to start the period
+     * @param startTime The time to start the period
+     * @param endDay    The day of the week to end the period
+     * @param endTime   The time to end the period
+     */
+    public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
+        DayOfWeek day = startDay;
+        long seconds = Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds();  // round the start time to the nearest schedule
+        if (seconds >= 86400) {
+            seconds = 0;
+            day = day.plus(1);
+        }
+        LocalTime time = LocalTime.ofSecondOfDay(seconds);
+        for (; day != endDay || (!time.plus(getScheduleDuration()).isAfter(endTime) && !time.plus(getScheduleDuration()).equals(LocalTime.MIN)); time = time.plus(getScheduleDuration())) {
+            addSchedule(new Schedule(time, getScheduleDuration(), nbPersons, day));
+            if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
+                day = day.plus(1);
+        }
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -287,18 +327,5 @@ public class Restaurant {
     @Override
     public String toString() {
         return name + " [" + typeOfFood + "]";
-    }
-
-    /**
-     * Add a schedule to the restaurant
-     *
-     * @param schedule The schedule to add
-     */
-    public void addSchedule(Schedule schedule) {
-        if (!schedule.getDuration().equals(scheduleDuration))
-            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
-        if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
-            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
-        schedules.add(schedule);
     }
 }

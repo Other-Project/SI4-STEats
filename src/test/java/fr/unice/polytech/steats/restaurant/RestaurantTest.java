@@ -15,7 +15,8 @@ import java.time.*;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RestaurantTest {
 
@@ -29,15 +30,6 @@ class RestaurantTest {
         AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
     }
 
-    private void addScheduleForPeriod(Restaurant restaurant, int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
-        DayOfWeek day = startDay;
-        for (LocalTime time = startTime; day != endDay || time.isBefore(endTime); time = time.plus(restaurant.getScheduleDuration())) {
-            restaurant.addSchedule(new Schedule(time, restaurant.getScheduleDuration(), nbPersons, day));
-            if (time.equals(LocalTime.of(0, 0).minus(restaurant.getScheduleDuration())))
-                day = day.plus(1);
-        }
-    }
-
     @Test
     void testGetTypeOfFood() {
         Restaurant restaurant = new Restaurant("McDonald's", TypeOfFood.FAST_FOOD);
@@ -47,6 +39,10 @@ class RestaurantTest {
     @Test
     void testGetOrders() {
         Restaurant restaurant = new Restaurant("McDonald's");
+        LocalDateTime deliveryTime = LocalDateTime.now().plusDays(1);
+        restaurant.addScheduleForPeriod(1,
+                deliveryTime.minusHours(2).getDayOfWeek(), deliveryTime.minusHours(2).toLocalTime(),
+                deliveryTime.getDayOfWeek(), deliveryTime.toLocalTime());
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
         Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
         AddressManager.getInstance().add(address.label(), address);
@@ -56,8 +52,8 @@ class RestaurantTest {
         UserManager.getInstance().add("JaneID", user2);
         STEats steats = new STEats(user);
         STEats steats2 = new STEats(user2);
-        steats.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
-        steats2.createOrder(LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        steats.createOrder(deliveryTime, "Campus Sophia Tech", restaurant.getName());
+        steats2.createOrder(deliveryTime, "Campus Sophia Tech", restaurant.getName());
         List<Order> orders = restaurant.getOrders();
         assertEquals(2, orders.size());
     }
@@ -88,11 +84,11 @@ class RestaurantTest {
     @Test
     void getOpeningTimes() {
         Restaurant restaurant = new Restaurant("");
-        addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(10, 0), DayOfWeek.MONDAY, LocalTime.of(14, 30));
-        addScheduleForPeriod(restaurant, 3, DayOfWeek.MONDAY, LocalTime.of(16, 0), DayOfWeek.MONDAY, LocalTime.of(17, 30));
-        addScheduleForPeriod(restaurant, 5, DayOfWeek.MONDAY, LocalTime.of(17, 30), DayOfWeek.MONDAY, LocalTime.of(19, 0));
-        addScheduleForPeriod(restaurant, 10, DayOfWeek.MONDAY, LocalTime.of(19, 0), DayOfWeek.TUESDAY, LocalTime.of(1, 0));
-        addScheduleForPeriod(restaurant, 10, DayOfWeek.FRIDAY, LocalTime.of(18, 0), DayOfWeek.MONDAY, LocalTime.of(3, 0));
+        restaurant.addScheduleForPeriod(5, DayOfWeek.MONDAY, LocalTime.of(10, 0), DayOfWeek.MONDAY, LocalTime.of(14, 30));
+        restaurant.addScheduleForPeriod(3, DayOfWeek.MONDAY, LocalTime.of(16, 0), DayOfWeek.MONDAY, LocalTime.of(17, 30));
+        restaurant.addScheduleForPeriod(5, DayOfWeek.MONDAY, LocalTime.of(17, 30), DayOfWeek.MONDAY, LocalTime.of(19, 0));
+        restaurant.addScheduleForPeriod(10, DayOfWeek.MONDAY, LocalTime.of(19, 0), DayOfWeek.TUESDAY, LocalTime.of(1, 0));
+        restaurant.addScheduleForPeriod(10, DayOfWeek.FRIDAY, LocalTime.of(18, 0), DayOfWeek.MONDAY, LocalTime.of(3, 0));
         Map<DayOfWeek, List<OpeningTime>> openingByDays = Map.of(
                 DayOfWeek.MONDAY, List.of(
                         new OpeningTime(LocalTime.of(0, 0), LocalTime.of(3, 0)),
@@ -104,25 +100,29 @@ class RestaurantTest {
                 DayOfWeek.SATURDAY, List.of(new OpeningTime(LocalTime.of(0, 0), LocalTime.of(23, 59, 59))),
                 DayOfWeek.SUNDAY, List.of(new OpeningTime(LocalTime.of(0, 0), LocalTime.of(23, 59, 59)))
         );
-        openingByDays.forEach((day, intervals) -> assertEquals(intervals, restaurant.getOpeningTimes(day)));
+        openingByDays.forEach((day, intervals) -> assertEquals(intervals, restaurant.getOpeningTimes(day), day + " opening times"));
     }
 
     @Test
     void setStatusOfOrder() throws NotFoundException {
         Restaurant restaurant = new Restaurant("McDonald's");
+        LocalDateTime deliveryTime = LocalDateTime.now().plusDays(1);
+        restaurant.addScheduleForPeriod(1,
+                deliveryTime.minusHours(2).getDayOfWeek(), deliveryTime.minusHours(2).toLocalTime(),
+                deliveryTime.getDayOfWeek(), deliveryTime.toLocalTime());
         RestaurantManager.getInstance().add("McDonald's", restaurant);
-        Order order = new SingleOrder("1", LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
+        Order order = new SingleOrder("1", deliveryTime, "Campus SophiaTech", restaurant.getName());
         assertThrows(IllegalArgumentException.class, () -> order.setStatus(Status.PAID));
         assertThrows(IllegalArgumentException.class, () -> order.setStatus(Status.DELIVERED));
 
-        GroupOrder groupOrder = new GroupOrder(LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
+        GroupOrder groupOrder = new GroupOrder(deliveryTime, "Campus SophiaTech", restaurant.getName());
         assertThrows(IllegalArgumentException.class, () -> groupOrder.setStatus(Status.PAID));
         assertThrows(IllegalArgumentException.class, () -> groupOrder.setStatus(Status.DELIVERED));
 
         User user = new User("Alex", "1", Role.STUDENT);
         UserManager.getInstance().add("1", user);
         STEats stEats = new STEats(user);
-        String groupCode = stEats.createGroupOrder(LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
+        String groupCode = stEats.createGroupOrder(deliveryTime, "Campus SophiaTech", restaurant.getName());
         stEats.payOrder();
         assertEquals(Status.PAID, GroupOrderManager.getInstance().get(groupCode).getOrders().getFirst().getStatus());
         assertThrows(IllegalArgumentException.class, () -> groupOrder.setStatus(Status.IN_PREPARATION));
@@ -159,29 +159,25 @@ class RestaurantTest {
             ));
         }
 
-        SingleOrder singleOrder = new SingleOrder("1", LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
-
         User user = new User("Alex", "2", Role.STUDENT);
         UserManager.getInstance().add("2", user);
         STEats stEats = new STEats(user);
-        stEats.createOrder(singleOrder.getDeliveryTime(), "Campus SophiaTech", restaurant.getName());
+        stEats.createOrder(LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
 
-        stEats.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10)));
+        stEats.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(6)));
         stEats.payOrder();
 
+        for (int i = 1; i <= 5; i++) {
+            SingleOrder iceCreamOrder = new SingleOrder("2", LocalDateTime.now().plusDays(1).plusHours(3), "Campus SophiaTech", restaurant.getName());
+            iceCreamOrder.addMenuItem(new MenuItem("Ice Cream", 2.0, Duration.ofMinutes(5)));
 
-        SingleOrder iceCreamOrder = new SingleOrder("2", LocalDateTime.now().plusDays(1).plusHours(3), "Campus SophiaTech", restaurant.getName());
-        iceCreamOrder.addMenuItem(new MenuItem("Ice Cream", 2.0, Duration.ofMinutes(5)));
-        // Normally, max 6 ice cream if we don't consider a max order
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 3 > 1
-        restaurant.addOrder(iceCreamOrder);
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 4 > 2
-        restaurant.addOrder(iceCreamOrder);
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 4.5 > 3
-        restaurant.addOrder(iceCreamOrder);
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3)));  // max order = 4.8 > 4
-        restaurant.addOrder(iceCreamOrder);
-        assertFalse(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 5.0 = 5
-
+            // Normally, max 6 ice cream if we don't consider a max order
+            // 1st : max order = 3 > 1
+            // 2nd : max order = 4 > 2
+            // 3rd : max order = 4.5 > 3
+            // 4th : max order = 4.8 > 4
+            // 5th : max order = 5.0 = 5
+            assertEquals(i != 5, restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3)), "Can handle " + i + " ice cream");
+        }
     }
 }

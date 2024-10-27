@@ -8,11 +8,11 @@ Feature: Manage GroupOrder
     Given The user named "Alexandra" with the id "3232" is logged in
     Given A restaurant named "McDonald's" with the following schedules :
       | start | duration | capacity |
-      | 08:20 | 30       | 5        |
-      | 08:50 | 30       | 5        |
-      | 09:20 | 30       | 5        |
-      | 09:50 | 30       | 5        |
-      | 10:20 | 30       | 5        |
+      | 08:30 | 30       | 5        |
+      | 09:00 | 30       | 5        |
+      | 09:30 | 30       | 5        |
+      | 10:00 | 30       | 5        |
+      | 10:30 | 30       | 5        |
     Given The restaurant named "McDonald's" have the following menu :
       | name         | price | preparationTime |
       | Alban_Burger | 30.0  | 29              |
@@ -89,13 +89,13 @@ Feature: Manage GroupOrder
   Scenario: Close Group order if delivery time not set
     Given A restaurant named "BurgerKing" with the following schedules :
       | start | duration | capacity | day    |
-      | 11:20 | 30       | 2        | MONDAY |
-      | 11:50 | 30       | 1        | MONDAY |
-      | 12:20 | 30       | 1        | MONDAY |
-      | 12:50 | 30       | 1        | MONDAY |
-      | 13:20 | 30       | 3        | MONDAY |
-      | 14:50 | 30       | 1        | MONDAY |
-      | 15:20 | 30       | 3        | MONDAY |
+      | 11:30 | 30       | 2        | MONDAY |
+      | 12:00 | 30       | 1        | MONDAY |
+      | 12:30 | 30       | 1        | MONDAY |
+      | 13:00 | 30       | 1        | MONDAY |
+      | 13:30 | 30       | 3        | MONDAY |
+      | 15:00 | 30       | 1        | MONDAY |
+      | 15:30 | 30       | 3        | MONDAY |
     Given The restaurant named "BurgerKing" have the following menu :
       | name         | price | preparationTime |
       | Alban_Burger | 30.0  | 29              |
@@ -120,7 +120,7 @@ Feature: Manage GroupOrder
     When "Alex" close the group order that doesn't have a delivery time
     Then "Alex" he need to choose the delivery time so he gets the next 2 delivery time from tomorrow at "12:30:00" and gets :
       | deliveryTime |
-      | 14:00        |
       | 14:30        |
-    And "Alex" can choose the following delivery time : "14:00"
-          # also 14:30 or 15:00 are possible but he can only change the delivery time once
+      | 15:00        |
+    And "Alex" can choose the following delivery time : "14:30"
+          # also 15:00 is possible but he can only change the delivery time once

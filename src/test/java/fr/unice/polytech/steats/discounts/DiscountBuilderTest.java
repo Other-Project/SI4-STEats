@@ -31,14 +31,18 @@ class DiscountBuilderTest {
         AddressManager.getInstance().add("Campus Sophia Tech", address);
 
         RestaurantManager.getInstance().clear();
+        LocalDateTime deliveryTime = LocalDateTime.now().plusDays(1);
         restaurant = new Restaurant("Mcdo", TypeOfFood.FAST_FOOD);
+        restaurant.addScheduleForPeriod(1,
+                deliveryTime.minusHours(2).getDayOfWeek(), deliveryTime.minusHours(2).toLocalTime(),
+                deliveryTime.getDayOfWeek(), deliveryTime.toLocalTime());
         RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
 
         UserManager.getInstance().clear();
         User user = new User("Alban", "Alban", Role.STUDENT);
         UserManager.getInstance().add("Alban", user);
 
-        order = new SingleOrder("Alban", LocalDateTime.now().plusDays(1), "Campus Sophia Tech", restaurant.getName());
+        order = new SingleOrder("Alban", deliveryTime, "Campus Sophia Tech", restaurant.getName());
     }
 
 
