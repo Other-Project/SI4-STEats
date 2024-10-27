@@ -1,6 +1,4 @@
-package fr.unice.polytech.steats;
-
-import fr.unice.polytech.steats.order.Payment;
+package fr.unice.polytech.steats.payment;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

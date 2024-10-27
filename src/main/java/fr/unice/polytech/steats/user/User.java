@@ -1,7 +1,7 @@
 package fr.unice.polytech.steats.user;
 
 import fr.unice.polytech.steats.discounts.Discount;
-import fr.unice.polytech.steats.order.Payment;
+import fr.unice.polytech.steats.payment.Payment;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.SingleOrderManager;
 import fr.unice.polytech.steats.order.Status;
