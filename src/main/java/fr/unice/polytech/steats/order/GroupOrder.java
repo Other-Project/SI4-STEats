@@ -206,7 +206,7 @@ public class GroupOrder implements Order {
     public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) {
         List<LocalDateTime> availableTimes = new ArrayList<>();
         LocalDateTime time = from;
-        while (availableTimes.size() < numberOfTimes) {
+        while (availableTimes.size() < numberOfTimes && time.isBefore(from.plusMonths(1))) {
             if (getRestaurant().canHandle(this, time)) availableTimes.add(time);
             time = time.plusMinutes(30);
         }

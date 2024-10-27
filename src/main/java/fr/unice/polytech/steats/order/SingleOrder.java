@@ -65,10 +65,10 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
-        SingleOrderManager.getInstance().add(getId(), this);
-        if (groupCode == null) getRestaurant().addOrder(this);
         if (!getRestaurant().canHandle(this, deliveryTime))
             throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
+        SingleOrderManager.getInstance().add(getId(), this);
+        if (groupCode == null) getRestaurant().addOrder(this);
     }
 
     @Override

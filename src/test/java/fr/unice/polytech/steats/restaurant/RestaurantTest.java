@@ -15,7 +15,8 @@ import java.time.*;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RestaurantTest {
 
@@ -158,29 +159,25 @@ class RestaurantTest {
             ));
         }
 
-        SingleOrder singleOrder = new SingleOrder("1", LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
-
         User user = new User("Alex", "2", Role.STUDENT);
         UserManager.getInstance().add("2", user);
         STEats stEats = new STEats(user);
-        stEats.createOrder(singleOrder.getDeliveryTime(), "Campus SophiaTech", restaurant.getName());
+        stEats.createOrder(LocalDateTime.now().plusHours(3), "Campus SophiaTech", restaurant.getName());
 
-        stEats.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(10)));
+        stEats.addMenuItem(new MenuItem("Big Mac", 5.0, Duration.ofMinutes(6)));
         stEats.payOrder();
 
+        for (int i = 1; i <= 5; i++) {
+            SingleOrder iceCreamOrder = new SingleOrder("2", LocalDateTime.now().plusDays(1).plusHours(3), "Campus SophiaTech", restaurant.getName());
+            iceCreamOrder.addMenuItem(new MenuItem("Ice Cream", 2.0, Duration.ofMinutes(5)));
 
-        SingleOrder iceCreamOrder = new SingleOrder("2", LocalDateTime.now().plusDays(1).plusHours(3), "Campus SophiaTech", restaurant.getName());
-        iceCreamOrder.addMenuItem(new MenuItem("Ice Cream", 2.0, Duration.ofMinutes(5)));
-        // Normally, max 6 ice cream if we don't consider a max order
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 3 > 1
-        restaurant.addOrder(iceCreamOrder);
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 4 > 2
-        restaurant.addOrder(iceCreamOrder);
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 4.5 > 3
-        restaurant.addOrder(iceCreamOrder);
-        assertTrue(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3)));  // max order = 4.8 > 4
-        restaurant.addOrder(iceCreamOrder);
-        assertFalse(restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3))); // max order = 5.0 = 5
-
+            // Normally, max 6 ice cream if we don't consider a max order
+            // 1st : max order = 3 > 1
+            // 2nd : max order = 4 > 2
+            // 3rd : max order = 4.5 > 3
+            // 4th : max order = 4.8 > 4
+            // 5th : max order = 5.0 = 5
+            assertEquals(i != 5, restaurant.canHandle(iceCreamOrder, LocalDateTime.now().plusDays(1).plusHours(3)), "Can handle " + i + " ice cream");
+        }
     }
 }

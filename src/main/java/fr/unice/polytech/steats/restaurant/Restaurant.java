@@ -5,10 +5,7 @@ import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.Status;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -140,7 +137,7 @@ public class Restaurant {
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
         if (deliveryTime == null) return true;
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(order.getDeliveryTime(), maxCapacity);
+        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(deliveryTime, maxCapacity);
     }
 
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
@@ -155,12 +152,15 @@ public class Restaurant {
     }
 
     private Duration getAveragePreparationTime() {
-        if (orders.isEmpty()) return Duration.ZERO;
-        return orders.reversed().stream()
+        List<Duration> lastOrderDurations = orders.reversed().stream()
+                .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0 && order.getDeliveryTime() != null)
                 .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
                 .map(Order::getPreparationTime)
+                .toList();
+        if (lastOrderDurations.isEmpty()) return Duration.ZERO;
+        return lastOrderDurations.stream()
                 .reduce(Duration.ZERO, Duration::plus)
-                .dividedBy(Math.min(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION, orders.size()));
+                .dividedBy(lastOrderDurations.size());
     }
 
     /**
@@ -178,10 +178,10 @@ public class Restaurant {
         }
     }
 
-    private Duration capacityLeft(Schedule schedule, LocalDateTime deliveryTimeOrder) {
+    private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
         List<Order> ordersTakenAccountSchedule = orders.stream()
                 .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
-                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryTimeOrder.getDayOfYear())
+                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryDate.getDayOfYear())
                 .filter(schedule::contains)
                 .toList();
         Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream()
@@ -196,7 +196,7 @@ public class Restaurant {
                 .filter(schedule -> schedule.isBetween(deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY), deliveryTime))
                 .collect(Collectors.toSet());
         return schedulesBefore2Hours.stream()
-                .map(schedule -> capacityLeft(schedule, deliveryTime))
+                .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
                 .max(Comparator.comparing(Function.identity()))
                 .orElse(Duration.ZERO);
     }
