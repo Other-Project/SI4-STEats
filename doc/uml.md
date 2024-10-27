@@ -83,6 +83,235 @@ UC20 <. UC30 : extends
 ```mermaid
 classDiagram
     direction BT
+
+    namespace order {
+        class Address {
+            + label() String
+            + street() String
+            + additional_address() String
+            + postal_code() String
+            + city() String
+        }
+        class AddressManager {
+            AddressManager INSTANCE
+        }
+        class GroupOrder {
+            + closeOrder() void
+            + pay(SingleOrder) boolean
+            + getAvailableDeliveryTimes(LocalDateTime, int) List~LocalDateTime~
+            + createOrder(String) SingleOrder
+            List~MenuItem~ availableMenu
+            List~SingleOrder~ orders
+            Address address
+            String restaurantId
+            LocalDateTime orderTime
+            double price
+            List~User~ users
+            Restaurant restaurant
+            Duration preparationTime
+            String groupCode
+            LocalDateTime deliveryTime
+            List~MenuItem~ items
+            Status status
+        }
+        class GroupOrderManager {
+            GroupOrderManager INSTANCE
+        }
+        class Order {
+            <<Interface>>
+            LocalDateTime orderTime
+            List~MenuItem~ availableMenu
+            List~User~ users
+            Restaurant restaurant
+            Duration preparationTime
+            String groupCode
+            Address address
+            LocalDateTime deliveryTime
+            String restaurantId
+            List~MenuItem~ items
+            Status status
+        }
+
+        class Saleable {
+            <<Interface>>
+            double price
+        }
+
+        class SingleOrder {
+            + addMenuItem(MenuItem) void
+            + removeMenuItem(MenuItem) void
+            + pay() boolean
+            - updateDiscounts() void
+            Optional~GroupOrder~ groupOrder
+            List~MenuItem~ availableMenu
+            double subPrice
+            List~Discount~ discounts
+            Address address
+            String restaurantId
+            String id
+            User user
+            LocalDateTime orderTime
+            double price
+            List~User~ users
+            Restaurant restaurant
+            Duration preparationTime
+            List~Discount~ discountsToApplyNext
+            String groupCode
+            LocalDateTime deliveryTime
+            List~MenuItem~ items
+            Payment payment
+            Status status
+            String userId
+        }
+        class SingleOrderManager {
+            + getOrdersByUser(String) List~SingleOrder~
+            + getOrdersByGroup(String) List~SingleOrder~
+            SingleOrderManager INSTANCE
+        }
+        class Status {
+            <<enumeration>>
+            + values() Status[]
+            + valueOf(String) Status
+        }
+    }
+
+    namespace discounts {
+        class Discount {
+            + isApplicable(SingleOrder) boolean
+            + value(double) double
+            + freeItems() List~MenuItem~
+            + getNewPrice(double) double
+            + canBeAppliedDirectly() boolean
+            boolean stackable
+            boolean expired
+        }
+        class DiscountBuilder {
+            + stackable() DiscountBuilder
+            + oneTimeOffer() DiscountBuilder
+            + neverExpires() DiscountBuilder
+            + unstackable() DiscountBuilder
+            + appliesAfterOrder() DiscountBuilder
+            + expiresAt(LocalDateTime) DiscountBuilder
+            + appliesDuringOrder() DiscountBuilder
+            + build() Discount
+            MenuItem[] freeItems
+            int ordersAmount
+            Criteria criteria
+            Role[] userRoles
+            Discounts discounts
+            Options options
+            double orderDiscount
+            int itemsAmount
+            int currentOrderItemsAmount
+            double orderCredit
+        }
+    }
+    namespace restaurant {
+        class MenuItem {
+            + toString() String
+            + equals(Object) boolean
+            + hashCode() int
+            String name
+            Restaurant restaurant
+            Duration preparationTime
+            String restaurantName
+            double price
+        }
+        class OpeningTime {
+            + toString() String
+            + hashCode() int
+            + equals(Object) boolean
+            LocalTime end
+            LocalTime start
+        }
+
+        class Schedule {
+            + overlap(Schedule) boolean
+            + compareTo(LocalDateTime) int
+            + isBetween(LocalDateTime, LocalDateTime) boolean
+            + contains(LocalDateTime) boolean
+            + hashCode() int
+            + toString() String
+            + equals(Object) boolean
+            + contains(Order) boolean
+            + compareTo(Schedule) int
+            Duration totalCapacity
+            int nbPerson
+            Duration duration
+            LocalTime end
+            DayOfWeek dayOfWeek
+            LocalTime start
+        }
+        class Restaurant {
+            - getMaxCapacityLeft(LocalDateTime) Duration
+            + hashCode() int
+            + addSchedule(Schedule) void
+            + removeDiscount(Discount) void
+            + addOrder(Order) void
+            + addMenuItem(MenuItem) void
+            + discounts() List~Discount~
+            - capacityLeft(Schedule, LocalDateTime) Duration
+            + toString() String
+            - canAddOrder(LocalDateTime, Duration) boolean
+            + getOpeningTimes(DayOfWeek) List~OpeningTime~
+            + getAvailableMenu(LocalDateTime) List~MenuItem~
+            + equals(Object) boolean
+            + addScheduleForPeriod(int, DayOfWeek, LocalTime, DayOfWeek, LocalTime) void
+            + availableDiscounts(SingleOrder) List~Discount~
+            + canHandle(Order, LocalDateTime) boolean
+            + canDeliverAt(LocalDateTime) boolean
+            + addDiscount(Discount) void
+            + removeMenuItem(MenuItem) void
+            String name
+            TypeOfFood typeOfFood
+            List~Order~ orders
+            List~MenuItem~ fullMenu
+            Duration averagePreparationTime
+            Duration scheduleDuration
+        }
+        class RestaurantManager {
+            + filterRestaurant(LocalDateTime) List~Restaurant~
+            + filterRestaurant(String) List~Restaurant~
+            + filterRestaurant(String, TypeOfFood, LocalDateTime) List~Restaurant~
+            + filterRestaurant(TypeOfFood) List~Restaurant~
+            RestaurantManager INSTANCE
+        }
+        class TypeOfFood {
+            <<enumeration>>
+            + values() TypeOfFood[]
+            + valueOf(String) TypeOfFood
+        }
+    }
+    namespace payment {
+        class Payment {
+            + date() LocalDateTime
+            + amount() Double
+        }
+        class PaymentSystem {
+            + pay(double) Optional~Payment~
+        }
+    }
+    namespace user {
+        class Role {
+            <<enumeration>>
+            + valueOf(String) Role
+            + values() Role[]
+        }
+        class User {
+            + getOrders(String) List~SingleOrder~
+            + getDiscountsToApplyNext(String) List~Discount~
+            String name
+            List~SingleOrder~ orders
+            Role role
+            List~Payment~ payments
+            String userId
+        }
+        class UserManager {
+            + fillForDemo() void
+            UserManager INSTANCE
+        }
+    }
+
     class AbstractManager~T~ {
         + clear() void
         + add(String, T) void
@@ -91,145 +320,7 @@ classDiagram
         + get(String) T
         List~T~ all
     }
-    class Address {
-        + label() String
-        + street() String
-        + additional_address() String
-        + postal_code() String
-        + city() String
-    }
-    class AddressManager {
-        AddressManager INSTANCE
-    }
-    class Discount {
-        + isApplicable(SingleOrder) boolean
-        + value(double) double
-        + freeItems() List~MenuItem~
-        + getNewPrice(double) double
-        + canBeAppliedDirectly() boolean
-        boolean stackable
-        boolean expired
-    }
-    class DiscountBuilder {
-        + stackable() DiscountBuilder
-        + oneTimeOffer() DiscountBuilder
-        + neverExpires() DiscountBuilder
-        + unstackable() DiscountBuilder
-        + appliesAfterOrder() DiscountBuilder
-        + expiresAt(LocalDateTime) DiscountBuilder
-        + appliesDuringOrder() DiscountBuilder
-        + build() Discount
-        MenuItem[] freeItems
-        int ordersAmount
-        Criteria criteria
-        Role[] userRoles
-        Discounts discounts
-        Options options
-        double orderDiscount
-        int itemsAmount
-        int currentOrderItemsAmount
-        double orderCredit
-    }
-    class GroupOrder {
-        + closeOrder() void
-        + pay(SingleOrder) boolean
-        + getAvailableDeliveryTimes(LocalDateTime, int) List~LocalDateTime~
-        + createOrder(String) SingleOrder
-        List~MenuItem~ availableMenu
-        List~SingleOrder~ orders
-        Address address
-        String restaurantId
-        LocalDateTime orderTime
-        double price
-        List~User~ users
-        Restaurant restaurant
-        Duration preparationTime
-        String groupCode
-        LocalDateTime deliveryTime
-        List~MenuItem~ items
-        Status status
-    }
-    class GroupOrderManager {
-        GroupOrderManager INSTANCE
-    }
-    class MenuItem {
-        + toString() String
-        + equals(Object) boolean
-        + hashCode() int
-        String name
-        Restaurant restaurant
-        Duration preparationTime
-        String restaurantName
-        double price
-    }
     class NotFoundException
-    class OpeningTime {
-        + toString() String
-        + hashCode() int
-        + equals(Object) boolean
-        LocalTime end
-        LocalTime start
-    }
-    class Order {
-        <<Interface>>
-        LocalDateTime orderTime
-        List~MenuItem~ availableMenu
-        List~User~ users
-        Restaurant restaurant
-        Duration preparationTime
-        String groupCode
-        Address address
-        LocalDateTime deliveryTime
-        String restaurantId
-        List~MenuItem~ items
-        Status status
-    }
-    class Payment {
-        + date() LocalDateTime
-        + amount() Double
-    }
-    class PaymentSystem {
-        + pay(double) Optional~Payment~
-    }
-    class Restaurant {
-        - getMaxCapacityLeft(LocalDateTime) Duration
-        + hashCode() int
-        + addSchedule(Schedule) void
-        + removeDiscount(Discount) void
-        + addOrder(Order) void
-        + addMenuItem(MenuItem) void
-        + discounts() List~Discount~
-        - capacityLeft(Schedule, LocalDateTime) Duration
-        + toString() String
-        - canAddOrder(LocalDateTime, Duration) boolean
-        + getOpeningTimes(DayOfWeek) List~OpeningTime~
-        + getAvailableMenu(LocalDateTime) List~MenuItem~
-        + equals(Object) boolean
-        + addScheduleForPeriod(int, DayOfWeek, LocalTime, DayOfWeek, LocalTime) void
-        + availableDiscounts(SingleOrder) List~Discount~
-        + canHandle(Order, LocalDateTime) boolean
-        + canDeliverAt(LocalDateTime) boolean
-        + addDiscount(Discount) void
-        + removeMenuItem(MenuItem) void
-        String name
-        TypeOfFood typeOfFood
-        List~Order~ orders
-        List~MenuItem~ fullMenu
-        Duration averagePreparationTime
-        Duration scheduleDuration
-    }
-    class RestaurantManager {
-        + filterRestaurant(LocalDateTime) List~Restaurant~
-        + filterRestaurant(String) List~Restaurant~
-        + filterRestaurant(String, TypeOfFood, LocalDateTime) List~Restaurant~
-        + filterRestaurant(TypeOfFood) List~Restaurant~
-        RestaurantManager INSTANCE
-    }
-    class Role {
-        <<enumeration>>
-        + valueOf(String) Role
-        + values() Role[]
-    }
     class STEats {
         + getOpeningTimes(Restaurant) Map~DayOfWeek, List~ OpeningTime~~
         + changeDeliveryTime(LocalDateTime) void
@@ -255,81 +346,6 @@ classDiagram
     }
     class STEatsController {
         + logging(String) STEats
-    }
-    class Saleable {
-        <<Interface>>
-        double price
-    }
-    class Schedule {
-        + overlap(Schedule) boolean
-        + compareTo(LocalDateTime) int
-        + isBetween(LocalDateTime, LocalDateTime) boolean
-        + contains(LocalDateTime) boolean
-        + hashCode() int
-        + toString() String
-        + equals(Object) boolean
-        + contains(Order) boolean
-        + compareTo(Schedule) int
-        Duration totalCapacity
-        int nbPerson
-        Duration duration
-        LocalTime end
-        DayOfWeek dayOfWeek
-        LocalTime start
-    }
-    class SingleOrder {
-        + addMenuItem(MenuItem) void
-        + removeMenuItem(MenuItem) void
-        + pay() boolean
-        - updateDiscounts() void
-        Optional~GroupOrder~ groupOrder
-        List~MenuItem~ availableMenu
-        double subPrice
-        List~Discount~ discounts
-        Address address
-        String restaurantId
-        String id
-        User user
-        LocalDateTime orderTime
-        double price
-        List~User~ users
-        Restaurant restaurant
-        Duration preparationTime
-        List~Discount~ discountsToApplyNext
-        String groupCode
-        LocalDateTime deliveryTime
-        List~MenuItem~ items
-        Payment payment
-        Status status
-        String userId
-    }
-    class SingleOrderManager {
-        + getOrdersByUser(String) List~SingleOrder~
-        + getOrdersByGroup(String) List~SingleOrder~
-        SingleOrderManager INSTANCE
-    }
-    class Status {
-        <<enumeration>>
-        + values() Status[]
-        + valueOf(String) Status
-    }
-    class TypeOfFood {
-        <<enumeration>>
-        + values() TypeOfFood[]
-        + valueOf(String) TypeOfFood
-    }
-    class User {
-        + getOrders(String) List~SingleOrder~
-        + getDiscountsToApplyNext(String) List~Discount~
-        String name
-        List~SingleOrder~ orders
-        Role role
-        List~Payment~ payments
-        String userId
-    }
-    class UserManager {
-        + fillForDemo() void
-        UserManager INSTANCE
     }
 
     AbstractManager~T~ ..> NotFoundException: «create»
