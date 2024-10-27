@@ -9,7 +9,7 @@
 
 ## User stories
 
-**[US] Make an order inside a group order #26** :
+**[[US] Make an order inside a group order #26](https://github.com/PNS-Conception/STE-24-25--teamc/issues/26)** :
 
 * **As a** Client
 * **I want** to be able to make an order while being in a group order
