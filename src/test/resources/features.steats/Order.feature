@@ -7,7 +7,7 @@ Feature: Order
   Scenario: Creating an order
     When the user creates an order and specifies a date, an address and a restaurant :
       | date     | addressId         | restaurant |
-      | 10:15:30 | Campus SophiaTech | La Cafet   |
+      | 21:15:30 | Campus SophiaTech | La Cafet   |
     Then the user can order
 
   Scenario: Filtering restaurants by name

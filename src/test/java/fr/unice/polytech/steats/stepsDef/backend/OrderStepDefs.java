@@ -16,6 +16,7 @@ import io.cucumber.java.en.When;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,8 @@ public class OrderStepDefs {
 
     @When("the user creates an order and specifies a date, an address and a restaurant :")
     public void whenCreatesOrder(List<Map<String, String>> order) {
-        stEats.createOrder(LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.parse(order.getFirst().get("date"))), order.getFirst().get("addressId"), restaurantId);
+        LocalDateTime nextWednesday = LocalDateTime.of(LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY)), LocalTime.parse(order.getFirst().get("date")));
+        stEats.createOrder(nextWednesday, order.getFirst().get("addressId"), restaurantId);
     }
 
     @Then("the user can order")

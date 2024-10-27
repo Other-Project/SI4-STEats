@@ -198,7 +198,7 @@ public class Restaurant {
         return schedulesBefore2Hours.stream()
                 .map(schedule -> capacityLeft(schedule, deliveryTime))
                 .max(Comparator.comparing(Function.identity()))
-                .orElseThrow(() -> new IllegalArgumentException("This restaurant can't deliver at this time"));
+                .orElse(Duration.ZERO);
     }
 
     /**
@@ -295,7 +295,12 @@ public class Restaurant {
      */
     public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
         DayOfWeek day = startDay;
-        LocalTime time = LocalTime.ofSecondOfDay(Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds()); // round the start time to the nearest schedule
+        long seconds = Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds();  // round the start time to the nearest schedule
+        if (seconds >= 86400) {
+            seconds = 0;
+            day = day.plus(1);
+        }
+        LocalTime time = LocalTime.ofSecondOfDay(seconds);
         for (; day != endDay || (!time.plus(getScheduleDuration()).isAfter(endTime) && !time.plus(getScheduleDuration()).equals(LocalTime.MIN)); time = time.plus(getScheduleDuration())) {
             addSchedule(new Schedule(time, getScheduleDuration(), nbPersons, day));
             if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))

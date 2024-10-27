@@ -124,7 +124,7 @@ public class Schedule implements Comparable<Schedule> {
     @SuppressWarnings("java:S4351")
     public int compareTo(LocalDateTime dateTime) {
         int compareDayOfWeek = dayOfWeek.compareTo(dateTime.getDayOfWeek());
-        if (compareDayOfWeek != 0) return (compareDayOfWeek + 3) % 7 - 3;
+        if (compareDayOfWeek != 0) return ((Math.absExact(compareDayOfWeek) + 3) % 7 - 3) * (compareDayOfWeek > 0 ? 1 : -1);
         if (start.isAfter(dateTime.toLocalTime())) return 1;
         if (!getEnd().isAfter(dateTime.toLocalTime())) return -1;
         return 0;
