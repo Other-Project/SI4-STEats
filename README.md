@@ -3,7 +3,7 @@
 ## Team members and roles
 
 * FALCOZ Alban : SA (Software Architect)
-* GALLI Evan : QA (Quality Assurance)
+* GALLI Evan : QA (Quality Assurance Engineer)
 * GRIPARI Alexandre : Ops (Continuous Integration and Repository Manager)
 * LASSAUNIERE Théo : PO (Product Owner)
 
