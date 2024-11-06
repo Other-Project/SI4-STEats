@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class AddressHttpServer {
-
     public static final String API_ADDRESS = "/api/address";
     public static final int API_PORT = 5001;
 
