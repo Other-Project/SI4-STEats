@@ -1,6 +1,6 @@
-package fr.unice.polytech.steats.user;
+package fr.unice.polytech.steats.users;
 
-import fr.unice.polytech.steats.AbstractManager;
+import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.util.List;
 
@@ -33,5 +33,10 @@ public class UserManager extends AbstractManager<User> {
                 new User("Alban Falcoz", "140403", Role.STUDENT),
                 new User("Théo Lassauniere", "141103", Role.STUDENT)
         ).forEach(user -> add(user.getUserId(), user));
+    }
+
+    @Override
+    public void add(User item) {
+        add(item.getUserId(), item);
     }
 }
