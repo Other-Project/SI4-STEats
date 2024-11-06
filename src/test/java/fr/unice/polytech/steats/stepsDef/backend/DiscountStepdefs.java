@@ -2,8 +2,8 @@ package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
-import fr.unice.polytech.steats.order.Address;
-import fr.unice.polytech.steats.order.AddressManager;
+import fr.unice.polytech.steats.address.Address;
+import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.SingleOrderManager;
 import fr.unice.polytech.steats.restaurant.MenuItem;

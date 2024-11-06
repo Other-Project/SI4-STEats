@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.address;
 
 /**
  * Represents the address where an order can be delivered

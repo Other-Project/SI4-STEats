@@ -1,6 +1,6 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.address;
 
-import fr.unice.polytech.steats.AbstractManager;
+import fr.unice.polytech.steats.utils.AbstractManager;
 
 /**
  * Manage addresses (store addresses, and allow to create, delete and get them)
@@ -21,5 +21,10 @@ public class AddressManager extends AbstractManager<Address> {
      */
     public static AddressManager getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public void add(Address item) {
+        add(item.label(), item);
     }
 }

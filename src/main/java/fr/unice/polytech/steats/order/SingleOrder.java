@@ -1,6 +1,8 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.NotFoundException;
+import fr.unice.polytech.steats.address.Address;
+import fr.unice.polytech.steats.address.AddressManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.payment.Payment;
 import fr.unice.polytech.steats.payment.PaymentSystem;

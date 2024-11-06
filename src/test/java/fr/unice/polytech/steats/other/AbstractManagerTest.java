@@ -1,7 +1,7 @@
 package fr.unice.polytech.steats.other;
 
 import fr.unice.polytech.steats.NotFoundException;
-import fr.unice.polytech.steats.order.AddressManager;
+import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.order.GroupOrderManager;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.Role;

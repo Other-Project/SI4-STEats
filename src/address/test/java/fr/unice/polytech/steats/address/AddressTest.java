@@ -1,6 +1,5 @@
-package fr.unice.polytech.steats.restaurant;
+package fr.unice.polytech.steats.address;
 
-import fr.unice.polytech.steats.order.Address;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
