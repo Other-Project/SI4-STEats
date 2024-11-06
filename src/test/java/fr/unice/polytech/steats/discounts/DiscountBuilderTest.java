@@ -7,16 +7,14 @@ import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.restaurant.TypeOfFood;
-import fr.unice.polytech.steats.user.Role;
-import fr.unice.polytech.steats.user.User;
-import fr.unice.polytech.steats.user.UserManager;
+import fr.unice.polytech.steats.users.Role;
+import fr.unice.polytech.steats.users.User;
+import fr.unice.polytech.steats.users.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DiscountBuilderTest {
 

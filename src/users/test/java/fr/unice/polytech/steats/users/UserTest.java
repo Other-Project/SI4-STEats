@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.user;
+package fr.unice.polytech.steats.users;
 
 import org.junit.jupiter.api.Test;
 

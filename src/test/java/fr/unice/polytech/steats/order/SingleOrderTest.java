@@ -4,8 +4,8 @@ import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.user.User;
-import fr.unice.polytech.steats.user.UserManager;
+import fr.unice.polytech.steats.users.User;
+import fr.unice.polytech.steats.users.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
