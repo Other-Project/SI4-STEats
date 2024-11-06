@@ -1,7 +1,7 @@
 package fr.unice.polytech.steats.utils;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Contient les infos sur une route, ainsi que la logique permettant notamment de récupérer des paramètres dans l'URL, tels que /api/members/{memberId}
@@ -20,7 +20,7 @@ public class RouteInfo {
         this.handler = handler;
 
         // Convertit le chemin avec paramètre en expression régulière "/api/members/{memberId}" devient "/api/members/([^/?]+)"
-        String regexPath = path.replaceAll("\\{[^/]+}", "([^/?]+)");
+        String regexPath = path.replaceAll("\\{([^/]+)}", "(?<$1>[^/?]+)");
         this.pathPattern = Pattern.compile(regexPath);
     }
 
