@@ -1,5 +1,9 @@
 package fr.unice.polytech.steats.payments;
 
+import fr.unice.polytech.steats.helpers.OrderServiceHelper;
+import fr.unice.polytech.steats.models.Order;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,13 +24,12 @@ public class PaymentSystem {
      * @param orderId The order id
      * @return The payment
      */
-    public static Optional<Payment> pay(String orderId) {
-        String userId = "user1";
-        double amount = 10.0;
-        // TODO: Retrieve the user id and the amount from the order
+    public static Optional<Payment> pay(String orderId) throws IOException {
+        Order order = OrderServiceHelper.getOrder(orderId);
+        if (order == null) return Optional.empty();
 
         // Here we would call the payment system API
-        var payment = new Payment(UUID.randomUUID().toString(), LocalDateTime.now(), userId, orderId, amount);
+        var payment = new Payment(UUID.randomUUID().toString(), LocalDateTime.now(), order.userId(), orderId, order.amount());
         PaymentManager.getInstance().add(payment);
         return Optional.of(payment);
     }
