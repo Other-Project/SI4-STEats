@@ -24,17 +24,20 @@ public class UserManager extends AbstractManager<User> {
         return INSTANCE;
     }
 
-    public void fillForDemo() {
+    @Override
+    public void add(User item) {
+        add(item.getUserId(), item);
+    }
+
+    /**
+     * Fill the manager with some demo data
+     */
+    public void demo() {
         List.of(
                 new User("John Doe", "123456", Role.STUDENT),
                 new User("Jane Doe", "654321", Role.STUDENT),
                 new User("Alban Falcoz", "140403", Role.STUDENT),
                 new User("Théo Lassauniere", "141103", Role.STUDENT)
         ).forEach(user -> add(user.getUserId(), user));
-    }
-
-    @Override
-    public void add(User item) {
-        add(item.getUserId(), item);
     }
 }

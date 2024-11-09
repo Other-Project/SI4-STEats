@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.address;
 import fr.unice.polytech.steats.utils.AbstractHttpServer;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class AddressHttpServer extends AbstractHttpServer {
     public static final String API_ADDRESS = "/api/address";
@@ -13,6 +14,7 @@ public class AddressHttpServer extends AbstractHttpServer {
     }
 
     public static void main(String[] args) throws IOException {
+        if (Arrays.asList(args).contains("--demo")) AddressManager.getInstance().demo();
         new AddressHttpServer(API_PORT).start();
     }
 

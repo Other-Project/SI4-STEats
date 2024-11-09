@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.users;
 import fr.unice.polytech.steats.utils.AbstractHttpServer;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class UserHttpServer extends AbstractHttpServer {
     public static final String API_ADDRESS = "/api/users";
@@ -13,6 +14,7 @@ public class UserHttpServer extends AbstractHttpServer {
     }
 
     public static void main(String[] args) throws IOException {
+        if (Arrays.asList(args).contains("--demo")) UserManager.getInstance().demo();
         new UserHttpServer(API_PORT).start();
     }
 
