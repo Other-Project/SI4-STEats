@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.payments;
 
 import fr.unice.polytech.steats.helpers.OrderServiceHelper;
 import fr.unice.polytech.steats.models.Order;
+import fr.unice.polytech.steats.models.Payment;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

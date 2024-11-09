@@ -11,8 +11,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class JaxsonUtils {
-    private JaxsonUtils() {
+public class JacksonUtils {
+    private JacksonUtils() {
     }
 
     private static ObjectMapper getMapper() {

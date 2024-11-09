@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.payments;
 
+import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.time.LocalDateTime;

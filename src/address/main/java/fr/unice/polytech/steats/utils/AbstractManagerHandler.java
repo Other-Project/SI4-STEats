@@ -54,7 +54,7 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
     protected void add(HttpExchange exchange) throws IOException {
         try {
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
-            U object = JaxsonUtils.fromJson(exchange.getRequestBody(), clazz);
+            U object = JacksonUtils.fromJson(exchange.getRequestBody(), clazz);
             getManager().add(object);
             exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, -1);
         } catch (Exception e) {

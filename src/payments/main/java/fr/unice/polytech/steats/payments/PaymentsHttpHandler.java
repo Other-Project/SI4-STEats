@@ -1,10 +1,11 @@
 package fr.unice.polytech.steats.payments;
 
 import com.sun.net.httpserver.HttpExchange;
+import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
-import fr.unice.polytech.steats.utils.JaxsonUtils;
+import fr.unice.polytech.steats.utils.JacksonUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class PaymentsHttpHandler extends AbstractManagerHandler<PaymentManager, 
     }
 
     private void pay(HttpExchange exchange) throws IOException {
-        Map<String, Object> params = JaxsonUtils.fromJson(exchange.getRequestBody());
+        Map<String, Object> params = JacksonUtils.fromJson(exchange.getRequestBody());
         String orderId = params == null ? null : params.get("orderId").toString();
         if (orderId == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, 0);

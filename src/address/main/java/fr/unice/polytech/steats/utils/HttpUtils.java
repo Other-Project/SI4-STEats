@@ -3,12 +3,21 @@ package fr.unice.polytech.steats.utils;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Utility class for HTTP operations.
+ *
+ * @author Team C
+ */
 public class HttpUtils {
     private HttpUtils() {
     }
@@ -25,6 +34,7 @@ public class HttpUtils {
     public static final String PUT = "PUT";
     public static final String DELETE = "DELETE";
 
+    public static final String ACCEPT = "Accept";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String APPLICATION_JSON = "application/json";
     public static final String TEXT_PLAIN = "text/plain";
@@ -43,11 +53,33 @@ public class HttpUtils {
                 .collect(Collectors.toMap(x -> x[0], x -> x[1]));
     }
 
+    /**
+     * Send a JSON response.
+     *
+     * @param exchange The HTTP exchange
+     * @param code     The status code
+     * @param object   The object to send
+     */
     public static void sendJsonResponse(HttpExchange exchange, int code, Object object) throws IOException {
         exchange.getResponseHeaders().add(CONTENT_TYPE, APPLICATION_JSON);
-        var json = JaxsonUtils.toJson(object).getBytes(StandardCharsets.UTF_8);
+        var json = JacksonUtils.toJson(object).getBytes(StandardCharsets.UTF_8);
         exchange.sendResponseHeaders(code, json.length);
         exchange.getResponseBody().write(json);
         exchange.close();
+    }
+
+    /**
+     * Send a request
+     *
+     * @param request The HTTP request
+     * @return The response
+     */
+    public static HttpResponse<InputStream> sendRequest(HttpRequest request) throws IOException {
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            return client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(e);
+        }
     }
 }
