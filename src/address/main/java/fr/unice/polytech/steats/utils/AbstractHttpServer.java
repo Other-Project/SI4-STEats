@@ -28,7 +28,7 @@ public abstract class AbstractHttpServer {
 
     protected void registerHandlers() {
         server.createContext("/", (exchange -> {
-            exchange.getResponseHeaders().add("Content-Type", "application/json");
+            exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
             exchange.sendResponseHeaders(200, 0);
             JaxsonUtils.toJsonStream(registeredHandlers.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, kv -> "http://localhost:" + apiPort + kv.getValue())), exchange.getResponseBody());

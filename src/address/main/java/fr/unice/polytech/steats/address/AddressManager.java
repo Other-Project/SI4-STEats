@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.address;
 
+import fr.unice.polytech.steats.payments.PaymentManager;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 /**
@@ -7,6 +8,7 @@ import fr.unice.polytech.steats.utils.AbstractManager;
  *
  * @author Team C
  */
+@SuppressWarnings("java:S6548")
 public class AddressManager extends AbstractManager<Address> {
     private static final AddressManager INSTANCE = new AddressManager();
 
@@ -15,9 +17,7 @@ public class AddressManager extends AbstractManager<Address> {
     }
 
     /**
-     * Get the instance of the {@link AddressManager}
-     *
-     * @return The instance of the {@link AddressManager}
+     * Get the instance of the {@link PaymentManager}
      */
     public static AddressManager getInstance() {
         return INSTANCE;
