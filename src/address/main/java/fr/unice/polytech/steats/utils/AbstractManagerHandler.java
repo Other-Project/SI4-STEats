@@ -30,10 +30,10 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
     }
 
     protected void register() {
-        ApiRegistry.registerRoute("GET", subPath + "/{id}", this::get);
-        ApiRegistry.registerRoute("GET", subPath, (exchange, param) -> getAll(exchange));
-        ApiRegistry.registerRoute("PUT", subPath, (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute("DELETE", subPath + "/{id}", this::remove);
+        ApiRegistry.registerRoute(HttpUtils.GET, subPath + "/{id}", this::get);
+        ApiRegistry.registerRoute(HttpUtils.GET, subPath, (exchange, param) -> getAll(exchange));
+        ApiRegistry.registerRoute(HttpUtils.PUT, subPath, (exchange, param) -> add(exchange));
+        ApiRegistry.registerRoute(HttpUtils.DELETE, subPath + "/{id}", this::remove);
     }
 
     protected void get(HttpExchange exchange, Map<String, String> params) throws IOException {
