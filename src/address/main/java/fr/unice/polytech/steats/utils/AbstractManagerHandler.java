@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -35,23 +36,19 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
         ApiRegistry.registerRoute("DELETE", subPath + "/{id}", this::remove);
     }
 
-    protected void get(HttpExchange httpExchange, Map<String, String> params) throws IOException {
+    protected void get(HttpExchange exchange, Map<String, String> params) throws IOException {
         try {
             U object = getManager().get(params.get("id"));
-            httpExchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
-            httpExchange.sendResponseHeaders(HttpUtils.OK_CODE, 0);
-            JaxsonUtils.toJsonStream(object, httpExchange.getResponseBody());
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, object);
 
         } catch (NotFoundException e) {
-            httpExchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
-            httpExchange.getResponseBody().close();
+            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
+            exchange.getResponseBody().close();
         }
     }
 
     protected void getAll(HttpExchange exchange) throws IOException {
-        exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
-        exchange.sendResponseHeaders(HttpUtils.OK_CODE, 0);
-        JaxsonUtils.toJsonStream(getManager().getAll(), exchange.getResponseBody());
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
     }
 
     protected void add(HttpExchange exchange) throws IOException {
@@ -59,9 +56,9 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
             U object = JaxsonUtils.fromJson(exchange.getRequestBody(), clazz);
             getManager().add(object);
-            exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, -1);
         } catch (Exception e) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
         }
         exchange.getResponseBody().close();
     }
@@ -69,9 +66,9 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
     protected void remove(HttpExchange exchange, Map<String, String> params) throws IOException {
         try {
             getManager().remove(params.get("id"));
-            exchange.sendResponseHeaders(HttpUtils.NO_CONTENT_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.NO_CONTENT_CODE, -1);
         } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
         }
         exchange.getResponseBody().close();
     }
@@ -98,6 +95,12 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
         Map<String, String> params = matcher.find()
                 ? matcher.namedGroups().keySet().stream().collect(Collectors.toMap(k -> k, matcher::group))
                 : Map.of();
-        route.getHandler().handle(exchange, params);
+        try {
+            route.getHandler().handle(exchange, params);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Exception thrown while handling request", e);
+            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
+            exchange.getResponseBody().close();
+        }
     }
 }

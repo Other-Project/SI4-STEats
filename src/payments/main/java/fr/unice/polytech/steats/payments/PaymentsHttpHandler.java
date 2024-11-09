@@ -42,11 +42,6 @@ public class PaymentsHttpHandler extends AbstractManagerHandler<UserManager, Use
         if (result.isEmpty()) {
             exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
             exchange.getResponseBody().close();
-            return;
-        }
-
-        exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
-        exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, 0);
-        JaxsonUtils.toJsonStream(result.get(), exchange.getResponseBody());
+        } else HttpUtils.sendJsonResponse(exchange, HttpUtils.CREATED_CODE, result.get());
     }
 }

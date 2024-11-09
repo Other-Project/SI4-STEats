@@ -27,12 +27,11 @@ public abstract class AbstractHttpServer {
     }
 
     protected void registerHandlers() {
-        server.createContext("/", (exchange -> {
-            exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
-            exchange.sendResponseHeaders(200, 0);
-            JaxsonUtils.toJsonStream(registeredHandlers.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, kv -> "http://localhost:" + apiPort + kv.getValue())), exchange.getResponseBody());
-        }));
+        server.createContext("/", (exchange -> HttpUtils.sendJsonResponse(
+                exchange,
+                HttpUtils.OK_CODE,
+                registeredHandlers.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, kv -> "http://localhost:" + apiPort + kv.getValue()))
+        )));
     }
 
     protected AbstractHttpServer(int apiPort) throws IOException {

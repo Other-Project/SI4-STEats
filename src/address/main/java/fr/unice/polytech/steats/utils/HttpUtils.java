@@ -1,5 +1,9 @@
 package fr.unice.polytech.steats.utils;
 
+import com.sun.net.httpserver.HttpExchange;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +35,13 @@ public class HttpUtils {
                 .filter(s -> !s.isEmpty())
                 .map(kv -> kv.split("=", 2))
                 .collect(Collectors.toMap(x -> x[0], x -> x[1]));
+    }
 
+    public static void sendJsonResponse(HttpExchange exchange, int code, Object object) throws IOException {
+        exchange.getResponseHeaders().add(CONTENT_TYPE, APPLICATION_JSON);
+        var json = JaxsonUtils.toJson(object).getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(code, json.length);
+        exchange.getResponseBody().write(json);
+        exchange.close();
     }
 }
