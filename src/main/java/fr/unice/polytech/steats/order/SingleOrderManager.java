@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.AbstractManager;
+import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.util.List;
 
@@ -25,6 +25,11 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      */
     public static SingleOrderManager getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public void add(SingleOrder item) {
+        super.add(item.getId(), item);
     }
 
     /**

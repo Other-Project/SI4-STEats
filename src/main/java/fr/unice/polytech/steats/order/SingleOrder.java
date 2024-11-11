@@ -4,13 +4,13 @@ import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.discounts.Discount;
-import fr.unice.polytech.steats.payment.Payment;
-import fr.unice.polytech.steats.payment.PaymentSystem;
+import fr.unice.polytech.steats.payments.Payment;
+import fr.unice.polytech.steats.payments.PaymentSystem;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.user.User;
-import fr.unice.polytech.steats.user.UserManager;
+import fr.unice.polytech.steats.users.User;
+import fr.unice.polytech.steats.users.UserManager;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -70,7 +70,7 @@ public class SingleOrder implements Order {
         this.restaurantId = restaurantId;
         if (!getRestaurant().canHandle(this, deliveryTime))
             throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
-        SingleOrderManager.getInstance().add(getId(), this);
+        SingleOrderManager.getInstance().add(this);
         if (groupCode == null) getRestaurant().addOrder(this);
     }
 

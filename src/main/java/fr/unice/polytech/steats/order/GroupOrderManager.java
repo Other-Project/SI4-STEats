@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.AbstractManager;
+import fr.unice.polytech.steats.utils.AbstractManager;
 
 /**
  * Will manage group orders
@@ -22,6 +22,11 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
      */
     public static GroupOrderManager getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public void add(GroupOrder item) {
+        super.add(item.getGroupCode(), item);
     }
 }
 

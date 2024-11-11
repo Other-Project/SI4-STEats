@@ -75,13 +75,6 @@ public class User {
 //    }
 //
 //    /**
-//     * Get all the payments of the user
-//     */
-//    public List<Payment> getPayments() {
-//        return getOrders().stream().filter(order -> order.getStatus().compareTo(Status.PAID) >= 0).map(SingleOrder::getPayment).toList();
-//    }
-//
-//    /**
 //     * Get the discounts to apply to the next order
 //     *
 //     * @param restaurantId The id of the restaurant where the user wants to order
