@@ -17,7 +17,7 @@ public class AddressManager extends AbstractManager<Address> {
     }
 
     /**
-     * Get the instance of the {@link PaymentManager}
+     * Get the instance of the {@link AddressManager}
      */
     public static AddressManager getInstance() {
         return INSTANCE;
