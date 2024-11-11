@@ -1,7 +1,7 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats;
 
-import fr.unice.polytech.steats.NotFoundException;
-import fr.unice.polytech.steats.STEats;
+import fr.unice.polytech.steats.order.GroupOrder;
+import fr.unice.polytech.steats.order.GroupOrderManager;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;

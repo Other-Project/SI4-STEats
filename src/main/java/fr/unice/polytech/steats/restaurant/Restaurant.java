@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
  * @author Team C
  */
 public class Restaurant {
+    private final String id;
     private final String name;
     private final TypeOfFood typeOfFood;
     private final Duration scheduleDuration;
@@ -35,7 +36,8 @@ public class Restaurant {
      * @param typeOfFood       The type of food the restaurant serves
      * @param scheduleDuration The duration of the schedule
      */
-    public Restaurant(String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
+    public Restaurant(String id, String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
+        this.id = id;
         this.name = name;
         this.typeOfFood = typeOfFood;
         this.scheduleDuration = scheduleDuration;
@@ -46,8 +48,8 @@ public class Restaurant {
      *
      * @param name The name of the restaurant
      */
-    public Restaurant(String name) {
-        this(name, TypeOfFood.CLASSIC);
+    public Restaurant(String name, String id) {
+        this(name, TypeOfFood.CLASSIC, id);
     }
 
     /**
@@ -56,8 +58,16 @@ public class Restaurant {
      * @param name       The name of the restaurant
      * @param typeOfFood The type of food the restaurant serves
      */
-    public Restaurant(String name, TypeOfFood typeOfFood) {
-        this(name, typeOfFood, Duration.ofMinutes(30));
+    public Restaurant(String name, TypeOfFood typeOfFood, String id) {
+        this(id, name, typeOfFood, Duration.ofMinutes(30));
+    }
+
+    /**
+     *
+     * ID of the restaurant
+     */
+    public String getId(){
+        return id;
     }
 
     /**
@@ -208,7 +218,7 @@ public class Restaurant {
      */
     public void addMenuItem(MenuItem menuItem) {
         this.menu.add(menuItem);
-        menuItem.setRestaurantName(name);
+        menuItem.setRestaurantId(name);
     }
 
     /**

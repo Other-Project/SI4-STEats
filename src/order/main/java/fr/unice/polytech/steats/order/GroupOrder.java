@@ -1,6 +1,8 @@
 package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.NotFoundException;
+import fr.unice.polytech.steats.location.Address;
+import fr.unice.polytech.steats.location.AddressManager;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;

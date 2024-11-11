@@ -1,9 +1,10 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.NotFoundException;
-import fr.unice.polytech.steats.STEats;
+import fr.unice.polytech.steats.*;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
+import fr.unice.polytech.steats.location.Address;
+import fr.unice.polytech.steats.location.AddressManager;
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.user.Role;
 import fr.unice.polytech.steats.user.User;

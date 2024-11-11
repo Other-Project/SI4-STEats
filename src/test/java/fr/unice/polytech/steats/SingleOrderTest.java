@@ -1,5 +1,7 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats;
 
+import fr.unice.polytech.steats.order.GroupOrderManager;
+import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.User;

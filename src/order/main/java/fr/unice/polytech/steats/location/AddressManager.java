@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.location;
 
 import fr.unice.polytech.steats.AbstractManager;
 

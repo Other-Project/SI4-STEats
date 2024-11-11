@@ -2,6 +2,8 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.location.Address;
+import fr.unice.polytech.steats.location.AddressManager;
 import fr.unice.polytech.steats.payment.Payment;
 import fr.unice.polytech.steats.payment.PaymentSystem;
 import fr.unice.polytech.steats.restaurant.MenuItem;
@@ -27,13 +29,15 @@ public class SingleOrder implements Order {
     private final String groupCode;
     private LocalDateTime deliveryTime;
     private final LocalDateTime orderTime;
-    private final List<MenuItem> items = new ArrayList<>();
+    //private final List<MenuItem> items = new ArrayList<>();
+    private final List<String> items = new ArrayList<>();
     private final String addressId;
     private final String restaurantId;
     private Payment payment;
 
     private Status status = Status.INITIALISED;
-    private final List<Discount> appliedDiscounts = new ArrayList<>();
+    //private final List<Discount> appliedDiscounts = new ArrayList<>();
+    private final List<String> appliedDiscounts = new ArrayList<>();
 
     /**
      * @param userId       The user that initialized the order
@@ -137,7 +141,7 @@ public class SingleOrder implements Order {
     /**
      * The price without discounts
      *
-     * @implNote Returns the sum of the price of all the {@link fr.unice.polytech.steats.restaurant.MenuItem MenuItem} it contains.
+     * @implNote Returns the sum of the price of all the {@link MenuItem MenuItem} it contains.
      */
     public double getSubPrice() {
         return items.stream().mapToDouble(MenuItem::getPrice).sum();

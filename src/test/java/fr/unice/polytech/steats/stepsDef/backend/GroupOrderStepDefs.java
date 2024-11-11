@@ -1,8 +1,8 @@
 package fr.unice.polytech.steats.stepsDef.backend;
 
-import fr.unice.polytech.steats.NotFoundException;
-import fr.unice.polytech.steats.STEats;
-import fr.unice.polytech.steats.STEatsController;
+import fr.unice.polytech.steats.*;
+import fr.unice.polytech.steats.location.Address;
+import fr.unice.polytech.steats.location.AddressManager;
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;

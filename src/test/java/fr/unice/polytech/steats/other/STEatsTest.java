@@ -1,8 +1,6 @@
 package fr.unice.polytech.steats.other;
 
 import fr.unice.polytech.steats.STEats;
-import fr.unice.polytech.steats.order.Address;
-import fr.unice.polytech.steats.order.AddressManager;
 import fr.unice.polytech.steats.order.GroupOrderManager;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
