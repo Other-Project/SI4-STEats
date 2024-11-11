@@ -1,8 +1,12 @@
 package fr.unice.polytech.steats;
 
+import fr.unice.polytech.steats.items.MenuItemManager;
 import fr.unice.polytech.steats.location.Address;
 import fr.unice.polytech.steats.location.AddressManager;
-import fr.unice.polytech.steats.order.*;
+import fr.unice.polytech.steats.order.GroupOrder;
+import fr.unice.polytech.steats.order.GroupOrderManager;
+import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.Status;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
@@ -78,6 +82,19 @@ public class STEats {
     }
 
     /**
+     * Get the menu item with the given ID
+     *
+     * @param menuItemId The ID of the menu item
+     */
+    public MenuItem getMenuItem(String menuItemId) {
+        try {
+            return MenuItemManager.getInstance().get(menuItemId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("Menu item not found");
+        }
+    }
+
+    /**
      * Get the order of the user
      *
      * @return the order of the user
@@ -128,17 +145,18 @@ public class STEats {
      *
      * @param menuItem The menu item to add to the order
      */
-    public void addMenuItem(MenuItem menuItem) {
-        if (!getAvailableMenu().contains(menuItem)) throw new IllegalStateException("Menu item not available");
+    public void addMenuItem(String menuItem) {
+        if (!getAvailableMenu().contains(getMenuItem(menuItem)))
+            throw new IllegalStateException("Menu item not available");
         order.addMenuItem(menuItem);
     }
 
     /**
      * Remove a menu item from the order.
      *
-     * @param menuItem The menu item to remove from the order
+     * @param menuItem The ID of the menu item to remove from the order
      */
-    public void removeMenuItem(MenuItem menuItem) {
+    public void removeMenuItem(String menuItem) {
         order.removeMenuItem(menuItem);
     }
 

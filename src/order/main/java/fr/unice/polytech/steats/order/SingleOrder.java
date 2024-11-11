@@ -2,6 +2,8 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.items.DiscountManager;
+import fr.unice.polytech.steats.items.MenuItemManager;
 import fr.unice.polytech.steats.location.Address;
 import fr.unice.polytech.steats.location.AddressManager;
 import fr.unice.polytech.steats.payment.Payment;
@@ -29,14 +31,12 @@ public class SingleOrder implements Order {
     private final String groupCode;
     private LocalDateTime deliveryTime;
     private final LocalDateTime orderTime;
-    //private final List<MenuItem> items = new ArrayList<>();
     private final List<String> items = new ArrayList<>();
     private final String addressId;
     private final String restaurantId;
     private Payment payment;
 
     private Status status = Status.INITIALISED;
-    //private final List<Discount> appliedDiscounts = new ArrayList<>();
     private final List<String> appliedDiscounts = new ArrayList<>();
 
     /**
@@ -74,6 +74,32 @@ public class SingleOrder implements Order {
             throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
         SingleOrderManager.getInstance().add(getId(), this);
         if (groupCode == null) getRestaurant().addOrder(this);
+    }
+
+    /**
+     * Get a menu item from its id
+     *
+     * @param id The id of the menu item
+     */
+    public MenuItem getMenuItem(String id) {
+        try {
+            return MenuItemManager.getInstance().get(id);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The menu item of the order is not found.");
+        }
+    }
+
+    /**
+     * Get a discount from its id
+     *
+     * @param id The id of the discount
+     */
+    public Discount getDiscount(String id) {
+        try {
+            return DiscountManager.getInstance().get(id);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("The discount of the order is not found.");
+        }
     }
 
     @Override
@@ -144,7 +170,7 @@ public class SingleOrder implements Order {
      * @implNote Returns the sum of the price of all the {@link MenuItem MenuItem} it contains.
      */
     public double getSubPrice() {
-        return items.stream().mapToDouble(MenuItem::getPrice).sum();
+        return items.stream().map(this::getMenuItem).mapToDouble(MenuItem::getPrice).sum();
     }
 
     @Override
@@ -157,15 +183,15 @@ public class SingleOrder implements Order {
         }
 
         return Stream.concat(
-                appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly),
+                appliedDiscounts.stream().map(this::getDiscount),
                 oldDiscountsToApplied.stream()
         ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
     }
 
     @Override
     public List<MenuItem> getItems() {
-        List<MenuItem> res = new ArrayList<>(items);
-        res.addAll(appliedDiscounts.stream().filter(Discount::canBeAppliedDirectly).map(Discount::freeItems).flatMap(List::stream).toList());
+        List<MenuItem> res = new ArrayList<>(items.stream().map(this::getMenuItem).toList());
+        res.addAll(appliedDiscounts.stream().map(this::getDiscount).filter(Discount::canBeAppliedDirectly).map(Discount::freeItems).flatMap(List::stream).toList());
         return res;
     }
 
@@ -224,9 +250,9 @@ public class SingleOrder implements Order {
     /**
      * Add a menu item to the items of the order
      *
-     * @param item A menu item the user chose to order
+     * @param item The id of the menu item the user chose to add to the order
      */
-    public void addMenuItem(MenuItem item) {
+    public void addMenuItem(String item) {
         items.add(item);
         updateDiscounts();
     }
@@ -234,30 +260,31 @@ public class SingleOrder implements Order {
     /**
      * Remove a menu item from the items of the order
      *
-     * @param item A menu item the user chose to remove from the order
+     * @param item The id of the menu item the user chose to remove from the order
      */
-    public void removeMenuItem(MenuItem item) {
+    public void removeMenuItem(String item) {
         items.remove(item);
         updateDiscounts();
     }
 
     private void updateDiscounts() {
-        appliedDiscounts.clear();
-        appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
+        //appliedDiscounts.clear();
+        //appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
+        // Restaurant will have the list of available discounts IDs
     }
 
     /**
      * Get the discounts to apply to the next order
      */
     public List<Discount> getDiscountsToApplyNext() {
-        return appliedDiscounts.stream().filter(discount -> !discount.canBeAppliedDirectly() && !discount.isExpired()).toList();
+        return appliedDiscounts.stream().map(this::getDiscount).filter(discount -> !discount.canBeAppliedDirectly() && !discount.isExpired()).toList();
     }
 
     /**
      * Get the discounts triggered by the order
      */
     public List<Discount> getDiscounts() {
-        return Collections.unmodifiableList(appliedDiscounts);
+        return appliedDiscounts.stream().map(this::getDiscount).toList();
     }
 
     /**
@@ -265,7 +292,7 @@ public class SingleOrder implements Order {
      */
     @Override
     public Duration getPreparationTime() {
-        return items.stream().map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+        return items.stream().map(this::getMenuItem).map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
     @Override

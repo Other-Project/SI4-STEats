@@ -1,7 +1,5 @@
-package fr.unice.polytech.steats;
+package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.order.GroupOrderManager;
-import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.user.User;
@@ -9,7 +7,6 @@ import fr.unice.polytech.steats.user.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SingleOrderTest {

@@ -7,6 +7,7 @@ import fr.unice.polytech.steats.utils.AbstractManager;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("java:S6548")
 public class MenuItemManager extends AbstractManager<MenuItem> {
     private static final MenuItemManager INSTANCE = new MenuItemManager();
 
@@ -23,6 +24,11 @@ public class MenuItemManager extends AbstractManager<MenuItem> {
         return INSTANCE;
     }
 
+    /**
+     * Get all the menu items of a restaurant
+     *
+     * @param restaurantId The id of the restaurant
+     */
     public List<MenuItem> getByRestaurant(String restaurantId){
         return getInstance().getAll().stream().filter(menuItem -> {
             try {
