@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.utils.AbstractManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -67,5 +68,19 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      */
     public List<SingleOrder> getOrdersForUserInRestaurant(String userId, String restaurantId) {
         return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId()) && restaurantId.equals(singleOrder.getRestaurantId())).toList();
+    }
+
+    /**
+     * Fill the manager with some demo data
+     */
+    public void demo() {
+        SingleOrder order1 = new SingleOrder("1", LocalDateTime.now().plusHours(3), "1", "1");
+        SingleOrder order2 = new SingleOrder("1", LocalDateTime.now().plusHours(4), "2", "2");
+        SingleOrder order3 = new SingleOrder("3", LocalDateTime.now().plusHours(5), "3", "3");
+        SingleOrder order4 = new SingleOrder("4", LocalDateTime.now().plusHours(6), "4", "4");
+        add(order1);
+        add(order2);
+        add(order3);
+        add(order4);
     }
 }
