@@ -3,9 +3,10 @@ package fr.unice.polytech.steats.order;
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.discounts.Discount;
-import fr.unice.polytech.steats.payments.PaymentSystem;
+import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
 import fr.unice.polytech.steats.items.DiscountManager;
 import fr.unice.polytech.steats.items.MenuItemManager;
+import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
@@ -13,10 +14,13 @@ import fr.unice.polytech.steats.users.User;
 import fr.unice.polytech.steats.users.UserManager;
 import fr.unice.polytech.steats.utils.NotFoundException;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Represents a single order taken by a client.
@@ -174,17 +178,20 @@ public class SingleOrder implements Order {
 
     @Override
     public double getPrice() {
-        List<Discount> oldDiscountsToApplied;
-        try {
-            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurantId);
-        } catch (NotFoundException e) {
-            oldDiscountsToApplied = Collections.emptyList();
-        }
+        // Should compile after the implementation of the restaurant service (that include a discount microservice)
 
-        return Stream.concat(
-                appliedDiscounts.stream().map(this::getDiscount),
-                oldDiscountsToApplied.stream()
-        ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
+//        List<Discount> oldDiscountsToApplied;
+//        try {
+//            oldDiscountsToApplied = UserManager.getInstance().get(userId).getDiscountsToApplyNext(restaurantId);
+//        } catch (NotFoundException e) {
+//            oldDiscountsToApplied = Collections.emptyList();
+//        }
+//
+//        return Stream.concat(
+//                appliedDiscounts.stream().map(this::getDiscount),
+//                oldDiscountsToApplied.stream()
+//        ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);
+        return 0;
     }
 
     @Override
@@ -267,9 +274,9 @@ public class SingleOrder implements Order {
     }
 
     private void updateDiscounts() {
-        //appliedDiscounts.clear();
-        //appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
-        // Restaurant will have the list of available discounts IDs
+        // Should compile after the implementation of the restaurant service
+        // appliedDiscounts.clear();
+        // appliedDiscounts.addAll(getRestaurant().availableDiscounts(this));
     }
 
     /**
@@ -304,11 +311,9 @@ public class SingleOrder implements Order {
      *
      * @return true if the payment is successful, false otherwise
      */
-    public boolean pay() {
+    public boolean pay() throws IOException {
         if (status == Status.PAID) throw new IllegalStateException("Order already paid");
-        Optional<Payment> optionalPayment = PaymentSystem.pay(getPrice());
-        if (optionalPayment.isEmpty()) return false;
-        this.payment = optionalPayment.get();
+        this.payment = PaymentServiceHelper.payForOrder(id);
         status = Status.PAID;
         return true;
     }

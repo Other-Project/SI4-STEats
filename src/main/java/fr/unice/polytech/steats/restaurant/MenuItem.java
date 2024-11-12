@@ -1,8 +1,10 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.order.Saleable;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.Duration;
+import java.util.UUID;
 
 public class MenuItem implements Saleable {
     private final String name;
@@ -22,7 +24,7 @@ public class MenuItem implements Saleable {
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
-        this.id =
+        this.id = UUID.randomUUID().toString();
     }
 
     /**
@@ -38,6 +40,10 @@ public class MenuItem implements Saleable {
     @Override
     public double getPrice() {
         return this.price;
+    }
+
+    public String getId() {
+        return id;
     }
 
     /**

@@ -3,7 +3,10 @@ package fr.unice.polytech.steats;
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.items.MenuItemManager;
-import fr.unice.polytech.steats.order.*;
+import fr.unice.polytech.steats.order.GroupOrder;
+import fr.unice.polytech.steats.order.GroupOrderManager;
+import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.Status;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
@@ -11,6 +14,7 @@ import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.users.User;
 import fr.unice.polytech.steats.utils.NotFoundException;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -202,7 +206,7 @@ public class STEats {
      *
      * @return If the payment was successful
      */
-    public boolean payOrder() throws NotFoundException {
+    public boolean payOrder() throws NotFoundException, IOException {
         if (groupCode != null)
             return GroupOrderManager.getInstance().get(groupCode).pay(order);
         if (order.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");

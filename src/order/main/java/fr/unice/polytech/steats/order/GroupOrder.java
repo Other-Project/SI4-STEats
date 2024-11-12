@@ -8,6 +8,7 @@ import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.users.User;
 import fr.unice.polytech.steats.utils.NotFoundException;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -193,7 +194,7 @@ public class GroupOrder implements Order {
      * @param order The single order of the user that wants to pay
      * @return if the payment was successful
      */
-    public boolean pay(SingleOrder order) {
+    public boolean pay(SingleOrder order) throws IOException {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
         return order.pay();
     }

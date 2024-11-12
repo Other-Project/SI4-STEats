@@ -1,11 +1,14 @@
 package fr.unice.polytech.steats.discounts;
 
+import fr.unice.polytech.steats.helpers.OrderServiceHelper;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A restaurant's discount with trigger criteria.
@@ -14,11 +17,14 @@ import java.util.List;
  * @see DiscountBuilder
  */
 public class Discount {
+
+    private String id;
     private final DiscountBuilder.Options options;
     private final DiscountBuilder.Criteria criteria;
     private final DiscountBuilder.Discounts discounts;
 
     Discount(DiscountBuilder builder) {
+        this.id = UUID.randomUUID().toString();
         this.options = builder.getOptions();
         this.criteria = builder.getCriteria();
         this.discounts = builder.getDiscounts();
@@ -32,7 +38,12 @@ public class Discount {
      */
     public boolean isApplicable(SingleOrder order) {
         List<MenuItem> items = order.getItems();
-        List<SingleOrder> orders = order.getUser().getOrders(order.getRestaurantId());
+        List<SingleOrder> orders = null;
+        try {
+            orders = OrderServiceHelper.getOrdersByUserInRestaurant(order.getUser().getUserId(), order.getRestaurant().getId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return items.size() >= criteria.currentOrderItemsAmount
                 && (criteria.ordersAmount <= 0 || (orders.size() + 1) % criteria.ordersAmount == 0)
                 && (criteria.itemsAmount <= 0 || orders.stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
@@ -79,6 +90,13 @@ public class Discount {
      */
     public double getNewPrice(double price) {
         return (price - discounts.orderCredit) * (1 - discounts.orderDiscount);
+    }
+
+    /**
+     * Gets the id of the discount
+     */
+    public String getId() {
+        return id;
     }
 
     /**

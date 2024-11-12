@@ -49,4 +49,23 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
     public List<SingleOrder> getOrdersByGroup(String groupCode) {
         return getAll().stream().filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode())).toList();
     }
+
+    /**
+     * Get all the orders of a restaurant
+     *
+     * @param restaurantId The id of the restaurant
+     */
+    public List<SingleOrder> getOrdersByRestaurant(String restaurantId) {
+        return getAll().stream().filter(singleOrder -> restaurantId.equals(singleOrder.getRestaurantId())).toList();
+    }
+
+    /**
+     * Get all the orders of a user in a restaurant
+     *
+     * @param userId       The id of the user
+     * @param restaurantId The id of the restaurant
+     */
+    public List<SingleOrder> getOrdersForUserInRestaurant(String userId, String restaurantId) {
+        return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId()) && restaurantId.equals(singleOrder.getRestaurantId())).toList();
+    }
 }
