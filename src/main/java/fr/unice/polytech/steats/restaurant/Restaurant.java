@@ -2,7 +2,6 @@ package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
-import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.Status;
 
 import java.time.*;
@@ -111,20 +110,20 @@ public class Restaurant {
         return scheduleDuration;
     }
 
-    /**
-     * The discounts that can be applied to an order
-     *
-     * @param order The order to check
-     */
-    public List<Discount> availableDiscounts(SingleOrder order) {
-        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
-        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
-        applicableDiscounts.stream()
-                .filter(discount -> !discount.isStackable())
-                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
-                .ifPresent(res::add);
-        return res;
-    }
+//    /**
+//     * The discounts that can be applied to an order
+//     *
+//     * @param order The order to check
+//     */
+//    public List<Discount> availableDiscounts(SingleOrder order) {
+//        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
+//        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
+//        applicableDiscounts.stream()
+//                .filter(discount -> !discount.isStackable())
+//                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
+//                .ifPresent(res::add);
+//        return res;
+//    }
 
     /**
      * The part of the menu that can be prepared and delivered in time

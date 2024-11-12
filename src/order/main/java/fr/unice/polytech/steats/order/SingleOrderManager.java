@@ -1,8 +1,9 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.address.AddressManager;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -74,14 +75,15 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
     /**
      * Fill the manager with some demo data
      */
-    public void demo() throws IOException {
-        SingleOrder order1 = new SingleOrder("1", LocalDateTime.now().plusHours(3), "1", "1");
-        SingleOrder order2 = new SingleOrder("1", LocalDateTime.now().plusHours(4), "2", "2");
-        SingleOrder order3 = new SingleOrder("3", LocalDateTime.now().plusHours(5), "3", "3");
-        SingleOrder order4 = new SingleOrder("4", LocalDateTime.now().plusHours(6), "4", "4");
-        add(order1);
-        add(order2);
-        add(order3);
-        add(order4);
+    public void demo() {
+        String johnDoe = "123456";
+        String janeDoe = "654321";
+        String albanFalcoz = "140403";
+        AddressManager.getInstance().demo();
+        RestaurantManager.getInstance().demo();
+        add(new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"));
+        add(new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"));
+        add(new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"));
+        add(new SingleOrder(johnDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "EURECOM", "2"));
     }
 }

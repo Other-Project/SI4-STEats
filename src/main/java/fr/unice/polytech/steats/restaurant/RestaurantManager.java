@@ -79,4 +79,14 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
     public static List<Restaurant> filterRestaurant(LocalDateTime deliveryTime) {
         return filterRestaurant(null, null, deliveryTime);
     }
+
+    /**
+     * Fill the manager with some demo data
+     */
+    public void demo() {
+        add(new Restaurant("1", "McDonald's"));
+        add(new Restaurant("2", "KFC"));
+        add(new Restaurant("3", "Burger King"));
+        add(new Restaurant("4", "Quick"));
+    }
 }
