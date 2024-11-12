@@ -1,10 +1,6 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.address.Address;
-import fr.unice.polytech.steats.restaurant.MenuItem;
-import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.users.User;
-
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,19 +29,9 @@ public interface Order extends Saleable {
     LocalDateTime getDeliveryTime();
 
     /**
-     * @return The address where the order must be delivered
-     */
-    Address getAddress();
-
-    /**
      * The id of the restaurant in which the order is made
      */
     String getRestaurantId();
-
-    /**
-     * @return The restaurant in which the order is made
-     */
-    Restaurant getRestaurant();
 
     /**
      * Get the group code of the order
@@ -53,21 +39,6 @@ public interface Order extends Saleable {
      * @return null if not applicable
      */
     String getGroupCode();
-
-    /**
-     * @return A copy of the items of the order
-     */
-    List<MenuItem> getItems();
-
-    /**
-     * @return The menu that can be ordered at the given time
-     */
-    List<MenuItem> getAvailableMenu();
-
-    /**
-     * @return The List of users that have ordered
-     */
-    List<User> getUsers();
 
     /**
      * @return The time it takes to prepare the order
@@ -80,9 +51,24 @@ public interface Order extends Saleable {
     LocalDateTime getOrderTime();
 
     /**
+     * get the list of the items id's in the order
+     */
+    List<String> getItems();
+
+    /**
+     * get the list of the available items id's in the restaurant
+     */
+    List<String> getAvailableMenu() throws IOException;
+
+    /**
+     * get the list of the users id's in the order
+     */
+    List<String> getUsers();
+
+    /**
      * Set the delivery time of the order
      *
      * @param deliveryTime The time the order must be delivered
      */
-    void setDeliveryTime(LocalDateTime deliveryTime);
+    void setDeliveryTime(LocalDateTime deliveryTime) throws IOException;
 }

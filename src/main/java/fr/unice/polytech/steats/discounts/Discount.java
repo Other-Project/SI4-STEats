@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.discounts;
 
+import fr.unice.polytech.steats.helper.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.OrderServiceHelper;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.MenuItem;
@@ -37,10 +38,17 @@ public class Discount {
      * @return True if the discount can be applied to the order
      */
     public boolean isApplicable(SingleOrder order) {
-        List<MenuItem> items = order.getItems();
+        // TODO: Move this to DiscountServiceHelper
+        List<MenuItem> items = order.getItems().stream().map(item -> {
+            try {
+                return MenuItemServiceHelper.getMenuItem(item);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
         List<SingleOrder> orders = null;
         try {
-            orders = OrderServiceHelper.getOrdersByUserInRestaurant(order.getUser().getUserId(), order.getRestaurant().getId());
+            orders = OrderServiceHelper.getOrdersByUserInRestaurant(order.getUser().getUserId(), order.getRestaurantId());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
