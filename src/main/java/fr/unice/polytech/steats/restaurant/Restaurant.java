@@ -63,8 +63,7 @@ public class Restaurant {
     }
 
     /**
-     *
-     * ID of the restaurant
+     * Get the id of the restaurant
      */
     public String getId(){
         return id;

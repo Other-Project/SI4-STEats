@@ -42,6 +42,9 @@ public class MenuItem implements Saleable {
         return this.price;
     }
 
+    /**
+     * Get the id of the menu item
+     */
     public String getId() {
         return id;
     }
