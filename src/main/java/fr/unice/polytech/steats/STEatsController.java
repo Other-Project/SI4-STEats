@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats;
 
-import fr.unice.polytech.steats.user.UserManager;
+import fr.unice.polytech.steats.users.UserManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 /**
  * @author Team C

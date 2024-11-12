@@ -1,12 +1,12 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.NotFoundException;
-import fr.unice.polytech.steats.location.Address;
-import fr.unice.polytech.steats.location.AddressManager;
+import fr.unice.polytech.steats.address.Address;
+import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.users.User;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

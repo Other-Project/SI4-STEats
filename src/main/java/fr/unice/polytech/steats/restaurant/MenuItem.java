@@ -1,16 +1,15 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.order.Saleable;
 
 import java.time.Duration;
 
-public class
-MenuItem implements Saleable {
+public class MenuItem implements Saleable {
     private final String name;
     private final double price;
     private final Duration preparationTime;
     private String restaurantId;
+    private String id;
 
     /**
      * Create a menu item
@@ -23,6 +22,7 @@ MenuItem implements Saleable {
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
+        this.id =
     }
 
     /**

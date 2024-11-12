@@ -1,17 +1,15 @@
 package fr.unice.polytech.steats;
 
+import fr.unice.polytech.steats.address.Address;
+import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.items.MenuItemManager;
-import fr.unice.polytech.steats.location.Address;
-import fr.unice.polytech.steats.location.AddressManager;
-import fr.unice.polytech.steats.order.GroupOrder;
-import fr.unice.polytech.steats.order.GroupOrderManager;
-import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.order.Status;
+import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.users.User;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -75,7 +73,7 @@ public class STEats {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurantId);
         this.groupCode = groupOrder.getGroupCode();
-        GroupOrderManager.getInstance().add(groupCode, groupOrder);
+        GroupOrderManager.getInstance().add(groupOrder);
         order = groupOrder.createOrder(user.getUserId());
         updateFullMenu();
         return groupCode;

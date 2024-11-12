@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.AbstractManager;
+import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +25,11 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      */
     public static RestaurantManager getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public void add(Restaurant item) {
+        super.add(item.getName(), item);
     }
 
     /**

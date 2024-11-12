@@ -1,14 +1,16 @@
 package fr.unice.polytech.steats.order;
 
+import fr.unice.polytech.steats.address.Address;
+import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.restaurant.Schedule;
-import fr.unice.polytech.steats.user.Role;
-import fr.unice.polytech.steats.user.User;
-import fr.unice.polytech.steats.user.UserManager;
+import fr.unice.polytech.steats.users.Role;
+import fr.unice.polytech.steats.users.User;
+import fr.unice.polytech.steats.users.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

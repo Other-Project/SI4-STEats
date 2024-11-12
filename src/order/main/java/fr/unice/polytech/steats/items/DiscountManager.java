@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.items;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
+@SuppressWarnings("java:S6548")
 public class DiscountManager extends AbstractManager<Discount> {
 
     private static final DiscountManager INSTANCE = new DiscountManager();
@@ -18,5 +19,10 @@ public class DiscountManager extends AbstractManager<Discount> {
      */
     public static DiscountManager getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public void add(Discount item) {
+        super.add(item.getId(), item);
     }
 }
