@@ -9,10 +9,10 @@ import java.util.regex.Pattern;
 public class RouteInfo {
     public String method;
     public String path;
-    private RouteHandler handler;
+    private final RouteHandler handler;
 
     // Pour gérer les paramètres dans les URLs (/api/members/{memberId} par exemple)
-    private Pattern pathPattern;
+    private final Pattern pathPattern;
 
     public RouteInfo(String method, String path, RouteHandler handler) {
         this.method = method;

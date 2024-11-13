@@ -1,0 +1,220 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "STEats",
+    "description": "STEats API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "paths": {
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/users/": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/payments/": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/address/": {
+      "get": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      },
+      "put": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/payments/{id}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/payments/pay": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/address/{id}": {
+      "get": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

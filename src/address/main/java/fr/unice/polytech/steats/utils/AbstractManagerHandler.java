@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.utils;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.util.Map;
@@ -36,6 +37,7 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
         ApiRegistry.registerRoute(HttpUtils.DELETE, subPath + "/{id}", this::remove);
     }
 
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}")
     protected void get(HttpExchange exchange, Map<String, String> params) throws IOException {
         try {
             U object = getManager().get(params.get("id"));
@@ -47,10 +49,12 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
         }
     }
 
+    @ApiRoute(method = HttpUtils.GET, path = "/")
     protected void getAll(HttpExchange exchange) throws IOException {
         HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
     }
 
+    @ApiRoute(method = HttpUtils.PUT, path = "/")
     protected void add(HttpExchange exchange) throws IOException {
         try {
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
@@ -63,6 +67,7 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
         exchange.getResponseBody().close();
     }
 
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}")
     protected void remove(HttpExchange exchange, Map<String, String> params) throws IOException {
         try {
             getManager().remove(params.get("id"));
