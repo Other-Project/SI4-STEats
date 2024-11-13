@@ -30,7 +30,7 @@ public class PaymentSystem {
         if (order == null) return Optional.empty();
 
         // Here we would call the payment system API
-        var payment = new Payment(UUID.randomUUID().toString(), LocalDateTime.now(), order.userId(), orderId, order.amount());
+        var payment = new Payment(UUID.randomUUID().toString(), LocalDateTime.now(), order.userId(), orderId, order.price());
         PaymentManager.getInstance().add(payment);
         return Optional.of(payment);
     }

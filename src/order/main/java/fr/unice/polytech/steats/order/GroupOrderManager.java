@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.order;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Will manage group orders
@@ -33,15 +34,6 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
     }
 
     /**
-     * Get all the orders of a user
-     *
-     * @param userId The id of the user
-     */
-    public List<GroupOrder> getOrdersByUser(String userId) {
-        return getAll().stream().filter(groupOrder -> groupOrder.getUsers().contains(userId)).toList();
-    }
-
-    /**
      * Get all the orders of a restaurant
      *
      * @param restaurantId The id of the restaurant
@@ -51,16 +43,13 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
     }
 
     /**
-     * Get all the orders of a user in a restaurant
+     * Get all the users id's in the group order
      *
-     * @param userId       The id of the user
-     * @param restaurantId The id of the restaurant
+     * @param groupCode The groupCode of the group order
      */
-    public List<GroupOrder> getOrdersByUserInRestaurant(String userId, String restaurantId) {
-        return getAll().stream()
-                .filter(groupOrder -> groupOrder.getUsers().contains(userId))
-                .filter(groupOrder -> restaurantId.equals(groupOrder.getRestaurantId()))
-                .toList();
-
+    public List<String> getUsers(String groupCode) {
+        return SingleOrderManager.getInstance().getAll().stream()
+                .filter(order -> Objects.equals(order.getGroupCode(), groupCode))
+                .map(SingleOrder::getUserId).toList();
     }
 }

@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+
+// TODO : make a class that AbstractManager will inherit of
+
 public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager, SingleOrder> {
     public OrderHttpHandler(String subPath, Logger logger) {
         super(subPath, SingleOrder.class, logger);
@@ -21,10 +24,7 @@ public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager,
 
     @Override
     protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
@@ -32,6 +32,7 @@ public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager,
         String restaurantId = params.get("restaurantId");
 
         if (userId != null && restaurantId != null) {
+
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUserInRestaurant(userId, restaurantId));
         } else if (userId != null) {
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUser(userId));

@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.helper;
+package fr.unice.polytech.steats.helpers;
 
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.utils.HttpUtils;
@@ -17,7 +17,7 @@ import java.net.http.HttpResponse;
  */
 public class MenuItemServiceHelper {
 
-    public static final URI ORDER_SERVICE_URI = URI.create("http://localhost:5005/api/orders");
+    public static final URI MENUITEM_SERVICE_URI = URI.create("http://localhost:5007/api/menu-items");
 
     private MenuItemServiceHelper() {
     }
@@ -29,7 +29,7 @@ public class MenuItemServiceHelper {
      */
     public static MenuItem getMenuItem(String menuItemId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve(menuItemId))
+                .uri(MENUITEM_SERVICE_URI.resolve(menuItemId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

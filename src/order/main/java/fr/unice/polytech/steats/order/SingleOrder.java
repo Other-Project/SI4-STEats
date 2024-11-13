@@ -2,15 +2,19 @@ package fr.unice.polytech.steats.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.address.AddressManager;
+import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
 import fr.unice.polytech.steats.models.Payment;
+import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -48,7 +52,8 @@ public class SingleOrder implements Order {
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("groupCode") String groupCode, @JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
+    SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("groupCode") String groupCode, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
+                @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
         if (deliveryTime != null && orderTime.plusHours(2).isAfter(deliveryTime))
@@ -69,6 +74,16 @@ public class SingleOrder implements Order {
         //if (groupCode == null) RestaurantServiceHelper.addOrder(id);
     }
 
+    public void checkGroupOrder() throws NotFoundException {
+        if (groupCode == null) return;
+        GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
+        if (groupOrder.getDeliveryTime() != deliveryTime
+                || !Objects.equals(groupOrder.getAddressId(), addressId)
+                || !Objects.equals(groupOrder.getRestaurantId(), restaurantId)) {
+            throw new RuntimeException("Group Order and Single Order not matching");
+        }
+    }
+
     @Override
     public Status getStatus() {
         return status;
@@ -82,6 +97,11 @@ public class SingleOrder implements Order {
     @Override
     public String getRestaurantId() {
         return restaurantId;
+    }
+
+    @Override
+    public String getAddressId() {
+        return addressId;
     }
 
     /**
@@ -101,6 +121,7 @@ public class SingleOrder implements Order {
         return groupCode;
     }
 
+    //TODO : Menu Item
 //    /**
 //     * The price without discounts
 //     *
@@ -118,6 +139,7 @@ public class SingleOrder implements Order {
 
     @Override
     public double getPrice() {
+        //Todo : Discount
         /*List<Discount> oldDiscountsToApplied;
         try {
             oldDiscountsToApplied = DiscountServiceHelper.getDiscountToApplyNext(userId, restaurantId);
@@ -139,6 +161,7 @@ public class SingleOrder implements Order {
 
     @Override
     public List<String> getItems() {
+        //TODO : Menu Item
         /*List<String> res = new ArrayList<>(items);
         res.addAll(appliedDiscounts.stream().map(item -> {
             try {
@@ -150,29 +173,6 @@ public class SingleOrder implements Order {
         return res;*/
         return items;
     }
-
-    @Override
-    public List<String> getAvailableMenu() throws IOException {
-        //return RestaurantServiceHelper.getRestaurant(restaurantId).getAvailableMenu(deliveryTime).stream().map(MenuItem::getId).toList();
-        return null;
-    }
-
-    @Override
-    public List<String> getUsers() {
-        return List.of(userId);
-    }
-
-
-//    /**
-//     * @return The user that initialized the order
-//     */
-//    public User getUser() {
-//        try {
-//            return UserManager.getInstance().get(userId);
-//        } catch (NotFoundException e) {
-//            return null;
-//        }
-//    }
 
     /**
      * The user id that initialized the order
@@ -219,6 +219,8 @@ public class SingleOrder implements Order {
         //updateDiscounts();
     }
 
+    //TODO : Discount
+
 //    private void updateDiscounts() throws IOException {
 //        appliedDiscounts.clear();
 //        appliedDiscounts.addAll(RestaurantServiceHelper.getRestaurant(restaurantId).availableDiscounts(this).stream().map(Discount::getId).toList());
@@ -249,15 +251,14 @@ public class SingleOrder implements Order {
      */
     @Override
     public Duration getPreparationTime() {
-//        return items.stream().map(addMenuItem -> {
-//                    try {
-//                        return MenuItemServiceHelper.getMenuItem(addMenuItem);
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
-//        ).map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
-        return Duration.ZERO;
+        return items.stream().map(addMenuItem -> {
+                    try {
+                        return MenuItemServiceHelper.getMenuItem(addMenuItem);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        ).map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
     @Override

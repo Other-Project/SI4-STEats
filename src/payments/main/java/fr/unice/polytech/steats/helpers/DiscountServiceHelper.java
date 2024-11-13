@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.helper;
+package fr.unice.polytech.steats.helpers;
 
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.utils.HttpUtils;
@@ -12,25 +12,25 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 /**
- * Helper class for calling the MenuItem service.
+ * Helper class for calling the Discount service.
  *
  * @author Team C
  */
 public class DiscountServiceHelper {
 
-    public static final URI ORDER_SERVICE_URI = URI.create("http://localhost:5006/api/orders");
+    public static final URI DISCOUNT_SERVICE_URI = URI.create("http://localhost:5008/api/discounts");
 
     private DiscountServiceHelper() {
     }
 
     /**
-     * Get a menu item by its id.
+     * Get a discount by its id.
      *
-     * @param menuItemId The id of the menu item
+     * @param discountId The id of the discount
      */
-    public static Discount getDiscount(String menuItemId) throws IOException {
+    public static Discount getDiscount(String discountId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve(menuItemId))
+                .uri(DISCOUNT_SERVICE_URI.resolve(discountId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
@@ -47,7 +47,7 @@ public class DiscountServiceHelper {
      */
     public static List<Discount> getDiscountToApplyNext(String userId, String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve("?userId=" + userId + "&restaurantId=" + restaurantId))
+                .uri(DISCOUNT_SERVICE_URI.resolve("?userId=" + userId + "&restaurantId=" + restaurantId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

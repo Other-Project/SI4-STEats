@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.helper;
+package fr.unice.polytech.steats.helpers;
 
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.restaurant.MenuItem;
@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Helper class for calling the MenuItem service.
+ * Helper class for calling the Restaurant service.
  *
  * @author Team C
  */
 public class RestaurantServiceHelper {
 
-    public static final URI ORDER_SERVICE_URI = URI.create("http://localhost:5007/api/orders");
+    public static final URI RESTAURANT_SERVICE_URI = URI.create("http://localhost:5006/api/restaurants");
 
     private RestaurantServiceHelper() {
     }
@@ -30,11 +30,11 @@ public class RestaurantServiceHelper {
     /**
      * Get a restaurant by its id.
      *
-     * @param menuItemId The id of the menu item
+     * @param restaurantId The id of the restaurant
      */
-    public static Restaurant getRestaurant(String menuItemId) throws IOException {
+    public static Restaurant getRestaurant(String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve(menuItemId))
+                .uri(RESTAURANT_SERVICE_URI.resolve(restaurantId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
@@ -51,7 +51,7 @@ public class RestaurantServiceHelper {
      */
     public static boolean canHandle(String id, LocalDateTime deliveryTime) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve("?id=" + id + "&deliveryTime=" + deliveryTime))
+                .uri(RESTAURANT_SERVICE_URI.resolve("?id=" + id + "&deliveryTime=" + deliveryTime))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
@@ -66,7 +66,7 @@ public class RestaurantServiceHelper {
      */
     public static Order addOrder(String id) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve("/addOrder"))
+                .uri(RESTAURANT_SERVICE_URI.resolve("/addOrder"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
                 .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("orderId", id))))
@@ -82,7 +82,7 @@ public class RestaurantServiceHelper {
      */
     public static List<MenuItem> getFullMenu(String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve("/menu/" + restaurantId))
+                .uri(RESTAURANT_SERVICE_URI.resolve("/menu/" + restaurantId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

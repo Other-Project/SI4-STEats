@@ -31,6 +31,7 @@ public class Restaurant {
     /**
      * Create a restaurant
      *
+     * @param id               The id of the restaurant
      * @param name             The name of the restaurant
      * @param typeOfFood       The type of food the restaurant serves
      * @param scheduleDuration The duration of the schedule
@@ -47,17 +48,18 @@ public class Restaurant {
      *
      * @param name The name of the restaurant
      */
-    public Restaurant(String name, String id) {
-        this(name, TypeOfFood.CLASSIC, id);
+    public Restaurant(String id, String name) {
+        this(id, name, TypeOfFood.CLASSIC);
     }
 
     /**
      * Create a restaurant
      *
+     * @param id         The id of the restaurant
      * @param name       The name of the restaurant
      * @param typeOfFood The type of food the restaurant serves
      */
-    public Restaurant(String name, TypeOfFood typeOfFood, String id) {
+    public Restaurant(String id, String name, TypeOfFood typeOfFood) {
         this(id, name, typeOfFood, Duration.ofMinutes(30));
     }
 
@@ -110,6 +112,7 @@ public class Restaurant {
         return scheduleDuration;
     }
 
+    // TODO : Merge this in discount service
 //    /**
 //     * The discounts that can be applied to an order
 //     *
@@ -207,16 +210,6 @@ public class Restaurant {
                 .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
                 .max(Comparator.comparing(Function.identity()))
                 .orElse(Duration.ZERO);
-    }
-
-    /**
-     * Add a menu item to the restaurant
-     *
-     * @param menuItem The menu item
-     */
-    public void addMenuItem(MenuItem menuItem) {
-        this.menu.add(menuItem);
-        menuItem.setRestaurantId(name);
     }
 
     /**

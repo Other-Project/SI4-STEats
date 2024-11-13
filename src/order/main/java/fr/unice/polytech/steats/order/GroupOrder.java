@@ -1,9 +1,9 @@
 package fr.unice.polytech.steats.order;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.helper.RestaurantServiceHelper;
+import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.models.Payment;
-import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 
 import java.io.IOException;
@@ -35,7 +35,8 @@ public class GroupOrder implements Order {
      * @param addressId    The label of the address where the group order must be delivered
      * @param restaurantId The id of the restaurant in which the group order is made
      */
-    private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) throws IOException {
+    private GroupOrder(@JsonProperty("groupCode") String groupCode, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
+                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) throws IOException {
         this.orderTime = LocalDateTime.now();
         if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
@@ -75,6 +76,11 @@ public class GroupOrder implements Order {
         return restaurantId;
     }
 
+    @Override
+    public String getAddressId() {
+        return addressId;
+    }
+
     /**
      * @implNote Returns the sum of the price of the all the {@link SingleOrder} it contains.
      */
@@ -86,16 +92,6 @@ public class GroupOrder implements Order {
     @Override
     public List<String> getItems() {
         return getOrders().stream().map(SingleOrder::getItems).flatMap(Collection::stream).toList();
-    }
-
-    @Override
-    public List<String> getAvailableMenu() throws IOException {
-        return RestaurantServiceHelper.getRestaurant(restaurantId).getAvailableMenu(deliveryTime).stream().map(MenuItem::getId).toList();
-    }
-
-    @Override
-    public List<String> getUsers() {
-        return getOrders().stream().map(Order::getUsers).flatMap(Collection::stream).toList();
     }
 
     /**
@@ -149,7 +145,7 @@ public class GroupOrder implements Order {
      * @param userId The id of the user that joined the group order
      * @return The order created with the user ID, and with the delivery time and the address of the group order.
      */
-    public SingleOrder createOrder(String userId) throws IOException {
+    public SingleOrder createOrder(String userId) {
         if (status != Status.INITIALISED) throw new IllegalStateException("The group order has been closed.");
         return new SingleOrder(userId, groupCode, deliveryTime, addressId, restaurantId);
     }

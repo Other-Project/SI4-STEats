@@ -34,6 +34,11 @@ public interface Order extends Saleable {
     String getRestaurantId();
 
     /**
+     * Get the address id of the order
+     */
+    String getAddressId();
+
+    /**
      * Get the group code of the order
      *
      * @return null if not applicable
@@ -51,19 +56,9 @@ public interface Order extends Saleable {
     LocalDateTime getOrderTime();
 
     /**
-     * get the list of the items id's in the order
+     * Get the list of the items id's in the order
      */
     List<String> getItems();
-
-    /**
-     * get the list of the available items id's in the restaurant
-     */
-    List<String> getAvailableMenu() throws IOException;
-
-    /**
-     * get the list of the users id's in the order
-     */
-    List<String> getUsers();
 
     /**
      * Set the delivery time of the order

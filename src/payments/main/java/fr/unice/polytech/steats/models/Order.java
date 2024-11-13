@@ -16,6 +16,6 @@ public record Order(
         List<String> items,
         List<String> appliedDiscounts,
         LocalDateTime orderTime,
-        double amount
+        double price
 ) {
 }

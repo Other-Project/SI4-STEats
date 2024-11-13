@@ -2,7 +2,7 @@ package fr.unice.polytech.steats;
 
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.helper.RestaurantServiceHelper;
+import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.items.MenuItemManager;
 import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.order.GroupOrder;
@@ -130,12 +130,13 @@ public class STEats {
         updateFullMenu();
     }
 
-    /**
-     * Get all the id's of the menu items available at the time of the delivery.
-     */
-    public List<String> getAvailableMenu() throws IOException {
-        return order.getAvailableMenu();
-    }
+    //TODO : refactor this facade
+//    /**
+//     * Get all the id's of the menu items available at the time of the delivery.
+//     */
+//    public List<String> getAvailableMenu() throws IOException {
+//        return order.getAvailableMenu();
+//    }
 
     /**
      * Get the full menu of the restaurant, including the menu items that are not available at the time of the delivery.
@@ -144,24 +145,25 @@ public class STEats {
         return fullMenu;
     }
 
-    /**
-     * Add a menu item to the order.
-     *
-     * @param menuItem The ID of the menu item to add to the order
-     */
-    public void addMenuItem(String menuItem) throws IOException {
-        if (!getAvailableMenu().contains(getMenuItem(menuItem)))
-            throw new IllegalStateException("Menu item not available");
-        order.addMenuItem(menuItem);
-    }
+    //TODO : refactor this facade
+//    /**
+//     * Add a menu item to the order.
+//     *
+//     * @param menuItemId The ID of the menu item to add to the order
+//     */
+//    public void addMenuItem(String menuItemId) throws IOException {
+//        if (!getAvailableMenu().contains(getMenuItem(menuItemId)))
+//            throw new IllegalStateException("Menu item not available");
+//        order.addMenuItem(menuItemId);
+//    }
 
     /**
      * Remove a menu item from the order.
      *
-     * @param menuItem The ID of the menu item to remove from the order
+     * @param menuItemId The ID of the menu item to remove from the order
      */
-    public void removeMenuItem(String menuItem) throws IOException {
-        order.removeMenuItem(menuItem);
+    public void removeMenuItem(String menuItemId) throws IOException {
+        order.removeMenuItem(menuItemId);
     }
 
     /**

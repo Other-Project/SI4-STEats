@@ -73,6 +73,41 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
     }
 
     /**
+     * Get all the orders of a user with a specific group order
+     *
+     * @param userId    The id of the user
+     * @param groupCode The groupCode
+     */
+    public Object getOrdersByUser(String userId, String groupCode) {
+        return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId()) && groupCode.equals(singleOrder.getGroupCode())).toList();
+    }
+
+    /**
+     * Get all the orders of a restaurant with a specific group order
+     *
+     * @param restaurantId The id of the restaurant
+     * @param groupCode    The groupCode
+     */
+    public Object getOrdersByRestaurant(String restaurantId, String groupCode) {
+        return getAll().stream().filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode()) && restaurantId.equals(singleOrder.getRestaurantId())).toList();
+    }
+
+    /**
+     * Get all the order of a user in a restaurant with a specific group order
+     *
+     * @param userId       The id of the user
+     * @param restaurantId The id of the restaurant
+     * @param groupCode    The groupCode
+     */
+    public List<SingleOrder> getOrdersByUserInRestaurant(String userId, String restaurantId, String groupCode) {
+        return getAll().stream()
+                .filter(singleOrder -> userId.equals(singleOrder.getUserId()))
+                .filter(singleOrder -> restaurantId.equals(singleOrder.getRestaurantId()))
+                .filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode()))
+                .toList();
+    }
+
+    /**
      * Fill the manager with some demo data
      */
     public void demo() {
