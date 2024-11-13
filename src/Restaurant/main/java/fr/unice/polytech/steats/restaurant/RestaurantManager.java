@@ -79,4 +79,16 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
     public static List<Restaurant> filterRestaurant(LocalDateTime deliveryTime) {
         return filterRestaurant(null, null, deliveryTime);
     }
+
+    /**
+     * Fill the restaurant manager with demo data
+     */
+    public void demo() {
+        List.of(
+                new Restaurant("001", "La Cafet", TypeOfFood.SNACKS),
+                new Restaurant("002", "Le RU", TypeOfFood.CLASSIC),
+                new Restaurant("003", "Restaurant Alban", TypeOfFood.CLASSIC),
+                new Restaurant("004", "McAlban", TypeOfFood.FAST_FOOD)
+        ).forEach(restaurant -> add(restaurant.getRestaurantId(), restaurant));
+    }
 }
