@@ -1,7 +1,8 @@
 package fr.unice.polytech.steats.menuitem;
 
-import fr.unice.polytech.steats.order.Saleable;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.Saleable;
 
 import java.time.Duration;
 
@@ -19,11 +20,12 @@ public class MenuItem implements Saleable {
      * @param price           The price of the menu item
      * @param preparationTime The time needed to prepare the menu item
      */
-    public MenuItem(String menuItemId, String name, double price, Duration preparationTime) {
+    public MenuItem(@JsonProperty("menuItemId") String menuItemId, @JsonProperty("name") String name, @JsonProperty("price") double price, @JsonProperty("preparationTime") Duration preparationTime, @JsonProperty("restaurantId") String restaurantId) {
         this.menuItemId = menuItemId;
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
+        this.restaurantId = restaurantId;
     }
 
     /**

@@ -14,7 +14,7 @@ public class MenuItemHttpServer extends AbstractHttpServer {
     }
 
     public static void main(String[] args) throws IOException {
-        if (Arrays.asList(args).contains("demo")) MenuItemManager.getInstance().demo();
+        if (Arrays.asList(args).contains("--demo")) MenuItemManager.getInstance().demo();
         new MenuItemHttpServer(API_PORT).start();
     }
 

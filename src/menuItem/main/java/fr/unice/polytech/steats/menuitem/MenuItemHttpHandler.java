@@ -23,12 +23,13 @@ public class MenuItemHttpHandler extends AbstractManagerHandler<MenuItemManager,
     @Override
     protected void register() {
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/restaurant/{restaurantId}", (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/pay", (exchange, param) -> add(exchange));
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), ((exchange, params) -> getAll(exchange)));
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/restaurant/{restaurantId}", (exchange, param) -> getByRestaurant(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
+    private void getByRestaurant(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
         if (restaurantId == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);

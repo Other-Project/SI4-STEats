@@ -1,12 +1,16 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.discount.Discount;
-import fr.unice.polytech.steats.menuitem.MenuItem;
-import fr.unice.polytech.steats.order.Order;
-import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.schedule.Schedule;
+//import fr.unice.polytech.steats.discount.Discount;
 
-import java.time.*;
+import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
+import fr.unice.polytech.steats.models.MenuItem;
+import fr.unice.polytech.steats.models.Order;
+
+import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -80,8 +84,8 @@ public class Restaurant {
     /**
      * The full menu of the restaurant
      */
-    public void getFullMenu() {
-        // TODO : call the menuItem micro-service
+    public List<MenuItem> getFullMenu() throws IOException {
+        return MenuItemServiceHelper.getMenuItemByRestaurantId(getRestaurantId());
     }
 
     /**
@@ -119,8 +123,10 @@ public class Restaurant {
      *
      * @param order The order to check
      */
+    /*
+    TODO
     public List<Discount> availableDiscounts(SingleOrder order) {
-        /*
+        *//*
         List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
         List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
         applicableDiscounts.stream()
@@ -128,9 +134,10 @@ public class Restaurant {
                 .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
                 .ifPresent(res::add);
 
-         */
+         *//*
         return new ArrayList<>();
-    }
+    }*/
+
 
     /**
      * The part of the menu that can be prepared and delivered in time
@@ -149,14 +156,16 @@ public class Restaurant {
     /**
      * Check if the restaurant can handle an order at a given time
      *
-     * @param order        The order to check
+     //* @param order        The order to check
      * @param deliveryTime The time of delivery
      */
+    /*
+    TODO
     public boolean canHandle(Order order, LocalDateTime deliveryTime) {
         if (deliveryTime == null) return true;
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
         return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(deliveryTime, maxCapacity);
-    }
+    }*/
 
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
         /*
@@ -208,8 +217,8 @@ public class Restaurant {
         return true;
     }
 
-    private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
-        /*
+    /*private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
+     *//*
         List<Order> ordersTakenAccountSchedule = orders.stream()
                 .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
                 .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryDate.getDayOfYear())
@@ -220,9 +229,9 @@ public class Restaurant {
                 .reduce(Duration.ZERO, Duration::plus);
         return schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
 
-         */
+         *//*
         return null;
-    }
+    }*/
 
     private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) {
         /*
@@ -263,18 +272,18 @@ public class Restaurant {
      *
      * @param discount The discount
      */
-    public void addDiscount(Discount discount) {
+    /*public void addDiscount(Discount discount) {
         // this.discounts.add(discount);
-    }
+    }*/
 
     /**
      * Remove a discount of the restaurant
      *
      * @param discount The discount
      */
-    public void removeDiscount(Discount discount) {
+    /*public void removeDiscount(Discount discount) {
         // this.discounts.remove(discount);
-    }
+    }*/
 
     /**
      * Get the opening times of the restaurant for a given day
@@ -318,16 +327,16 @@ public class Restaurant {
      *
      * @param schedule The schedule to add
      */
-    public void addSchedule(Schedule schedule) {
-        /*
+    /*public void addSchedule(Schedule schedule) {
+     *//*
         if (!schedule.getDuration().equals(scheduleDuration))
             throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
         if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
             throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
         schedules.add(schedule);
 
-         */
-    }
+         *//*
+    }*/
 
     /**
      * Add schedules for a period of time
