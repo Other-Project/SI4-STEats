@@ -1,8 +1,6 @@
 package fr.unice.polytech.steats.menuitem;
 
 import fr.unice.polytech.steats.order.Saleable;
-import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.Duration;
@@ -58,20 +56,10 @@ public class MenuItem implements Saleable {
     }
 
     /**
-     * Links the menu item with a restaurant
-     *
-     * @param restaurantId The name of the restaurant
-     * @implNote This method is package-private because it should only be used by the Restaurant class.
-     */
-    void setRestaurantId(String restaurantId) {
-        this.restaurantId = restaurantId;
-    }
-
-    /**
      * Get the restaurant that serves the menu item
      */
-    public Restaurant getRestaurant() throws NotFoundException {
-        return RestaurantManager.getInstance().get(restaurantId);
+    public String getRestaurantId() throws NotFoundException {
+        return restaurantId;
     }
 
     @Override

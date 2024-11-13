@@ -142,7 +142,6 @@ public class Restaurant {
         if (arrivalTime == null) return menu;
         Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
         return menu.stream().filter(menuItem -> !maxCapacity.minus(menuItem.getPreparationTime()).isNegative()).toList();
-
          */
         return new ArrayList<>();
     }

@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class RestaurantHttpServer extends AbstractHttpServer {
     public static final String API_ADDRESS = "/api/restaurants";
-    public static final int API_PORT = 5010;
+    public static final int API_PORT = 5006;
 
     protected RestaurantHttpServer(int apiPort) throws IOException {
         super(apiPort);
