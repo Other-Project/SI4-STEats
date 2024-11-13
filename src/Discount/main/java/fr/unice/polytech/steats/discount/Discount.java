@@ -1,7 +1,7 @@
-package fr.unice.polytech.steats.discounts;
+package fr.unice.polytech.steats.discount;
 
+import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.restaurant.MenuItem;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -31,12 +31,16 @@ public class Discount {
      * @return True if the discount can be applied to the order
      */
     public boolean isApplicable(SingleOrder order) {
+        /*
         List<MenuItem> items = order.getItems();
         List<SingleOrder> orders = order.getUser().getOrders(order.getRestaurantId());
         return items.size() >= criteria.currentOrderItemsAmount
                 && (criteria.ordersAmount <= 0 || (orders.size() + 1) % criteria.ordersAmount == 0)
                 && (criteria.itemsAmount <= 0 || orders.stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
                 && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
+
+         */
+        return true;
     }
 
     /**

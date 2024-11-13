@@ -1,15 +1,18 @@
-package fr.unice.polytech.steats.restaurant;
+package fr.unice.polytech.steats.menuitem;
 
-import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.order.Saleable;
+import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.Duration;
 
 public class MenuItem implements Saleable {
+    private final String menuItemId;
     private final String name;
     private final double price;
     private final Duration preparationTime;
-    private String restaurantName;
+    private String restaurantId;
 
     /**
      * Create a menu item
@@ -18,7 +21,8 @@ public class MenuItem implements Saleable {
      * @param price           The price of the menu item
      * @param preparationTime The time needed to prepare the menu item
      */
-    public MenuItem(String name, double price, Duration preparationTime) {
+    public MenuItem(String menuItemId, String name, double price, Duration preparationTime) {
+        this.menuItemId = menuItemId;
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
@@ -29,6 +33,13 @@ public class MenuItem implements Saleable {
      */
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Get the id of the restaurant associated to the menu item
+     */
+    public String getMenuItemId() {
+        return this.menuItemId;
     }
 
     /**
@@ -49,18 +60,18 @@ public class MenuItem implements Saleable {
     /**
      * Links the menu item with a restaurant
      *
-     * @param restaurantName The name of the restaurant
+     * @param restaurantId The name of the restaurant
      * @implNote This method is package-private because it should only be used by the Restaurant class.
      */
-    void setRestaurantName(String restaurantName) {
-        this.restaurantName = restaurantName;
+    void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     /**
      * Get the restaurant that serves the menu item
      */
     public Restaurant getRestaurant() throws NotFoundException {
-        return RestaurantManager.getInstance().get(restaurantName);
+        return RestaurantManager.getInstance().get(restaurantId);
     }
 
     @Override

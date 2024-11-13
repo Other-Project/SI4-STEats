@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.restaurant;
+package fr.unice.polytech.steats.schedule;
 
 import fr.unice.polytech.steats.order.Order;
 
@@ -12,10 +12,12 @@ import java.util.Objects;
  * @author Team C
  */
 public class Schedule implements Comparable<Schedule> {
+    private final String scheduleId;
     private final DayOfWeek dayOfWeek;
     private final LocalTime start;
     private final Duration duration;
     private final int nbPerson;
+    private final String restaurantId;
 
     /**
      * @param start     The Localtime at which the schedule start
@@ -23,11 +25,21 @@ public class Schedule implements Comparable<Schedule> {
      * @param nbPerson  The number of person that works during the schedule
      * @param dayOfWeek The day of the week of the schedule
      */
-    public Schedule(LocalTime start, Duration duration, int nbPerson, DayOfWeek dayOfWeek) {
+    public Schedule(String scheduleId, LocalTime start, Duration duration,
+                    int nbPerson, DayOfWeek dayOfWeek, String restaurantId) {
+        this.scheduleId = scheduleId;
         this.start = start;
         this.duration = duration;
         this.nbPerson = nbPerson;
         this.dayOfWeek = dayOfWeek;
+        this.restaurantId = restaurantId;
+    }
+
+    /**
+     * @return the schedule's id
+     */
+    public String getScheduleId() {
+        return scheduleId;
     }
 
     /**
@@ -67,6 +79,13 @@ public class Schedule implements Comparable<Schedule> {
      */
     public int getNbPerson() {
         return nbPerson;
+    }
+
+    /**
+     * @return the associated restaurant's id
+     */
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
     /**
@@ -124,7 +143,8 @@ public class Schedule implements Comparable<Schedule> {
     @SuppressWarnings("java:S4351")
     public int compareTo(LocalDateTime dateTime) {
         int compareDayOfWeek = dayOfWeek.compareTo(dateTime.getDayOfWeek());
-        if (compareDayOfWeek != 0) return ((Math.absExact(compareDayOfWeek) + 3) % 7 - 3) * (compareDayOfWeek > 0 ? 1 : -1);
+        if (compareDayOfWeek != 0)
+            return ((Math.absExact(compareDayOfWeek) + 3) % 7 - 3) * (compareDayOfWeek > 0 ? 1 : -1);
         if (start.isAfter(dateTime.toLocalTime())) return 1;
         if (!getEnd().isAfter(dateTime.toLocalTime())) return -1;
         return 0;

@@ -1,14 +1,15 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.discount.Discount;
+import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.order.Status;
+import fr.unice.polytech.steats.schedule.Schedule;
 
 import java.time.*;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A restaurant that serves food
@@ -16,13 +17,14 @@ import java.util.stream.Collectors;
  * @author Team C
  */
 public class Restaurant {
+    private final String restaurantId;
     private final String name;
     private final TypeOfFood typeOfFood;
     private final Duration scheduleDuration;
-    private final List<MenuItem> menu = new ArrayList<>();
-    private final List<Discount> discounts = new ArrayList<>();
-    private final List<Order> orders = new ArrayList<>();
-    private final Set<Schedule> schedules = new TreeSet<>();
+    // private final List<MenuItem> menu = new ArrayList<>();
+    // private final List<Discount> discounts = new ArrayList<>();
+    // private final List<Order> orders = new ArrayList<>();
+    // private final Set<Schedule> schedules = new TreeSet<>();
     private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
@@ -35,7 +37,8 @@ public class Restaurant {
      * @param typeOfFood       The type of food the restaurant serves
      * @param scheduleDuration The duration of the schedule
      */
-    public Restaurant(String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
+    public Restaurant(String restaurantId, String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
+        this.restaurantId = restaurantId;
         this.name = name;
         this.typeOfFood = typeOfFood;
         this.scheduleDuration = scheduleDuration;
@@ -46,8 +49,8 @@ public class Restaurant {
      *
      * @param name The name of the restaurant
      */
-    public Restaurant(String name) {
-        this(name, TypeOfFood.CLASSIC);
+    public Restaurant(String restaurantId, String name) {
+        this(restaurantId, name, TypeOfFood.CLASSIC);
     }
 
     /**
@@ -56,8 +59,8 @@ public class Restaurant {
      * @param name       The name of the restaurant
      * @param typeOfFood The type of food the restaurant serves
      */
-    public Restaurant(String name, TypeOfFood typeOfFood) {
-        this(name, typeOfFood, Duration.ofMinutes(30));
+    public Restaurant(String restaurantId, String name, TypeOfFood typeOfFood) {
+        this(restaurantId, name, typeOfFood, Duration.ofMinutes(30));
     }
 
     /**
@@ -68,10 +71,17 @@ public class Restaurant {
     }
 
     /**
+     * ID of the Restaurant
+     */
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    /**
      * The full menu of the restaurant
      */
-    public List<MenuItem> getFullMenu() {
-        return Collections.unmodifiableList(menu);
+    public void getFullMenu() {
+        // TODO : call the menuItem micro-service
     }
 
     /**
@@ -84,15 +94,17 @@ public class Restaurant {
     /**
      * All the discounts the restaurant proposes
      */
-    public List<Discount> discounts() {
-        return Collections.unmodifiableList(discounts);
+    public void discounts() {
+        // TODO : call the discount micro-service
+        // return Collections.unmodifiableList(discounts);
     }
 
     /**
      * All the orders received by the restaurant
      */
-    public List<Order> getOrders() {
-        return new ArrayList<>(orders);
+    public void getOrders() {
+        // TODO : call the Order Service
+        // return new ArrayList<>(orders);
     }
 
     /**
@@ -108,13 +120,16 @@ public class Restaurant {
      * @param order The order to check
      */
     public List<Discount> availableDiscounts(SingleOrder order) {
+        /*
         List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
         List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
         applicableDiscounts.stream()
                 .filter(discount -> !discount.isStackable())
                 .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
                 .ifPresent(res::add);
-        return res;
+
+         */
+        return new ArrayList<>();
     }
 
     /**
@@ -123,9 +138,13 @@ public class Restaurant {
      * @param arrivalTime Wanted time of delivery
      */
     public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) {
+        /*
         if (arrivalTime == null) return menu;
         Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
         return menu.stream().filter(menuItem -> !maxCapacity.minus(menuItem.getPreparationTime()).isNegative()).toList();
+
+         */
+        return new ArrayList<>();
     }
 
     /**
@@ -141,6 +160,7 @@ public class Restaurant {
     }
 
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
+        /*
         if (deliveryTime == null || orders.isEmpty()) return true;
         long averagePreparationTime = getAveragePreparationTime().toMinutes();
         if (averagePreparationTime == 0) return true;
@@ -149,9 +169,13 @@ public class Restaurant {
                 .filter(order -> order.getStatus() == Status.INITIALISED)
                 .count();
         return currentNbOfOrder < maxNbOfOrder;
+
+         */
+        return true;
     }
 
     private Duration getAveragePreparationTime() {
+        /*
         List<Duration> lastOrderDurations = orders.reversed().stream()
                 .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0 && order.getDeliveryTime() != null)
                 .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
@@ -161,6 +185,9 @@ public class Restaurant {
         return lastOrderDurations.stream()
                 .reduce(Duration.ZERO, Duration::plus)
                 .dividedBy(lastOrderDurations.size());
+
+         */
+        return null;
     }
 
     /**
@@ -170,15 +197,20 @@ public class Restaurant {
      * @return True if the restaurant can deliver at the given time, false otherwise
      */
     public boolean canDeliverAt(LocalDateTime deliveryTime) {
+        /*
         try {
             Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
             return menu.stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
         } catch (Exception e) {
             return false;
         }
+
+         */
+        return true;
     }
 
     private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
+        /*
         List<Order> ordersTakenAccountSchedule = orders.stream()
                 .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
                 .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryDate.getDayOfYear())
@@ -188,9 +220,13 @@ public class Restaurant {
                 .map(Order::getPreparationTime)
                 .reduce(Duration.ZERO, Duration::plus);
         return schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
+
+         */
+        return null;
     }
 
     private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) {
+        /*
         LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
         Set<Schedule> schedulesBefore2Hours = schedules.stream()
                 .filter(schedule -> schedule.isBetween(deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY), deliveryTime))
@@ -199,6 +235,9 @@ public class Restaurant {
                 .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
                 .max(Comparator.comparing(Function.identity()))
                 .orElse(Duration.ZERO);
+
+         */
+        return null;
     }
 
     /**
@@ -207,8 +246,8 @@ public class Restaurant {
      * @param menuItem The menu item
      */
     public void addMenuItem(MenuItem menuItem) {
-        this.menu.add(menuItem);
-        menuItem.setRestaurantName(name);
+        // this.menu.add(menuItem);
+        // menuItem.setRestaurantName(name);
     }
 
     /**
@@ -217,7 +256,7 @@ public class Restaurant {
      * @param menuItem The menu item
      */
     public void removeMenuItem(MenuItem menuItem) {
-        this.menu.remove(menuItem);
+        // this.menu.remove(menuItem);
     }
 
     /**
@@ -226,7 +265,7 @@ public class Restaurant {
      * @param discount The discount
      */
     public void addDiscount(Discount discount) {
-        this.discounts.add(discount);
+        // this.discounts.add(discount);
     }
 
     /**
@@ -235,7 +274,7 @@ public class Restaurant {
      * @param discount The discount
      */
     public void removeDiscount(Discount discount) {
-        this.discounts.remove(discount);
+        // this.discounts.remove(discount);
     }
 
     /**
@@ -244,6 +283,7 @@ public class Restaurant {
      * @param day The day of the week
      */
     public List<OpeningTime> getOpeningTimes(DayOfWeek day) {
+        /*
         List<Schedule> scheduleList = schedules.stream()
                 .filter(schedule -> schedule.getDayOfWeek() == day)
                 .sorted(Comparator.comparing(Schedule::getStart))
@@ -260,6 +300,9 @@ public class Restaurant {
         if (currentInterval != null && currentInterval.getEnd().equals(LocalTime.of(0, 0))) currentInterval.setEnd(LocalTime.of(23, 59, 59));
         if (currentInterval != null) intervals.add(currentInterval);
         return intervals;
+
+         */
+        return new ArrayList<>();
     }
 
     /**
@@ -268,7 +311,7 @@ public class Restaurant {
      * @param order the order to add
      */
     public void addOrder(Order order) {
-        this.orders.add(order);
+        // this.orders.add(order);
     }
 
     /**
@@ -277,11 +320,14 @@ public class Restaurant {
      * @param schedule The schedule to add
      */
     public void addSchedule(Schedule schedule) {
+        /*
         if (!schedule.getDuration().equals(scheduleDuration))
             throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
         if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
             throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
         schedules.add(schedule);
+
+         */
     }
 
     /**
@@ -294,6 +340,7 @@ public class Restaurant {
      * @param endTime   The time to end the period
      */
     public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
+        /*
         DayOfWeek day = startDay;
         long seconds = Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds();  // round the start time to the nearest schedule
         if (seconds >= 86400) {
@@ -306,6 +353,7 @@ public class Restaurant {
             if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
                 day = day.plus(1);
         }
+         */
     }
 
     @Override
@@ -313,15 +361,12 @@ public class Restaurant {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (Restaurant) obj;
-        return Objects.equals(this.name, that.name) &&
-                Objects.equals(this.menu, that.menu) &&
-                Objects.equals(this.typeOfFood, that.typeOfFood) &&
-                Objects.equals(this.discounts, that.discounts);
+        return Objects.equals(this.restaurantId, that.restaurantId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, menu, typeOfFood, discounts);
+        return Objects.hash(restaurantId, name, typeOfFood);
     }
 
     @Override

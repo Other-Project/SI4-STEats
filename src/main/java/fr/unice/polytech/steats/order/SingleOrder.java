@@ -2,15 +2,15 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.payments.Payment;
 import fr.unice.polytech.steats.payments.PaymentSystem;
-import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.users.User;
 import fr.unice.polytech.steats.users.UserManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -139,7 +139,7 @@ public class SingleOrder implements Order {
     /**
      * The price without discounts
      *
-     * @implNote Returns the sum of the price of all the {@link fr.unice.polytech.steats.restaurant.MenuItem MenuItem} it contains.
+     * @implNote Returns the sum of the price of all the {@link MenuItem MenuItem} it contains.
      */
     public double getSubPrice() {
         return items.stream().mapToDouble(MenuItem::getPrice).sum();
