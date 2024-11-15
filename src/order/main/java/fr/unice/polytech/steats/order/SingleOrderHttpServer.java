@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class SingleOrderHttpServer extends AbstractHttpServer {
-    public static final String API_ADDRESS = "/api/orders/single-orders";
+    public static final String API_ADDRESS = "/api/orders/singles";
     public static final int API_PORT = 5004;
 
     protected SingleOrderHttpServer(int apiPort) throws IOException {
@@ -21,6 +21,6 @@ public class SingleOrderHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("single-orders", API_ADDRESS, new SingleOrderHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler("singles", API_ADDRESS, new SingleOrderHttpHandler(API_ADDRESS, getLogger()));
     }
 }

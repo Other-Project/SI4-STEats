@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class GroupOrderHttpServer extends AbstractHttpServer {
-    public static final String API_ADDRESS = "/api/orders/group-orders";
+    public static final String API_ADDRESS = "/api/orders/groups";
     public static final int API_PORT = 5005;
 
     protected GroupOrderHttpServer(int apiPort) throws IOException {
@@ -14,13 +14,13 @@ public class GroupOrderHttpServer extends AbstractHttpServer {
     }
 
     public static void main(String[] args) throws IOException {
-        if (Arrays.asList(args).contains("--demo")) SingleOrderManager.getInstance().demo();
-        new SingleOrderHttpServer(API_PORT).start();
+        if (Arrays.asList(args).contains("--demo")) GroupOrderManager.getInstance().demo();
+        new GroupOrderHttpServer(API_PORT).start();
     }
 
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("group-orders", API_ADDRESS, new SingleOrderHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler("groups", API_ADDRESS, new GroupOrderHttpHandler(API_ADDRESS, getLogger()));
     }
 }

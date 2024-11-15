@@ -74,14 +74,12 @@ public class SingleOrder implements Order {
         //if (groupCode == null) RestaurantServiceHelper.addOrder(id);
     }
 
-    public void checkGroupOrder() throws NotFoundException {
-        if (groupCode == null) return;
+    public boolean checkGroupOrder() throws NotFoundException {
+        if (groupCode == null) return true;
         GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
-        if (groupOrder.getDeliveryTime() != deliveryTime
-                || !Objects.equals(groupOrder.getAddressId(), addressId)
-                || !Objects.equals(groupOrder.getRestaurantId(), restaurantId)) {
-            throw new RuntimeException("Group Order and Single Order not matching");
-        }
+        return groupOrder.getDeliveryTime() == deliveryTime
+                && Objects.equals(groupOrder.getAddressId(), addressId)
+                && Objects.equals(groupOrder.getRestaurantId(), restaurantId);
     }
 
     @Override

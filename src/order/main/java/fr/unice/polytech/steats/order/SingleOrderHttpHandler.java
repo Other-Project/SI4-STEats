@@ -59,7 +59,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         String orderId = params.get("orderId");
 
         if (orderId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
             exchange.close();
             return;
         }
@@ -67,11 +67,11 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         try {
             payment = SingleOrderManager.getInstance().get(orderId).pay();
         } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
             exchange.close();
         }
         if (payment == null) {
-            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, -1);
             exchange.close();
         } else HttpUtils.sendJsonResponse(exchange, HttpUtils.CREATED_CODE, payment);
     }
@@ -83,6 +83,8 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
             singleOrder.checkGroupOrder();
             getManager().add(singleOrder);
             exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, -1);
+        } catch (NotFoundException e) {
+            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
         } catch (Exception e) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
         }

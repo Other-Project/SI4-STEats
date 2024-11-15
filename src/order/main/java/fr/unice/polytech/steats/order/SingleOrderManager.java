@@ -1,7 +1,5 @@
 package fr.unice.polytech.steats.order;
 
-import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.time.LocalDateTime;
@@ -78,7 +76,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param userId    The id of the user
      * @param groupCode The groupCode
      */
-    public Object getOrdersByUser(String userId, String groupCode) {
+    public List<SingleOrder> getOrdersByUser(String userId, String groupCode) {
         return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId()) && groupCode.equals(singleOrder.getGroupCode())).toList();
     }
 
@@ -88,7 +86,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param restaurantId The id of the restaurant
      * @param groupCode    The groupCode
      */
-    public Object getOrdersByRestaurant(String restaurantId, String groupCode) {
+    public List<SingleOrder> getOrdersByRestaurant(String restaurantId, String groupCode) {
         return getAll().stream().filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode()) && restaurantId.equals(singleOrder.getRestaurantId())).toList();
     }
 
@@ -114,8 +112,6 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         String johnDoe = "123456";
         String janeDoe = "654321";
         String albanFalcoz = "140403";
-        AddressManager.getInstance().demo();
-        RestaurantManager.getInstance().demo();
         add(new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"));
         add(new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"));
         add(new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"));

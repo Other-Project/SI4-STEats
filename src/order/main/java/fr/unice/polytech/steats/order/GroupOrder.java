@@ -36,7 +36,7 @@ public class GroupOrder implements Order {
      * @param restaurantId The id of the restaurant in which the group order is made
      */
     private GroupOrder(@JsonProperty("groupCode") String groupCode, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
-                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) throws IOException {
+                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
         this.orderTime = LocalDateTime.now();
         if (deliveryTime != null && LocalDateTime.now().plusHours(2).isAfter(deliveryTime))
             throw new IllegalArgumentException("The time between now and the delivery date is too short");
@@ -48,7 +48,6 @@ public class GroupOrder implements Order {
         this.groupCode = groupCode;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
-        RestaurantServiceHelper.addOrder(restaurantId);
     }
 
     /**
@@ -56,7 +55,7 @@ public class GroupOrder implements Order {
      * @param addressId    The label of the address where the group order must be delivered
      * @param restaurantId The id of the restaurant in which the group order is made
      */
-    public GroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IOException {
+    public GroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurantId);
     }
 

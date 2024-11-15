@@ -17,10 +17,10 @@ import java.util.List;
  *
  * @author Team C
  */
-public class OrderServiceHelper {
-    public static final URI ORDER_SERVICE_URI = URI.create("http://localhost:5004/api/orders");
+public class SingleOrderServiceHelper {
+    public static final URI SINGLE_ORDER_SERVICE_URI = URI.create("http://localhost:5004/api/orders/singles");
 
-    private OrderServiceHelper() {
+    private SingleOrderServiceHelper() {
     }
 
     /**
@@ -30,7 +30,7 @@ public class OrderServiceHelper {
      */
     public static Order getOrder(String orderId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve(orderId))
+                .uri(SINGLE_ORDER_SERVICE_URI.resolve(orderId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
@@ -46,7 +46,7 @@ public class OrderServiceHelper {
      */
     public static List<SingleOrder> getOrdersByUserInRestaurant(String userId, String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve("?userId=" + userId + "&restaurantId=" + restaurantId))
+                .uri(SINGLE_ORDER_SERVICE_URI.resolve("?userId=" + userId + "&restaurantId=" + restaurantId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
@@ -61,7 +61,7 @@ public class OrderServiceHelper {
      */
     public static List<SingleOrder> getOrdersByUser(String userId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ORDER_SERVICE_URI.resolve("?userId=" + userId))
+                .uri(SINGLE_ORDER_SERVICE_URI.resolve("?userId=" + userId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

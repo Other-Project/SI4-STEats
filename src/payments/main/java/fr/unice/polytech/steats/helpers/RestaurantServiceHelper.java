@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.helpers;
 
-import fr.unice.polytech.steats.order.Order;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.utils.HttpUtils;
@@ -46,33 +45,17 @@ public class RestaurantServiceHelper {
     /**
      * Check if the restaurant can handle the order.
      *
-     * @param id           The id of the restaurant
+     * @param restaurantId The id of the restaurant
      * @param deliveryTime The time the client wants the order to be delivered
      */
-    public static boolean canHandle(String id, LocalDateTime deliveryTime) throws IOException {
+    public static boolean canHandle(String restaurantId, LocalDateTime deliveryTime) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(RESTAURANT_SERVICE_URI.resolve("?id=" + id + "&deliveryTime=" + deliveryTime))
+                .uri(RESTAURANT_SERVICE_URI.resolve(restaurantId + "/canHandle"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
-                .GET()
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("deliveryTime", deliveryTime))))
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.fromJson(response.body(), Boolean.class);
-    }
-
-    /**
-     * Add an order.
-     *
-     * @param id The id of the order
-     */
-    public static Order addOrder(String id) throws IOException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(RESTAURANT_SERVICE_URI.resolve("/addOrder"))
-                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
-                .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
-                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("orderId", id))))
-                .build();
-        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
-        return JacksonUtils.fromJson(response.body(), Order.class);
     }
 
     /**
@@ -82,7 +65,7 @@ public class RestaurantServiceHelper {
      */
     public static List<MenuItem> getFullMenu(String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(RESTAURANT_SERVICE_URI.resolve("/menu/" + restaurantId))
+                .uri(RESTAURANT_SERVICE_URI.resolve(restaurantId + "/menu"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

@@ -2,8 +2,8 @@ package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.utils.AbstractManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Will manage group orders
@@ -43,13 +43,12 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
     }
 
     /**
-     * Get all the users id's in the group order
-     *
-     * @param groupCode The groupCode of the group order
+     * Fill the manager with some demo data
      */
-    public List<String> getUsers(String groupCode) {
-        return SingleOrderManager.getInstance().getAll().stream()
-                .filter(order -> Objects.equals(order.getGroupCode(), groupCode))
-                .map(SingleOrder::getUserId).toList();
+    public void demo() {
+        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 12, 0), "1", "1"));
+        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 15, 0), "2", "1"));
+        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 20, 0), "1", "2"));
+        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 8, 30), "2", "2"));
     }
 }

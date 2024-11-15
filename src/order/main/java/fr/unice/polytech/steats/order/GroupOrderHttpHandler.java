@@ -7,6 +7,8 @@ import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -32,28 +34,34 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
 
-        if (restaurantId != null) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByRestaurant(restaurantId));
-        } else {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
+        if (restaurantId == null) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            exchange.close();
+            return;
         }
+
+        List<Order> orders = new ArrayList<>();
+        orders.addAll(GroupOrderManager.getInstance().getOrdersByRestaurant(restaurantId));
+        orders.addAll(SingleOrderManager.getInstance().getOrdersByRestaurant(restaurantId));
+
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, orders);
     }
 
     private void close(HttpExchange exchange, Map<String, String> params) throws IOException {
         String groupOrderId = params.get("groupOrderId");
 
         if (groupOrderId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
             exchange.close();
             return;
         }
         try {
             GroupOrderManager.getInstance().get(groupOrderId).closeOrder();
         } catch (IllegalStateException e) {
-            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, -1);
             exchange.close();
         } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
+            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
             exchange.close();
         }
     }
