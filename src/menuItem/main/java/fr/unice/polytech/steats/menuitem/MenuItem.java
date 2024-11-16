@@ -1,13 +1,12 @@
 package fr.unice.polytech.steats.menuitem;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.utils.Saleable;
 
 import java.time.Duration;
 
 public class MenuItem implements Saleable {
-    private final String menuItemId;
+    private final String id;
     private final String name;
     private final double price;
     private final Duration preparationTime;
@@ -20,8 +19,8 @@ public class MenuItem implements Saleable {
      * @param price           The price of the menu item
      * @param preparationTime The time needed to prepare the menu item
      */
-    public MenuItem(@JsonProperty("menuItemId") String menuItemId, @JsonProperty("name") String name, @JsonProperty("price") double price, @JsonProperty("preparationTime") Duration preparationTime, @JsonProperty("restaurantId") String restaurantId) {
-        this.menuItemId = menuItemId;
+    public MenuItem(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("price") double price, @JsonProperty("preparationTime") Duration preparationTime, @JsonProperty("restaurantId") String restaurantId) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.preparationTime = preparationTime;
@@ -38,8 +37,8 @@ public class MenuItem implements Saleable {
     /**
      * Get the id of the restaurant associated to the menu item
      */
-    public String getMenuItemId() {
-        return this.menuItemId;
+    public String getId() {
+        return this.id;
     }
 
     /**
@@ -60,7 +59,7 @@ public class MenuItem implements Saleable {
     /**
      * Get the restaurant that serves the menu item
      */
-    public String getRestaurantId() throws NotFoundException {
+    public String getRestaurantId() {
         return restaurantId;
     }
 
