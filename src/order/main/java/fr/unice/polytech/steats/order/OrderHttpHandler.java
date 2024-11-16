@@ -1,11 +1,18 @@
 package fr.unice.polytech.steats.order;
 
 import com.sun.net.httpserver.HttpExchange;
+import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
+import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
+import fr.unice.polytech.steats.models.IOrder;
+import fr.unice.polytech.steats.order.singles.SingleOrder;
+import fr.unice.polytech.steats.order.singles.SingleOrderManager;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -28,18 +35,18 @@ public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager,
     }
 
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String userId = params.get("userId");
         String restaurantId = params.get("restaurantId");
 
-        if (userId != null && restaurantId != null) {
-
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUserInRestaurant(userId, restaurantId));
-        } else if (userId != null) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUser(userId));
-        } else if (restaurantId != null) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByRestaurant(restaurantId));
-        } else {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
+        if (restaurantId == null) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            exchange.close();
+            return;
         }
+
+        List<IOrder> orders = new ArrayList<>();
+        orders.addAll(GroupOrderServiceHelper.getGroupOrdersByRestaurant(restaurantId));
+        orders.addAll(SingleOrderServiceHelper.getSingleOrdersNotInGroupByRestaurant(restaurantId));
+
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, orders);
     }
 }

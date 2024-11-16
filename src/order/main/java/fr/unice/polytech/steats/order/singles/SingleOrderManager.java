@@ -1,9 +1,10 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.order.singles;
 
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Will manage single orders
@@ -48,7 +49,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param groupCode The invitation code of the group
      */
     public List<SingleOrder> getOrdersByGroup(String groupCode) {
-        return getAll().stream().filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode())).toList();
+        return getAll().stream().filter(singleOrder -> Objects.equals(groupCode, singleOrder.getGroupCode())).toList();
     }
 
     /**
@@ -77,7 +78,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param groupCode The groupCode
      */
     public List<SingleOrder> getOrdersByUser(String userId, String groupCode) {
-        return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId()) && groupCode.equals(singleOrder.getGroupCode())).toList();
+        return getAll().stream().filter(singleOrder -> userId.equals(singleOrder.getUserId()) && Objects.equals(groupCode, singleOrder.getGroupCode())).toList();
     }
 
     /**
@@ -87,7 +88,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * @param groupCode    The groupCode
      */
     public List<SingleOrder> getOrdersByRestaurant(String restaurantId, String groupCode) {
-        return getAll().stream().filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode()) && restaurantId.equals(singleOrder.getRestaurantId())).toList();
+        return getAll().stream().filter(singleOrder -> Objects.equals(groupCode, singleOrder.getGroupCode()) && restaurantId.equals(singleOrder.getRestaurantId())).toList();
     }
 
     /**
@@ -101,7 +102,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         return getAll().stream()
                 .filter(singleOrder -> userId.equals(singleOrder.getUserId()))
                 .filter(singleOrder -> restaurantId.equals(singleOrder.getRestaurantId()))
-                .filter(singleOrder -> groupCode.equals(singleOrder.getGroupCode()))
+                .filter(singleOrder -> Objects.equals(groupCode, singleOrder.getGroupCode()))
                 .toList();
     }
 

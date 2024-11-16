@@ -1,13 +1,14 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.order.singles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.unice.polytech.steats.address.AddressManager;
+import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
+import fr.unice.polytech.steats.models.GroupOrder;
+import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Payment;
-import fr.unice.polytech.steats.restaurant.MenuItem;
-import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.Order;
+import fr.unice.polytech.steats.utils.Status;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -31,7 +32,6 @@ public class SingleOrder implements Order {
     private final List<String> items = new ArrayList<>();
     private final String addressId;
     private final String restaurantId;
-
     private Status status = Status.INITIALISED;
     private final List<String> appliedDiscounts = new ArrayList<>();
 
@@ -56,12 +56,6 @@ public class SingleOrder implements Order {
                 @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
-        if (deliveryTime != null && orderTime.plusHours(2).isAfter(deliveryTime))
-            throw new IllegalArgumentException("The time between now and the delivery date is too short");
-        if (!AddressManager.getInstance().contains(addressId))
-            throw new IllegalArgumentException("This address is unknown");
-        if (!RestaurantManager.getInstance().contains(restaurantId))
-            throw new IllegalArgumentException("This restaurant is unknown");
         this.userId = userId;
         this.groupCode = groupCode;
         this.deliveryTime = deliveryTime;
@@ -74,12 +68,12 @@ public class SingleOrder implements Order {
         //if (groupCode == null) RestaurantServiceHelper.addOrder(id);
     }
 
-    public boolean checkGroupOrder() throws NotFoundException {
+    public boolean checkGroupOrder() throws IOException {
         if (groupCode == null) return true;
-        GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
-        return groupOrder.getDeliveryTime() == deliveryTime
-                && Objects.equals(groupOrder.getAddressId(), addressId)
-                && Objects.equals(groupOrder.getRestaurantId(), restaurantId);
+        GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
+        return groupOrder.deliveryTime() == deliveryTime
+                && Objects.equals(groupOrder.addressId(), addressId)
+                && Objects.equals(groupOrder.restaurantId(), restaurantId);
     }
 
     @Override
@@ -256,7 +250,7 @@ public class SingleOrder implements Order {
                         throw new RuntimeException(e);
                     }
                 }
-        ).map(MenuItem::getPreparationTime).reduce(Duration.ZERO, Duration::plus);
+        ).map(MenuItem::preparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
     @Override

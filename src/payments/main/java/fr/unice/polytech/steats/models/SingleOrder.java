@@ -6,8 +6,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record Order(
+public record SingleOrder(
         String id,
+        String userId,
         String groupCode,
         LocalDateTime deliveryTime,
         String addressId,

@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Team C
  */
 public class PaymentServiceHelper {
-    public static final URI PAYMENT_SERVICE_URI = URI.create("http://localhost:5003/api/payments");
+    public static final URI PAYMENT_SERVICE_URI = URI.create("http://localhost:5003/api/payments/");
 
     private PaymentServiceHelper() {
     }
@@ -50,7 +50,7 @@ public class PaymentServiceHelper {
                 .GET()
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
-        return JacksonUtils.fromJson(response.body());
+        return JacksonUtils.listFromJson(response.body(), Payment.class);
     }
 
     /**
@@ -65,7 +65,7 @@ public class PaymentServiceHelper {
                 .GET()
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
-        return JacksonUtils.fromJson(response.body());
+        return JacksonUtils.listFromJson(response.body(), Payment.class);
     }
 
     /**

@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.order.groups;
 
 import fr.unice.polytech.steats.utils.AbstractHttpServer;
 

@@ -1,8 +1,8 @@
 package fr.unice.polytech.steats.payments;
 
 import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
-import fr.unice.polytech.steats.models.Order;
 import fr.unice.polytech.steats.models.Payment;
+import fr.unice.polytech.steats.models.SingleOrder;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -26,7 +26,7 @@ public class PaymentSystem {
      * @return The payment
      */
     public static Optional<Payment> pay(String orderId) throws IOException {
-        Order order = SingleOrderServiceHelper.getOrder(orderId);
+        SingleOrder order = SingleOrderServiceHelper.getOrder(orderId);
         if (order == null) return Optional.empty();
 
         // Here we would call the payment system API

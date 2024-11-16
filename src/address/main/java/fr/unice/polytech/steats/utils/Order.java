@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.utils;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -21,7 +21,7 @@ public interface Order extends Saleable {
      *
      * @param status The new status of the order
      */
-    void setStatus(Status status);
+    void setStatus(Status status) throws IOException;
 
     /**
      * @return The time the user wants the order to be delivered

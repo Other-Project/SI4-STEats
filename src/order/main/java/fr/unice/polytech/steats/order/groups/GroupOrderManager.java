@@ -1,7 +1,10 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.order.groups;
 
+import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
+import fr.unice.polytech.steats.models.SingleOrder;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,6 +43,15 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
      */
     public List<GroupOrder> getOrdersByRestaurant(String restaurantId) {
         return getAll().stream().filter(groupOrder -> restaurantId.equals(groupOrder.getRestaurantId())).toList();
+    }
+
+    /**
+     * Get all the users id's of a group order
+     *
+     * @param groupOrderId The id of the group order
+     */
+    public List<String> getUsers(String groupOrderId) throws IOException {
+        return SingleOrderServiceHelper.getOrdersInGroup(groupOrderId).stream().map(SingleOrder::userId).toList();
     }
 
     /**

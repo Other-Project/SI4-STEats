@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.order.groups;
 
 import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
@@ -7,8 +7,6 @@ import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -28,27 +26,22 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/close", this::close);
+        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}/users", this::getUsers);
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
 
-        if (restaurantId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
+        if (restaurantId != null) {
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByRestaurant(restaurantId));
+        } else {
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
         }
-
-        List<Order> orders = new ArrayList<>();
-        orders.addAll(GroupOrderManager.getInstance().getOrdersByRestaurant(restaurantId));
-        orders.addAll(SingleOrderManager.getInstance().getOrdersByRestaurant(restaurantId));
-
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, orders);
     }
 
     private void close(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String groupOrderId = params.get("groupOrderId");
+        String groupOrderId = params.get("id");
 
         if (groupOrderId == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
@@ -64,5 +57,16 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
             exchange.close();
         }
+    }
+
+    private void getUsers(HttpExchange exchange, Map<String, String> params) throws IOException {
+        String groupOrderId = params.get("id");
+
+        if (groupOrderId == null) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            exchange.close();
+            return;
+        }
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getUsers(groupOrderId));
     }
 }

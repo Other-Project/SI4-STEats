@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.order.singles;
 
 import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.models.Payment;
@@ -56,7 +56,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
     }
 
     private void pay(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String orderId = params.get("orderId");
+        String orderId = params.get("id");
 
         if (orderId == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
@@ -80,11 +80,9 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         try {
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
             SingleOrder singleOrder = JacksonUtils.fromJson(exchange.getRequestBody(), SingleOrder.class);
-            singleOrder.checkGroupOrder();
+            if (!singleOrder.checkGroupOrder()) exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
             getManager().add(singleOrder);
             exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, -1);
-        } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
         } catch (Exception e) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
         }

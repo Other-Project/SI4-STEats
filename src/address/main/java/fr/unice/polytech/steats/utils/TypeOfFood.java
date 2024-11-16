@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.restaurant;
+package fr.unice.polytech.steats.utils;
 
 public enum TypeOfFood {
     FAST_FOOD,

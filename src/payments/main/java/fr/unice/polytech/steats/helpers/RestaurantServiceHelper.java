@@ -1,7 +1,7 @@
 package fr.unice.polytech.steats.helpers;
 
-import fr.unice.polytech.steats.restaurant.MenuItem;
-import fr.unice.polytech.steats.restaurant.Restaurant;
+import fr.unice.polytech.steats.models.MenuItem;
+import fr.unice.polytech.steats.models.Restaurant;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
 
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class RestaurantServiceHelper {
 
-    public static final URI RESTAURANT_SERVICE_URI = URI.create("http://localhost:5006/api/restaurants");
+    public static final URI RESTAURANT_SERVICE_URI = URI.create("http://localhost:5006/api/restaurants/");
 
     private RestaurantServiceHelper() {
     }
@@ -70,6 +70,6 @@ public class RestaurantServiceHelper {
                 .GET()
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
-        return JacksonUtils.fromJson(response.body());
+        return JacksonUtils.listFromJson(response.body(), MenuItem.class);
     }
 }

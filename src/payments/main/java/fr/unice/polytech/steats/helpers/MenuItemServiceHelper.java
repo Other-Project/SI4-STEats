@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.helpers;
 
-import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
 
@@ -17,7 +17,7 @@ import java.net.http.HttpResponse;
  */
 public class MenuItemServiceHelper {
 
-    public static final URI MENUITEM_SERVICE_URI = URI.create("http://localhost:5007/api/menu-items");
+    public static final URI MENUITEM_SERVICE_URI = URI.create("http://localhost:5007/api/menu-items/");
 
     private MenuItemServiceHelper() {
     }
