@@ -16,7 +16,7 @@ import java.net.http.HttpResponse;
  * @author Team C
  */
 public class OrderServiceHelper {
-    public static final URI ORDER_SERVICE_URI = URI.create("http://localhost:5004/api/orders");
+    public static final URI ORDER_SERVICE_URI = URI.create("http://localhost:5004/api/orders/");
 
     private OrderServiceHelper() {
     }

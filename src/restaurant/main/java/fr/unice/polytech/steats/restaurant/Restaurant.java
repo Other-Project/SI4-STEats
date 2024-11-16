@@ -149,14 +149,14 @@ public class Restaurant {
      * @param arrivalTime Wanted time of delivery
      */
     public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) throws IOException {
-        /*List<MenuItem> menu = MenuItemServiceHelper.getMenuItemByRestaurantId(getId());
+        List<MenuItem> menu = MenuItemServiceHelper.getMenuItemByRestaurantId(getId());
         if (arrivalTime == null) return menu;
+        // Todo : getMaxCapacityLeft doesn't work
         Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
         return menu.stream().filter(menuItem -> {
             assert maxCapacity != null;
             return !maxCapacity.minus(menuItem.preparationTime()).isNegative();
-        }).toList();*/
-        return new ArrayList<>();
+        }).toList();
     }
 
     /**

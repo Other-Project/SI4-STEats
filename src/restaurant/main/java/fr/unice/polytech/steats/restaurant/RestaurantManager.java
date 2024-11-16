@@ -29,7 +29,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
 
     @Override
     public void add(Restaurant item) {
-        super.add(item.getName(), item);
+        super.add(item.getId(), item);
     }
 
     /**
