@@ -1,7 +1,6 @@
 package fr.unice.polytech.steats.menuitem;
 
 import fr.unice.polytech.steats.utils.AbstractManager;
-import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.Duration;
 import java.util.List;
@@ -30,14 +29,9 @@ public class MenuItemManager extends AbstractManager<MenuItem> {
      * @param restaurantId The id of the restaurant
      */
     public List<MenuItem> getByRestaurant(String restaurantId) {
-        return getInstance().getAll().stream()
-                .filter(menuItem -> {
-                    try {
-                        return Objects.equals(menuItem.getRestaurantId(), restaurantId);
-                    } catch (NotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+        return getInstance().getAll()
+                .stream()
+                .filter(menuItem -> Objects.equals(menuItem.getRestaurantId(), restaurantId))
                 .toList();
     }
 

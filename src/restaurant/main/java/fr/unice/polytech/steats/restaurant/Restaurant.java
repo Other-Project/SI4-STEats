@@ -2,6 +2,8 @@ package fr.unice.polytech.steats.restaurant;
 
 //import fr.unice.polytech.steats.discount.Discount;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Order;
@@ -21,7 +23,7 @@ import java.util.Objects;
  * @author Team C
  */
 public class Restaurant {
-    private final String restaurantId;
+    private final String id;
     private final String name;
     private final TypeOfFood typeOfFood;
     private final Duration scheduleDuration;
@@ -37,12 +39,13 @@ public class Restaurant {
     /**
      * Create a restaurant
      *
+     * @param id               The id of the restaurant
      * @param name             The name of the restaurant
      * @param typeOfFood       The type of food the restaurant serves
      * @param scheduleDuration The duration of the schedule
      */
-    public Restaurant(String restaurantId, String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
-        this.restaurantId = restaurantId;
+    public Restaurant(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("typeOfFood") TypeOfFood typeOfFood, @JsonProperty("scheduleDuration") Duration scheduleDuration) {
+        this.id = id;
         this.name = name;
         this.typeOfFood = typeOfFood;
         this.scheduleDuration = scheduleDuration;
@@ -53,8 +56,8 @@ public class Restaurant {
      *
      * @param name The name of the restaurant
      */
-    public Restaurant(String restaurantId, String name) {
-        this(restaurantId, name, TypeOfFood.CLASSIC);
+    public Restaurant(String id, String name) {
+        this(id, name, TypeOfFood.CLASSIC);
     }
 
     /**
@@ -63,8 +66,8 @@ public class Restaurant {
      * @param name       The name of the restaurant
      * @param typeOfFood The type of food the restaurant serves
      */
-    public Restaurant(String restaurantId, String name, TypeOfFood typeOfFood) {
-        this(restaurantId, name, typeOfFood, Duration.ofMinutes(30));
+    public Restaurant(String id, String name, TypeOfFood typeOfFood) {
+        this(id, name, typeOfFood, Duration.ofMinutes(30));
     }
 
     /**
@@ -77,15 +80,16 @@ public class Restaurant {
     /**
      * ID of the Restaurant
      */
-    public String getRestaurantId() {
-        return restaurantId;
+    public String getId() {
+        return id;
     }
 
     /**
      * The full menu of the restaurant
      */
+    @JsonIgnore
     public List<MenuItem> getFullMenu() throws IOException {
-        return MenuItemServiceHelper.getMenuItemByRestaurantId(getRestaurantId());
+        return MenuItemServiceHelper.getMenuItemByRestaurantId(getId());
     }
 
     /**
@@ -144,12 +148,14 @@ public class Restaurant {
      *
      * @param arrivalTime Wanted time of delivery
      */
-    public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) {
-        /*
+    public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) throws IOException {
+        /*List<MenuItem> menu = MenuItemServiceHelper.getMenuItemByRestaurantId(getId());
         if (arrivalTime == null) return menu;
         Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
-        return menu.stream().filter(menuItem -> !maxCapacity.minus(menuItem.getPreparationTime()).isNegative()).toList();
-         */
+        return menu.stream().filter(menuItem -> {
+            assert maxCapacity != null;
+            return !maxCapacity.minus(menuItem.preparationTime()).isNegative();
+        }).toList();*/
         return new ArrayList<>();
     }
 
@@ -369,12 +375,12 @@ public class Restaurant {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (Restaurant) obj;
-        return Objects.equals(this.restaurantId, that.restaurantId);
+        return Objects.equals(this.id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(restaurantId, name, typeOfFood);
+        return Objects.hash(id, name, typeOfFood);
     }
 
     @Override

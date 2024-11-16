@@ -59,7 +59,5 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         } else {
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.getFullMenu());
         }
-
     }
-
 }
