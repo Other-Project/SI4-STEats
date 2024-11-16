@@ -24,8 +24,13 @@ Requirements :
 
 ```sh
 git clone https://github.com/PNS-Conception/STE-24-25--teamc.git
-cd STE-24-25--teamc
-mvn clean test
+cd STE-24-25--teamc/backend
+mvn -f common/pom.xml clean install
+```
+
+Then for each service :
+```sh
+mvn -f THESERVICE/pom.xml clean compile exec:java
 ```
 
 ## Project structure
