@@ -340,8 +340,7 @@ public class Restaurant {
      * @param endDay    The day of the week to end the period
      * @param endTime   The time to end the period
      */
-    public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) {
-        /*
+    public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) throws IOException {
         DayOfWeek day = startDay;
         long seconds = Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds();  // round the start time to the nearest schedule
         if (seconds >= 86400) {
@@ -350,11 +349,10 @@ public class Restaurant {
         }
         LocalTime time = LocalTime.ofSecondOfDay(seconds);
         for (; day != endDay || (!time.plus(getScheduleDuration()).isAfter(endTime) && !time.plus(getScheduleDuration()).equals(LocalTime.MIN)); time = time.plus(getScheduleDuration())) {
-            addSchedule(new Schedule(time, getScheduleDuration(), nbPersons, day));
+            ScheduleServiceHelper.addSchedule(new Schedule(UUID.randomUUID().toString(), time, getScheduleDuration(), nbPersons, day, getId(), time.plus(getScheduleDuration()), getScheduleDuration().multipliedBy(nbPersons)));
             if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
                 day = day.plus(1);
         }
-         */
     }
 
     @Override

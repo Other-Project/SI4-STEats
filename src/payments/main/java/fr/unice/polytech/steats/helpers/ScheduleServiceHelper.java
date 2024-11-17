@@ -50,4 +50,12 @@ public class ScheduleServiceHelper {
         return JacksonUtils.listFromJson(response.body(), Schedule.class);
     }
 
+    public static void addSchedule(Schedule schedule) throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(SCHEDULE_SERVICE_URI)
+                .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(schedule)))
+                .build();
+        HttpUtils.sendRequest(request);
+    }
 }
