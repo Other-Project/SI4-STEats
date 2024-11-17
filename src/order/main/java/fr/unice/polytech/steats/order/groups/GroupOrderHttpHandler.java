@@ -26,7 +26,7 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/close", this::close);
-        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}/users", this::getUsers);
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}/users", this::getUsers);
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 

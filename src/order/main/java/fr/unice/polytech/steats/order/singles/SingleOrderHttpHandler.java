@@ -77,7 +77,11 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         try {
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
             SingleOrder singleOrder = JacksonUtils.fromJson(exchange.getRequestBody(), SingleOrder.class);
-            if (!singleOrder.checkGroupOrder()) exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            if (!singleOrder.checkGroupOrder()) {
+                exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+                exchange.close();
+                return;
+            }
             getManager().add(singleOrder);
             exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, -1);
         } catch (Exception e) {
