@@ -170,6 +170,7 @@ public class Restaurant {
     }*/
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
         /*
+        TODO
         if (deliveryTime == null || orders.isEmpty()) return true;
         long averagePreparationTime = getAveragePreparationTime().toMinutes();
         if (averagePreparationTime == 0) return true;
@@ -185,6 +186,7 @@ public class Restaurant {
 
     private Duration getAveragePreparationTime() {
         /*
+        TODO
         List<Duration> lastOrderDurations = orders.reversed().stream()
                 .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0 && order.getDeliveryTime() != null)
                 .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
@@ -287,27 +289,21 @@ public class Restaurant {
      *
      * @param day The day of the week
      */
-    public List<OpeningTime> getOpeningTimes(DayOfWeek day) {
-        /*
-        List<Schedule> scheduleList = schedules.stream()
-                .filter(schedule -> schedule.getDayOfWeek() == day)
-                .sorted(Comparator.comparing(Schedule::getStart))
-                .toList();
+    public List<OpeningTime> getOpeningTimes(DayOfWeek day) throws IOException {
+        List<Schedule> scheduleList = ScheduleServiceHelper.getScheduleByRestaurantIdAndWeekday(getId(), day);
         List<OpeningTime> intervals = new ArrayList<>();
         OpeningTime currentInterval = null;
         for (Schedule schedule : scheduleList) {
-            if (currentInterval != null && currentInterval.getEnd().equals(schedule.getStart())) {
-                currentInterval.setEnd(schedule.getEnd());
+            if (currentInterval != null && currentInterval.getEnd().equals(schedule.start())) {
+                currentInterval.setEnd(schedule.end());
                 continue;
             } else if (currentInterval != null) intervals.add(currentInterval);
-            currentInterval = new OpeningTime(schedule.getStart(), schedule.getEnd());
+            currentInterval = new OpeningTime(schedule.start(), schedule.end());
         }
-        if (currentInterval != null && currentInterval.getEnd().equals(LocalTime.of(0, 0))) currentInterval.setEnd(LocalTime.of(23, 59, 59));
+        if (currentInterval != null && currentInterval.getEnd().equals(LocalTime.of(0, 0)))
+            currentInterval.setEnd(LocalTime.of(23, 59, 59));
         if (currentInterval != null) intervals.add(currentInterval);
         return intervals;
-
-         */
-        return new ArrayList<>();
     }
 
     /**

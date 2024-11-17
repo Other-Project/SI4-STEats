@@ -9,12 +9,13 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class ScheduleServiceHelper {
-    public static final URI SCHEDULE_SERVICE_URI = URI.create("http://localhost:5008/api/schedule/");
+    public static final URI SCHEDULE_SERVICE_URI = URI.create("http://localhost:5008/api/schedules/");
 
     private ScheduleServiceHelper() {
     }
@@ -22,6 +23,16 @@ public class ScheduleServiceHelper {
     public static List<Schedule> getScheduleByRestaurantId(String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(SCHEDULE_SERVICE_URI.resolve("restaurant/" + restaurantId))
+                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
+                .GET()
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        return JacksonUtils.listFromJson(response.body(), Schedule.class);
+    }
+
+    public static List<Schedule> getScheduleByRestaurantIdAndWeekday(String restaurantId, DayOfWeek dayOfWeek) throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(SCHEDULE_SERVICE_URI.resolve("restaurant/" + restaurantId + "?dayOfWeek=" + dayOfWeek))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

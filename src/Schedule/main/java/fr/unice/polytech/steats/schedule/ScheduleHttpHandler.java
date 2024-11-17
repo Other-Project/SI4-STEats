@@ -26,7 +26,7 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
     protected void register() {
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange));
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/restaurant/{restaurantId}", this::getScheduleByRestaurantId);
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/restaurant/{restaurantId}", (exchange, param) -> getScheduleByRestaurantId(exchange, param, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/delivery/toDeliver", (exchange, param) -> scheduleForDeliveryTime(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
@@ -57,13 +57,17 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
         HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, schedules2HoursBefore);
     }
 
-    private void getScheduleByRestaurantId(HttpExchange exchange, Map<String, String> param) throws IOException {
+    private void getScheduleByRestaurantId(HttpExchange exchange, Map<String, String> param, Map<String, String> query) throws IOException {
         String restaurantId = param.get("restaurantId");
         if (restaurantId == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
             exchange.close();
             return;
         }
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getScheduleByRestaurantId(restaurantId));
+        List<Schedule> schedules = getManager().getScheduleByRestaurantId(restaurantId);
+        String weekday = query.get("dayOfWeek");
+        if (weekday != null)
+            schedules = schedules.stream().filter(schedule -> schedule.getDayOfWeek().name().equalsIgnoreCase(weekday)).toList();
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, schedules);
     }
 }

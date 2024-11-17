@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 
 public class ScheduleHttpServer extends AbstractHttpServer {
-    public static final String API_ADDRESS = "/api/schedule";
+    public static final String API_ADDRESS = "/api/schedules";
     public static final int API_PORT = 5008;
 
     protected ScheduleHttpServer(int apiPort) throws IOException {
@@ -22,6 +22,6 @@ public class ScheduleHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("schedule", API_ADDRESS, new ScheduleHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler("schedules", API_ADDRESS, new ScheduleHttpHandler(API_ADDRESS, getLogger()));
     }
 }
