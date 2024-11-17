@@ -106,9 +106,9 @@ public class Schedule implements Comparable<Schedule> {
     /*
     TODO
     public boolean contains(Order order) {
-        fdpdesonarlintquimecasselescouillesenmedisantquecestducode LocalDateTime deliveryTime = order.getDeliveryTime();
-        a return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
-    a }*/
+        LocalDateTime deliveryTime = order.getDeliveryTime();
+        return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
+    }*/
 
     /**
      * Check if the schedule is between two dates

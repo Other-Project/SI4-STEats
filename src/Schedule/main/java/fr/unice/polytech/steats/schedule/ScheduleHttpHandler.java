@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.JacksonUtils;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -25,17 +26,17 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
     @Override
     protected void register() {
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange));
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/restaurant/{restaurantId}", (exchange, param) -> getScheduleByRestaurantId(exchange, param, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/delivery/toDeliver", (exchange, param) -> scheduleForDeliveryTime(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "{id}/delivery", this::scheduleForDeliveryTime);
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    private void scheduleForDeliveryTime(HttpExchange exchange, Map<String, String> query) throws IOException {
-        String restaurantId = query.get("restaurantId");
-        String deliveryTimeString = query.get("deliveryTime");
-        String maxPreparationTimeBeforeDeliveryString = query.get("maxPreparationTimeBeforeDelivery");
+    private void scheduleForDeliveryTime(HttpExchange exchange, Map<String, String> param) throws IOException {
+        Map<String, Object> params = JacksonUtils.mapFromJson(exchange.getRequestBody());
+        String restaurantId = params.get("id").toString();
+        String deliveryTimeString = params.get("deliveryTime").toString();
+        String maxPreparationTimeBeforeDeliveryString = params.get("maxPreparationTimeBeforeDelivery").toString();
         if (restaurantId == null || deliveryTimeString == null || maxPreparationTimeBeforeDeliveryString == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
             exchange.close();
@@ -57,17 +58,17 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
         HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, schedules2HoursBefore);
     }
 
-    private void getScheduleByRestaurantId(HttpExchange exchange, Map<String, String> param, Map<String, String> query) throws IOException {
-        String restaurantId = param.get("restaurantId");
+    private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
+        if (query.isEmpty()) {
+            super.getAll(exchange);
+            return;
+        }
+        String restaurantId = query.get("restaurantId");
         if (restaurantId == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
             exchange.close();
             return;
         }
-        List<Schedule> schedules = getManager().getScheduleByRestaurantId(restaurantId);
-        String weekday = query.get("dayOfWeek");
-        if (weekday != null)
-            schedules = schedules.stream().filter(schedule -> schedule.getDayOfWeek().name().equalsIgnoreCase(weekday)).toList();
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, schedules);
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getScheduleByRestaurantId(restaurantId));
     }
 }
