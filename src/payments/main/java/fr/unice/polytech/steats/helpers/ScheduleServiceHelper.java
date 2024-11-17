@@ -31,7 +31,7 @@ public class ScheduleServiceHelper {
 
     public static List<Schedule> getScheduleForDeliveryTime(String restaurantId, LocalDateTime deliveryTime, Duration maxPreparationTimeBeforeDelivery) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(SCHEDULE_SERVICE_URI.resolve("toDeliver?restaurantId" + restaurantId + "&deliveryTime=" + deliveryTime + "&maxPreparationTimeBeforeDelivery=" + maxPreparationTimeBeforeDelivery))
+                .uri(SCHEDULE_SERVICE_URI.resolve("delivery/toDeliver?restaurantId=" + restaurantId + "&deliveryTime=" + deliveryTime + "&maxPreparationTimeBeforeDelivery=" + maxPreparationTimeBeforeDelivery))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

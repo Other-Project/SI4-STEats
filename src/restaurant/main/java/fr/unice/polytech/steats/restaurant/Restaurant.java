@@ -234,9 +234,15 @@ public class Restaurant {
         LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
         Set<Schedule> schedulesBefore2Hours = new HashSet<>(ScheduleServiceHelper.getScheduleForDeliveryTime(getId(), deliveryTime, MAX_PREPARATION_DURATION_BEFORE_DELIVERY));
         return schedulesBefore2Hours.stream()
-                .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
+                .map(Schedule::totalCapacity)
                 .max(Comparator.comparing(Function.identity()))
                 .orElse(Duration.ZERO);
+        /*
+        Todo : change the return when capacityLeft will work
+        return schedulesBefore2Hours.stream()
+                .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
+                .max(Comparator.comparing(Function.identity()))
+                .orElse(Duration.ZERO);*/
     }
 
     /**
