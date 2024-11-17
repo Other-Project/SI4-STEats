@@ -53,6 +53,19 @@ public class GroupOrderServiceHelper {
     }
 
     /**
+     * Get all group orders
+     */
+    public static List<GroupOrder> getAll() throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(GROUP_ORDER_SERVICE_URI)
+                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
+                .GET()
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        return JacksonUtils.listFromJson(response.body(), GroupOrder.class);
+    }
+
+    /**
      * Get all group orders in a specific restaurant.
      *
      * @param restaurantId The id of the restaurant

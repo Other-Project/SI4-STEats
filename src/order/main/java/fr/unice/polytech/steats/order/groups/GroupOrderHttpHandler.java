@@ -43,13 +43,10 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
     private void close(HttpExchange exchange, Map<String, String> params) throws IOException {
         String groupOrderId = params.get("id");
 
-        if (groupOrderId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
-        }
         try {
             GroupOrderManager.getInstance().get(groupOrderId).closeOrder();
+            exchange.sendResponseHeaders(HttpUtils.NO_CONTENT_CODE, -1);
+            exchange.close();
         } catch (IllegalStateException e) {
             exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, -1);
             exchange.close();
@@ -61,12 +58,6 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
 
     private void getUsers(HttpExchange exchange, Map<String, String> params) throws IOException {
         String groupOrderId = params.get("id");
-
-        if (groupOrderId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
-        }
         HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getUsers(groupOrderId));
     }
 }

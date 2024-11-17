@@ -48,7 +48,7 @@ public interface Order extends Saleable {
     /**
      * @return The time it takes to prepare the order
      */
-    Duration getPreparationTime();
+    Duration getPreparationTime() throws IOException;
 
     /**
      * @return The ordering time of the order
@@ -58,7 +58,7 @@ public interface Order extends Saleable {
     /**
      * Get the list of the items id's in the order
      */
-    List<String> getItems();
+    List<String> getItems() throws IOException;
 
     /**
      * Set the delivery time of the order

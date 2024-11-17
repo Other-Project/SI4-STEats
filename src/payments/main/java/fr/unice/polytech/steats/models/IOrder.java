@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface IOrder {
-    String id();
 
     String groupCode();
 

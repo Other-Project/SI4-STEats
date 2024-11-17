@@ -14,6 +14,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class for calling the order service.
@@ -103,6 +104,19 @@ public class SingleOrderServiceHelper {
     }
 
     /**
+     * Get all the single orders that are in a group order
+     */
+    public static List<SingleOrder> getAll() throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(SINGLE_ORDER_SERVICE_URI.resolve("?groupCode="))
+                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
+                .GET()
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        return JacksonUtils.listFromJson(response.body(), SingleOrder.class);
+    }
+
+    /**
      * Pay for an order.
      *
      * @param orderId The id of the order
@@ -112,7 +126,7 @@ public class SingleOrderServiceHelper {
                 .uri(SINGLE_ORDER_SERVICE_URI.resolve("/pay"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
-                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(List.of(orderId))))
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("orderId", orderId))))
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.fromJson(response.body(), Payment.class);
@@ -128,7 +142,7 @@ public class SingleOrderServiceHelper {
                 .uri(SINGLE_ORDER_SERVICE_URI.resolve(orderId + "/status"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
-                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(status)))
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("status", status))))
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.fromJson(response.body(), Status.class);
@@ -145,7 +159,7 @@ public class SingleOrderServiceHelper {
                 .uri(SINGLE_ORDER_SERVICE_URI.resolve(orderId + "/deliveryTime"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
-                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(deliveryTime)))
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("deliveryTime", deliveryTime))))
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.fromJson(response.body(), LocalDateTime.class);

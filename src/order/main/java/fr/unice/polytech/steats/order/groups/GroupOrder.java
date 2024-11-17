@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.order.groups;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
@@ -81,12 +80,12 @@ public class GroupOrder implements Order {
      * @implNote Returns the sum of the price of the all the {@link SingleOrder} it contains.
      */
     @Override
-    public double getPrice() {
+    public double getPrice() throws IOException {
         return getOrders().stream().mapToDouble(SingleOrder::price).sum();
     }
 
     @Override
-    public List<String> getItems() {
+    public List<String> getItems() throws IOException {
         return getOrders().stream().map(SingleOrder::items).flatMap(Collection::stream).toList();
     }
 
@@ -94,7 +93,7 @@ public class GroupOrder implements Order {
      * @return The total preparation time of all the single order in the group order
      */
     @Override
-    public Duration getPreparationTime() {
+    public Duration getPreparationTime() throws IOException {
         return getOrders().stream().map(SingleOrder::preparationTime).reduce(Duration.ZERO, Duration::plus);
     }
 
@@ -140,7 +139,7 @@ public class GroupOrder implements Order {
      * Close the group order.
      * All the single orders must be paid before the group order can be closed.
      */
-    public void closeOrder() {
+    public void closeOrder() throws IOException {
         if (getOrders().stream().anyMatch(order -> order.status() != Status.PAID))
             throw new IllegalStateException("All the orders must be paid.");
         status = Status.PAID;
@@ -149,19 +148,14 @@ public class GroupOrder implements Order {
     /**
      * @return The list of single orders in the group order
      */
-    private List<SingleOrder> getOrders() {
-        try {
-            return SingleOrderServiceHelper.getOrdersInGroup(groupCode);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private List<SingleOrder> getOrders() throws IOException {
+        return SingleOrderServiceHelper.getOrdersInGroup(groupCode);
     }
 
     /**
      * Get the list of single orders id's in the group order
      */
-    @JsonIgnore
-    public List<String> getOrdersId() {
+    public List<String> getOrdersId() throws IOException {
         return getOrders().stream().map(SingleOrder::id).toList();
     }
 

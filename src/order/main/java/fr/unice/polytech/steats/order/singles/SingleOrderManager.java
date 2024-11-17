@@ -117,5 +117,6 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         add(new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"));
         add(new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"));
         add(new SingleOrder(johnDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "EURECOM", "2"));
+        add(new SingleOrder(albanFalcoz, "1", LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"));
     }
 }

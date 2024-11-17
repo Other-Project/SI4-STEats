@@ -5,6 +5,7 @@ import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.utils.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -24,6 +25,8 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> create(exchange));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/pay", this::pay);
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/status", this::setStatus);
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/deliveryTime", this::setDeliveryTime);
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
@@ -57,12 +60,6 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
 
     private void pay(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
-
-        if (orderId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
-        }
         Payment payment = null;
         try {
             payment = SingleOrderManager.getInstance().get(orderId).pay();
@@ -86,6 +83,46 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         } catch (Exception e) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
         }
+        exchange.getResponseBody().close();
+    }
+
+    private void setStatus(HttpExchange exchange, Map<String, String> params) throws IOException {
+        String orderId = params.get("id");
+        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
+        String status = body == null ? null : body.get("status").toString();
+
+        if (status == null) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            exchange.getResponseBody().close();
+            return;
+        }
+
+        try {
+            SingleOrderManager.getInstance().get(orderId).setStatus(Status.valueOf(status));
+        } catch (NotFoundException e) {
+            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
+        }
+        exchange.sendResponseHeaders(HttpUtils.OK_CODE, -1);
+        exchange.getResponseBody().close();
+    }
+
+    private void setDeliveryTime(HttpExchange exchange, Map<String, String> params) throws IOException {
+        String orderId = params.get("id");
+        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
+        String deliveryTime = body == null ? null : body.get("deliveryTime").toString();
+
+        if (deliveryTime == null) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            exchange.getResponseBody().close();
+            return;
+        }
+
+        try {
+            SingleOrderManager.getInstance().get(orderId).setDeliveryTime(LocalDateTime.parse(deliveryTime));
+        } catch (NotFoundException e) {
+            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
+        }
+        exchange.sendResponseHeaders(HttpUtils.OK_CODE, -1);
         exchange.getResponseBody().close();
     }
 }

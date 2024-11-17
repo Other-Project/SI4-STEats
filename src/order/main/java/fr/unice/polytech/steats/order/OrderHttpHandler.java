@@ -36,14 +36,15 @@ public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager,
 
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
+        List<IOrder> orders = new ArrayList<>();
 
         if (restaurantId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
+            orders.addAll(GroupOrderServiceHelper.getAll());
+            orders.addAll(SingleOrderServiceHelper.getAll());
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, orders);
             return;
         }
 
-        List<IOrder> orders = new ArrayList<>();
         orders.addAll(GroupOrderServiceHelper.getGroupOrdersByRestaurant(restaurantId));
         orders.addAll(SingleOrderServiceHelper.getSingleOrdersNotInGroupByRestaurant(restaurantId));
 

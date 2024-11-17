@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record GroupOrder(
-        String id,
         String groupCode,
         LocalDateTime deliveryTime,
         String addressId,
