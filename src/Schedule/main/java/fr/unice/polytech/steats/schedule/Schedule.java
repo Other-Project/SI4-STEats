@@ -56,6 +56,9 @@ public class Schedule implements Comparable<Schedule> {
         return this.duration;
     }
 
+    /**
+     * @return The end of the schedule
+     */
     public LocalTime getEnd() {
         return start.plus(duration);
     }
@@ -103,9 +106,9 @@ public class Schedule implements Comparable<Schedule> {
     /*
     TODO
     public boolean contains(Order order) {
-        LocalDateTime deliveryTime = order.getDeliveryTime();
-        return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
-    }*/
+        fdpdesonarlintquimecasselescouillesenmedisantquecestducode LocalDateTime deliveryTime = order.getDeliveryTime();
+        a return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
+    a }*/
 
     /**
      * Check if the schedule is between two dates

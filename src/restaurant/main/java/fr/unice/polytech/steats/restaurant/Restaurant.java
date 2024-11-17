@@ -1,21 +1,17 @@
 package fr.unice.polytech.steats.restaurant;
 
-//import fr.unice.polytech.steats.discount.Discount;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
+import fr.unice.polytech.steats.helpers.ScheduleServiceHelper;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Order;
+import fr.unice.polytech.steats.models.Schedule;
 
 import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.time.*;
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * A restaurant that serves food
@@ -151,7 +147,6 @@ public class Restaurant {
     public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) throws IOException {
         List<MenuItem> menu = MenuItemServiceHelper.getMenuItemByRestaurantId(getId());
         if (arrivalTime == null) return menu;
-        // Todo : getMaxCapacityLeft doesn't work
         Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
         return menu.stream().filter(menuItem -> {
             assert maxCapacity != null;
@@ -161,8 +156,9 @@ public class Restaurant {
 
     /**
      * Check if the restaurant can handle an order at a given time
+     * <p>
+     * //* @param order        The order to check
      *
-     //* @param order        The order to check
      * @param deliveryTime The time of delivery
      */
     /*
@@ -172,7 +168,6 @@ public class Restaurant {
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
         return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(deliveryTime, maxCapacity);
     }*/
-
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
         /*
         if (deliveryTime == null || orders.isEmpty()) return true;
@@ -211,20 +206,17 @@ public class Restaurant {
      * @return True if the restaurant can deliver at the given time, false otherwise
      */
     public boolean canDeliverAt(LocalDateTime deliveryTime) {
-        /*
+
         try {
             Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-            return menu.stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
+            return MenuItemServiceHelper.getMenuItemByRestaurantId(id).stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
         } catch (Exception e) {
             return false;
         }
-
-         */
-        return true;
     }
 
-    /*private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
-     *//*
+    private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
+        /*
         List<Order> ordersTakenAccountSchedule = orders.stream()
                 .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
                 .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryDate.getDayOfYear())
@@ -234,24 +226,17 @@ public class Restaurant {
                 .map(Order::getPreparationTime)
                 .reduce(Duration.ZERO, Duration::plus);
         return schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
-
-         *//*
+         */
         return null;
-    }*/
+    }
 
-    private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) {
-        /*
+    private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) throws IOException {
         LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
-        Set<Schedule> schedulesBefore2Hours = schedules.stream()
-                .filter(schedule -> schedule.isBetween(deliveryTime.minus(MAX_PREPARATION_DURATION_BEFORE_DELIVERY), deliveryTime))
-                .collect(Collectors.toSet());
+        Set<Schedule> schedulesBefore2Hours = new HashSet<>(ScheduleServiceHelper.getScheduleForDeliveryTime(getId(), deliveryTime, MAX_PREPARATION_DURATION_BEFORE_DELIVERY));
         return schedulesBefore2Hours.stream()
                 .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
                 .max(Comparator.comparing(Function.identity()))
                 .orElse(Duration.ZERO);
-
-         */
-        return null;
     }
 
     /**

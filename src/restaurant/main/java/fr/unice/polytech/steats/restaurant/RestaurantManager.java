@@ -1,7 +1,9 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.utils.AbstractManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import java.util.List;
  *
  * @author Team C
  */
+@SuppressWarnings("java:S6548")
 public class RestaurantManager extends AbstractManager<Restaurant> {
     private static final RestaurantManager INSTANCE = new RestaurantManager();
 
@@ -80,6 +83,10 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
         return filterRestaurant(null, null, deliveryTime);
     }
 
+    public static Duration getScheduleDurationForRestaurant(String restaurantId) throws NotFoundException {
+        return getInstance().get(restaurantId).getScheduleDuration();
+    }
+
     /**
      * Fill the restaurant manager with demo data
      */
@@ -91,9 +98,6 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
                 new Restaurant("4", "McAlban", TypeOfFood.FAST_FOOD)
         ).forEach(restaurant -> add(restaurant.getId(), restaurant));
         Restaurant restaurant = new Restaurant("5", "SushiRestaurant", TypeOfFood.CLASSIC);
-        //MenuItem menuItem = new MenuItem("1", "Sushi", 10.00, Duration.ofMinutes(15), restaurant.getId());
-        //restaurant.addMenuItem(menuItem);
-        //restaurant.addMenuItem(new MenuItem("2", "Maki", 8.00, Duration.ofMinutes(10), restaurant.getId()));
         add(restaurant.getId(), restaurant);
     }
 }
