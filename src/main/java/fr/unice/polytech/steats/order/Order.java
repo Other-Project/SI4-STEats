@@ -1,7 +1,6 @@
 package fr.unice.polytech.steats.order;
 
 import fr.unice.polytech.steats.address.Address;
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.users.User;
 

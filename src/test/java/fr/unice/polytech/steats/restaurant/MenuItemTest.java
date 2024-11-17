@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;

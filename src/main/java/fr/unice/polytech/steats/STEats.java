@@ -2,7 +2,6 @@ package fr.unice.polytech.steats;
 
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.order.GroupOrder;
 import fr.unice.polytech.steats.order.GroupOrderManager;
 import fr.unice.polytech.steats.order.SingleOrder;

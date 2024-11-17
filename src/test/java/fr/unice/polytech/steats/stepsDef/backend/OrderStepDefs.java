@@ -5,7 +5,6 @@ import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.STEatsController;
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.Status;
 import fr.unice.polytech.steats.restaurant.Restaurant;

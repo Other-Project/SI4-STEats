@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.discount;
 
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.order.SingleOrder;
 
 import java.time.LocalDateTime;

@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.menuitem;
 
+import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.time.Duration;

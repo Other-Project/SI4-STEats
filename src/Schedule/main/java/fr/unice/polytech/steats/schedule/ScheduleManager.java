@@ -57,5 +57,7 @@ public class ScheduleManager extends AbstractManager<Schedule> {
         add(schedule4.getId(), schedule4);
         Schedule schedule5 = new Schedule("5", LocalTime.of(12, 0), Duration.ofMinutes(30), 5, DayOfWeek.MONDAY, "1");
         add(schedule5.getId(), schedule5);
+        Schedule schedule6 = new Schedule("6", LocalTime.of(12, 30), Duration.ofMinutes(30), 5, DayOfWeek.MONDAY, "2");
+        add(schedule6.getId(), schedule6);
     }
 }

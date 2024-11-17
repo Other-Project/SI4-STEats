@@ -6,7 +6,6 @@ import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.order.*;
 import fr.unice.polytech.steats.schedule.Schedule;
 import fr.unice.polytech.steats.users.Role;

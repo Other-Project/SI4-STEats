@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.menuitem;
 
 import com.sun.net.httpserver.HttpExchange;
+import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;

@@ -4,7 +4,6 @@ import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.STEats;
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.schedule.Schedule;

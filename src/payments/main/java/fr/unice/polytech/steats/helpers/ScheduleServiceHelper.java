@@ -22,7 +22,7 @@ public class ScheduleServiceHelper {
 
     public static List<Schedule> getScheduleByRestaurantId(String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(SCHEDULE_SERVICE_URI.resolve("restaurant/" + restaurantId))
+                .uri(SCHEDULE_SERVICE_URI.resolve("?restaurantId=" + restaurantId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

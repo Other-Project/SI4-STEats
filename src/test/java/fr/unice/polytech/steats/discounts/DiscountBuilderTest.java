@@ -2,7 +2,6 @@ package fr.unice.polytech.steats.discounts;
 
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.menuitem.MenuItem;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
