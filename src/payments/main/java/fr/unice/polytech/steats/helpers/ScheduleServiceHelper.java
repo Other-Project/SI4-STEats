@@ -13,6 +13,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class ScheduleServiceHelper {
     public static final URI SCHEDULE_SERVICE_URI = URI.create("http://localhost:5008/api/schedules/");
@@ -32,7 +33,7 @@ public class ScheduleServiceHelper {
 
     public static List<Schedule> getScheduleByRestaurantIdAndWeekday(String restaurantId, DayOfWeek dayOfWeek) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(SCHEDULE_SERVICE_URI.resolve("restaurant/" + restaurantId + "?dayOfWeek=" + dayOfWeek))
+                .uri(SCHEDULE_SERVICE_URI.resolve("?restaurantId=" + restaurantId + "&dayOfWeek=" + dayOfWeek))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
@@ -42,9 +43,14 @@ public class ScheduleServiceHelper {
 
     public static List<Schedule> getScheduleForDeliveryTime(String restaurantId, LocalDateTime deliveryTime, Duration maxPreparationTimeBeforeDelivery) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(SCHEDULE_SERVICE_URI.resolve("delivery/toDeliver?restaurantId=" + restaurantId + "&deliveryTime=" + deliveryTime + "&maxPreparationTimeBeforeDelivery=" + maxPreparationTimeBeforeDelivery))
+                .uri(SCHEDULE_SERVICE_URI.resolve("restaurantId/" + restaurantId + "/delivery"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
-                .GET()
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of(
+                                "restaurantId", restaurantId,
+                                "deliveryTime", deliveryTime.toString(),
+                                "maxPreparationTimeBeforeDelivery", maxPreparationTimeBeforeDelivery.toString()
+                        )))
+                )
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.listFromJson(response.body(), Schedule.class);
