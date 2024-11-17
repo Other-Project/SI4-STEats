@@ -1,10 +1,13 @@
 package fr.unice.polytech.steats.schedule;
 
+import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.utils.AbstractManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.List;
 
 @SuppressWarnings("java:S6548")
 public class ScheduleManager extends AbstractManager<Schedule> {
@@ -25,8 +28,22 @@ public class ScheduleManager extends AbstractManager<Schedule> {
 
 
     @Override
-    public void add(Schedule item) {
-        super.add(item.getId(), item);
+    public void add(Schedule schedule) {
+        Duration restaurantScheduleDuration;
+        try {
+            restaurantScheduleDuration = RestaurantManager.getScheduleDurationForRestaurant(schedule.getRestaurantId());
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("This schedule's restaurant does not exist (schedule's restaurantId : " + schedule.getRestaurantId() + ")");
+        }
+        if (!schedule.getDuration().equals(restaurantScheduleDuration))
+            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
+        if (getAll().stream().anyMatch(s -> s.overlap(schedule)))
+            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
+        super.add(schedule.getId(), schedule);
+    }
+
+    public List<Schedule> getScheduleByRestaurantId(String restaurantId) {
+        return getAll().stream().filter(schedule -> schedule.getRestaurantId().equals(restaurantId)).toList();
     }
 
     public void demo() {

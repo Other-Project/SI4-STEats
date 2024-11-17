@@ -22,6 +22,6 @@ public class ScheduleHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("schedules", API_ADDRESS, new ScheduleHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler("schedule", API_ADDRESS, new ScheduleHttpHandler(API_ADDRESS, getLogger()));
     }
 }
