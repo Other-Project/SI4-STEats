@@ -123,10 +123,9 @@ public class SingleOrderServiceHelper {
      */
     public static Payment pay(String orderId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(SINGLE_ORDER_SERVICE_URI.resolve("/pay"))
+                .uri(SINGLE_ORDER_SERVICE_URI.resolve(orderId + "/pay"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
-                .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
-                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("orderId", orderId))))
+                .GET()
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.fromJson(response.body(), Payment.class);

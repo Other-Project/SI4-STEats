@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,7 @@ public abstract class AbstractHttpServer {
         server = HttpServer.create(new InetSocketAddress(apiPort), 0);
         this.apiPort = apiPort;
         registerHandlers();
-        server.setExecutor(null);
+        server.setExecutor(Executors.newCachedThreadPool());
     }
 
     public void start() {
