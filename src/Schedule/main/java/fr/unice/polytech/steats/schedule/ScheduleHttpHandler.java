@@ -27,14 +27,14 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
     protected void register() {
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "{id}/delivery", this::scheduleForDeliveryTime);
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{restaurantId}/delivery", this::scheduleForDeliveryTime);
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
     private void scheduleForDeliveryTime(HttpExchange exchange, Map<String, String> param) throws IOException {
         Map<String, Object> params = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String restaurantId = params.get("id").toString();
+        String restaurantId = params.get("restaurantId").toString();
         String deliveryTimeString = params.get("deliveryTime").toString();
         String maxPreparationTimeBeforeDeliveryString = params.get("maxPreparationTimeBeforeDelivery").toString();
         if (restaurantId == null || deliveryTimeString == null || maxPreparationTimeBeforeDeliveryString == null) {
