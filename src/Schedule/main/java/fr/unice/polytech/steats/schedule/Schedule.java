@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.schedule;
 
-import fr.unice.polytech.steats.order.Order;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author Team C
  */
 public class Schedule implements Comparable<Schedule> {
-    private final String scheduleId;
+    private final String id;
     private final DayOfWeek dayOfWeek;
     private final LocalTime start;
     private final Duration duration;
@@ -25,9 +25,9 @@ public class Schedule implements Comparable<Schedule> {
      * @param nbPerson  The number of person that works during the schedule
      * @param dayOfWeek The day of the week of the schedule
      */
-    public Schedule(String scheduleId, LocalTime start, Duration duration,
-                    int nbPerson, DayOfWeek dayOfWeek, String restaurantId) {
-        this.scheduleId = scheduleId;
+    public Schedule(@JsonProperty("id") String id, @JsonProperty("start") LocalTime start, @JsonProperty("duration") Duration duration,
+                    @JsonProperty("nbPerson") int nbPerson, @JsonProperty("dayOfWeek") DayOfWeek dayOfWeek, @JsonProperty("restaurantId") String restaurantId) {
+        this.id = id;
         this.start = start;
         this.duration = duration;
         this.nbPerson = nbPerson;
@@ -38,8 +38,8 @@ public class Schedule implements Comparable<Schedule> {
     /**
      * @return the schedule's id
      */
-    public String getScheduleId() {
-        return scheduleId;
+    public String getId() {
+        return id;
     }
 
     /**
@@ -100,10 +100,12 @@ public class Schedule implements Comparable<Schedule> {
      *
      * @param order The order to check
      */
+    /*
+    TODO
     public boolean contains(Order order) {
         LocalDateTime deliveryTime = order.getDeliveryTime();
         return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
-    }
+    }*/
 
     /**
      * Check if the schedule is between two dates
