@@ -211,7 +211,7 @@ public class Restaurant {
 
         try {
             Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-            return MenuItemServiceHelper.getMenuItemByRestaurantId(id).stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.getPreparationTime()) >= 0);
+            return MenuItemServiceHelper.getMenuItemByRestaurantId(id).stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.preparationTime()) >= 0);
         } catch (Exception e) {
             return false;
         }

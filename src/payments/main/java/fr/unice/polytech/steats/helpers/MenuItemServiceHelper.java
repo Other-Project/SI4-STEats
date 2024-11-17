@@ -30,7 +30,7 @@ public class MenuItemServiceHelper {
 
     public static MenuItem getAllMenuItem() throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(MENU_ITEM_SERVICE_URI.resolve(""))
+                .uri(MENU_ITEM_SERVICE_URI)
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
@@ -40,7 +40,7 @@ public class MenuItemServiceHelper {
 
     public static List<MenuItem> getMenuItemByRestaurantId(String restaurantId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(MENU_ITEM_SERVICE_URI.resolve("restaurant/" + restaurantId))
+                .uri(MENU_ITEM_SERVICE_URI.resolve("?restaurantId=" + restaurantId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

@@ -12,11 +12,4 @@ import java.time.Duration;
  * @param restaurantId    The id of the restaurant that serves the menu item
  */
 public record MenuItem(String id, String name, double price, Duration preparationTime, String restaurantId) {
-
-    /**
-     * @return The preparation time of the menu item
-     */
-    public Duration getPreparationTime() {
-        return preparationTime;
-    }
 }

@@ -91,13 +91,10 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
      * Fill the restaurant manager with demo data
      */
     public void demo() {
-        List.of(
-                new Restaurant("1", "La Cafet", TypeOfFood.SNACKS),
-                new Restaurant("2", "Le RU", TypeOfFood.CLASSIC),
-                new Restaurant("3", "Restaurant Alban", TypeOfFood.CLASSIC),
-                new Restaurant("4", "McAlban", TypeOfFood.FAST_FOOD)
-        ).forEach(restaurant -> add(restaurant.getId(), restaurant));
-        Restaurant restaurant = new Restaurant("5", "SushiRestaurant", TypeOfFood.CLASSIC);
-        add(restaurant.getId(), restaurant);
+        add(new Restaurant("1", "La Cafet", TypeOfFood.SNACKS));
+        add(new Restaurant("2", "Le RU", TypeOfFood.CLASSIC));
+        add(new Restaurant("3", "Restaurant Alban", TypeOfFood.CLASSIC));
+        add(new Restaurant("4", "McAlban", TypeOfFood.FAST_FOOD));
+        add(new Restaurant("5", "SushiRestaurant", TypeOfFood.CLASSIC));
     }
 }

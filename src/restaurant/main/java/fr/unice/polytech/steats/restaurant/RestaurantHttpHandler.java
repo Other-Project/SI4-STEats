@@ -36,11 +36,6 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
     private void getOpeningTimes(HttpExchange exchange, Map<String, String> param) throws IOException {
         String restaurantId = param.get("id");
         String dayOfWeek = param.get("dayOfWeek");
-        if (restaurantId == null || dayOfWeek == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
-        }
         DayOfWeek day;
         try {
             day = DayOfWeek.valueOf(dayOfWeek.toUpperCase());
@@ -58,11 +53,6 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
     private void getMenu(HttpExchange exchange, Map<String, String> param, Map<String, String> query) throws IOException {
         String restaurantId = param.get("id");
         String deliveryTimeString = query.get("deliveryTime");
-        if (restaurantId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
-        }
         Restaurant restaurant;
         try {
             restaurant = getManager().get(restaurantId);

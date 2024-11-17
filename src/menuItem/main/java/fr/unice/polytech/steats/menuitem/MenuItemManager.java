@@ -32,13 +32,13 @@ public class MenuItemManager extends AbstractManager<MenuItem> {
     public List<MenuItem> getByRestaurant(String restaurantId) {
         return getInstance().getAll()
                 .stream()
-                .filter(menuItem -> Objects.equals(menuItem.getRestaurantId(), restaurantId))
+                .filter(menuItem -> Objects.equals(menuItem.restaurantId(), restaurantId))
                 .toList();
     }
 
     @Override
     public void add(MenuItem item) {
-        super.add(item.getId(), item);
+        super.add(item.id(), item);
     }
 
     public void demo() {
