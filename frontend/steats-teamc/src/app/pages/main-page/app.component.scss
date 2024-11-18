@@ -1,3 +1,16 @@
-h1 {
-  color: greenyellow;
+.main-container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 9fr;
+
+  h1 {
+    color: greenyellow;
+  }
+
+  app-navbar {
+    grid-row: 1;
+  }
 }
+
+
