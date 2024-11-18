@@ -2,7 +2,12 @@ package fr.unice.polytech.steats;
 
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.order.*;
+import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
+import fr.unice.polytech.steats.models.Payment;
+import fr.unice.polytech.steats.order.GroupOrder;
+import fr.unice.polytech.steats.order.GroupOrderManager;
+import fr.unice.polytech.steats.order.SingleOrder;
+import fr.unice.polytech.steats.order.Status;
 import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.OpeningTime;
 import fr.unice.polytech.steats.restaurant.Restaurant;
@@ -10,6 +15,7 @@ import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.users.User;
 import fr.unice.polytech.steats.utils.NotFoundException;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -44,8 +50,8 @@ public class STEats {
     public STEats() {
     }
 
-    private void updateFullMenu() {
-        this.fullMenu = order.getRestaurant().getFullMenu();
+    private void updateFullMenu() throws IOException {
+        this.fullMenu = RestaurantServiceHelper.getFullMenu(order.getRestaurantId());
     }
 
     /**
@@ -55,7 +61,7 @@ public class STEats {
      * @param addressId The label of the address the user wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    public void createOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException {
+    public void createOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException, IOException {
         if (order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         order = new SingleOrder(user.getUserId(), deliveryTime, addressId, restaurantId);
         updateFullMenu();
@@ -68,7 +74,7 @@ public class STEats {
      * @param addressId    The label of the address where the group order must be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException {
+    public String createGroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) throws IllegalStateException, IOException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         GroupOrder groupOrder = new GroupOrder(deliveryTime, addressId, restaurantId);
         this.groupCode = groupOrder.getGroupCode();
@@ -76,6 +82,19 @@ public class STEats {
         order = groupOrder.createOrder(user.getUserId());
         updateFullMenu();
         return groupCode;
+    }
+
+    /**
+     * Get the menu item with the given ID
+     *
+     * @param menuItemId The ID of the menu item
+     */
+    public MenuItem getMenuItem(String menuItemId) {
+        try {
+            return MenuItemManager.getInstance().get(menuItemId);
+        } catch (NotFoundException e) {
+            throw new IllegalStateException("Menu item not found");
+        }
     }
 
     /**
@@ -101,7 +120,7 @@ public class STEats {
      *
      * @param groupCode The invitation code for the group order
      */
-    public void joinGroupOrder(String groupCode) throws NotFoundException {
+    public void joinGroupOrder(String groupCode) throws NotFoundException, IOException {
         if (this.groupCode != null || order != null) throw new IllegalStateException(ORDER_ALREADY_IN_PROGRESS);
         GroupOrder groupOrder = GroupOrderManager.getInstance().get(groupCode);
         if (groupOrder.getStatus() == Status.PAID) throw new IllegalStateException(GROUP_ORDER_ALREADY_CLOSED);
@@ -110,12 +129,13 @@ public class STEats {
         updateFullMenu();
     }
 
-    /**
-     * Get all the menu items available at the time of the delivery.
-     */
-    public List<MenuItem> getAvailableMenu() {
-        return order.getAvailableMenu();
-    }
+    //TODO : refactor this facade
+//    /**
+//     * Get all the id's of the menu items available at the time of the delivery.
+//     */
+//    public List<String> getAvailableMenu() throws IOException {
+//        return order.getAvailableMenu();
+//    }
 
     /**
      * Get the full menu of the restaurant, including the menu items that are not available at the time of the delivery.
@@ -124,23 +144,25 @@ public class STEats {
         return fullMenu;
     }
 
-    /**
-     * Add a menu item to the order.
-     *
-     * @param menuItem The menu item to add to the order
-     */
-    public void addMenuItem(MenuItem menuItem) {
-        if (!getAvailableMenu().contains(menuItem)) throw new IllegalStateException("Menu item not available");
-        order.addMenuItem(menuItem);
-    }
+    //TODO : refactor this facade
+//    /**
+//     * Add a menu item to the order.
+//     *
+//     * @param menuItemId The ID of the menu item to add to the order
+//     */
+//    public void addMenuItem(String menuItemId) throws IOException {
+//        if (!getAvailableMenu().contains(getMenuItem(menuItemId)))
+//            throw new IllegalStateException("Menu item not available");
+//        order.addMenuItem(menuItemId);
+//    }
 
     /**
      * Remove a menu item from the order.
      *
-     * @param menuItem The menu item to remove from the order
+     * @param menuItemId The ID of the menu item to remove from the order
      */
-    public void removeMenuItem(MenuItem menuItem) {
-        order.removeMenuItem(menuItem);
+    public void removeMenuItem(String menuItemId) throws IOException {
+        order.removeMenuItem(menuItemId);
     }
 
     /**
@@ -151,9 +173,9 @@ public class STEats {
     }
 
     /**
-     * Get all the item that the user wants to order.
+     * Get all the id's of the item that the user wants to order.
      */
-    public List<MenuItem> getCart() {
+    public List<String> getCart() {
         return order.getItems();
     }
 
@@ -171,7 +193,7 @@ public class STEats {
      * @param numberOfTimes The number of possible delivery times
      * @return The list of possible delivery times
      */
-    public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) throws NotFoundException {
+    public List<LocalDateTime> getAvailableDeliveryTimes(LocalDateTime from, int numberOfTimes) throws NotFoundException, IOException {
         return GroupOrderManager.getInstance().get(groupCode).getAvailableDeliveryTimes(from, numberOfTimes);
     }
 
@@ -187,7 +209,7 @@ public class STEats {
      *
      * @return If the payment was successful
      */
-    public boolean payOrder() throws NotFoundException {
+    public Payment payOrder() throws NotFoundException, IOException {
         if (groupCode != null)
             return GroupOrderManager.getInstance().get(groupCode).pay(order);
         if (order.getDeliveryTime() == null) throw new IllegalStateException("Please select a delivery time");
@@ -236,7 +258,7 @@ public class STEats {
      *
      * @param deliveryTime The new delivery time
      */
-    public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException {
+    public void changeDeliveryTime(LocalDateTime deliveryTime) throws NotFoundException, IOException {
         (groupCode == null ? order : GroupOrderManager.getInstance().get(groupCode)).setDeliveryTime(deliveryTime);
     }
 }
