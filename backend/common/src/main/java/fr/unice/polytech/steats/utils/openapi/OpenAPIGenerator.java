@@ -1,15 +1,6 @@
 package fr.unice.polytech.steats.utils.openapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.unice.polytech.steats.address.AddressHttpHandler;
-import fr.unice.polytech.steats.menuitem.MenuItemHttpHandler;
-import fr.unice.polytech.steats.order.OrderHttpHandler;
-import fr.unice.polytech.steats.order.groups.GroupOrderHttpHandler;
-import fr.unice.polytech.steats.order.singles.SingleOrderHttpHandler;
-import fr.unice.polytech.steats.payments.PaymentsHttpHandler;
-import fr.unice.polytech.steats.restaurant.RestaurantHttpHandler;
-import fr.unice.polytech.steats.schedule.ScheduleHttpHandler;
-import fr.unice.polytech.steats.users.UserHttpHandler;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -22,19 +13,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class OpenAPIGenerator {
-    public static void main(String[] args) throws IOException {
-        Class<?>[] handlers = {
-                PaymentsHttpHandler.class,
-                AddressHttpHandler.class,
-                UserHttpHandler.class,
-                MenuItemHttpHandler.class,
-                RestaurantHttpHandler.class,
-                ScheduleHttpHandler.class,
-                OrderHttpHandler.class,
-                SingleOrderHttpHandler.class,
-                GroupOrderHttpHandler.class
-        };
+    private OpenAPIGenerator() {
+    }
 
+    public static void generate(Class<?> ...handlers) throws IOException {
         Map<String, Map<String, OpenAPI.Path>> routes = new HashMap<>();
         Pattern urlParamPattern = Pattern.compile("\\{([^/]+)}");
         Arrays.stream(handlers)
