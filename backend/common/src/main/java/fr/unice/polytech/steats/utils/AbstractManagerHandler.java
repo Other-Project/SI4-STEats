@@ -1,39 +1,27 @@
 package fr.unice.polytech.steats.utils;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 
-public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> implements HttpHandler {
+public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> extends AbstractHandler {
     protected abstract T getManager();
 
-    private final String subPath;
     private final Class<U> clazz;
-    private final Logger logger;
 
     protected AbstractManagerHandler(String subPath, Class<U> clazz, Logger logger) {
-        this.subPath = subPath;
+        super(subPath, logger);
         this.clazz = clazz;
-        this.logger = logger;
-        register();
     }
 
-    public String getSubPath() {
-        return subPath;
-    }
-
+    @Override
     protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, subPath + "/{id}", this::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, subPath, (exchange, param) -> getAll(exchange));
-        ApiRegistry.registerRoute(HttpUtils.PUT, subPath, (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute(HttpUtils.DELETE, subPath + "/{id}", this::remove);
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", this::get);
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange));
+        ApiRegistry.registerRoute(HttpUtils.PUT, getSubPath(), (exchange, param) -> add(exchange));
+        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", this::remove);
     }
 
     protected void get(HttpExchange exchange, Map<String, String> params) throws IOException {
@@ -70,36 +58,5 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
         }
         exchange.getResponseBody().close();
-    }
-
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        // CORS
-        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*"); // Remplacez par votre origine cliente
-        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Accept, X-Requested-With, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization");
-
-        String requestMethod = exchange.getRequestMethod();
-        String requestPath = exchange.getRequestURI().getPath().replaceAll("/$", "");
-
-        logger.info(() -> "Received " + requestMethod + " at " + requestPath);
-        Optional<RouteInfo> routeInfoOptional = ApiRegistry.getRoutes().stream().filter(r -> r.matches(requestMethod, requestPath)).findFirst();
-        if (routeInfoOptional.isEmpty()) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
-            exchange.getResponseBody().close();
-            return;
-        }
-        RouteInfo route = routeInfoOptional.get();
-        Matcher matcher = route.getPathMatcher(requestPath);
-        Map<String, String> params = matcher.find()
-                ? matcher.namedGroups().keySet().stream().collect(Collectors.toMap(k -> k, matcher::group))
-                : Map.of();
-        try {
-            route.getHandler().handle(exchange, params);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Exception thrown while handling request", e);
-            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
-            exchange.getResponseBody().close();
-        }
     }
 }

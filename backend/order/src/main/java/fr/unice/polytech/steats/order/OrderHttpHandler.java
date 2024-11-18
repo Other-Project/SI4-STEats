@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.IOrder;
-import fr.unice.polytech.steats.utils.AbstractManagerHandler;
+import fr.unice.polytech.steats.utils.AbstractHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
 
@@ -14,14 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager, SingleOrder> {
+public class OrderHttpHandler extends AbstractHandler {
     public OrderHttpHandler(String subPath, Logger logger) {
-        super(subPath, SingleOrder.class, logger);
-    }
-
-    @Override
-    protected SingleOrderManager getManager() {
-        return SingleOrderManager.getInstance();
+        super(subPath, logger);
     }
 
     @Override
