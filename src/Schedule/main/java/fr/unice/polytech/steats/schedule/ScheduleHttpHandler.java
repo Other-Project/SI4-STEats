@@ -4,12 +4,9 @@ import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
-import fr.unice.polytech.steats.utils.JacksonUtils;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -27,35 +24,8 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
     protected void register() {
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{restaurantId}/delivery", this::scheduleForDeliveryTime);
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
-    }
-
-    private void scheduleForDeliveryTime(HttpExchange exchange, Map<String, String> param) throws IOException {
-        Map<String, Object> params = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String restaurantId = params.get("restaurantId").toString();
-        String deliveryTimeString = params.get("deliveryTime").toString();
-        String maxPreparationTimeBeforeDeliveryString = params.get("maxPreparationTimeBeforeDelivery").toString();
-        if (restaurantId == null || deliveryTimeString == null || maxPreparationTimeBeforeDeliveryString == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
-        }
-        LocalDateTime deliveryTime;
-        Duration maxPreparationTimeBeforeDelivery;
-        try {
-            deliveryTime = LocalDateTime.parse(deliveryTimeString);
-            maxPreparationTimeBeforeDelivery = Duration.parse(maxPreparationTimeBeforeDeliveryString);
-        } catch (Exception e) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            return;
-        }
-        List<Schedule> schedules = getManager().getScheduleByRestaurantId(restaurantId);
-        List<Schedule> schedules2HoursBefore = schedules.stream()
-                .filter(schedule -> schedule.isBetween(deliveryTime.minus(maxPreparationTimeBeforeDelivery), deliveryTime))
-                .toList();
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, schedules2HoursBefore);
     }
 
     private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
@@ -64,11 +34,26 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
             return;
         }
         String restaurantId = query.get("restaurantId");
-        if (restaurantId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
+        String startTime = query.get("startTime");
+        String endTime = query.get("endTime");
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (startTime != null) {
+            try {
+                start = LocalDateTime.parse(startTime);
+            } catch (Exception e) {
+                HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, "Invalid start time");
+                return;
+            }
         }
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getScheduleByRestaurantId(restaurantId));
+        if (endTime != null) {
+            try {
+                end = LocalDateTime.parse(endTime);
+            } catch (Exception e) {
+                HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, "Invalid end time");
+                return;
+            }
+        }
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getSchedule(restaurantId, start, end));
     }
 }

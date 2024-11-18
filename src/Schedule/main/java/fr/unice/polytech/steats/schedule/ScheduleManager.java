@@ -6,8 +6,10 @@ import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @SuppressWarnings("java:S6548")
 public class ScheduleManager extends AbstractManager<Schedule> {
@@ -40,6 +42,17 @@ public class ScheduleManager extends AbstractManager<Schedule> {
         if (getAll().stream().anyMatch(s -> s.overlap(schedule)))
             throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
         super.add(schedule.getId(), schedule);
+    }
+
+    public List<Schedule> getSchedule(String restaurantId, LocalDateTime startTime, LocalDateTime endTime) {
+        Stream<Schedule> schedules = getAll().stream();
+        if (restaurantId != null)
+            schedules = schedules.filter(schedule -> restaurantId.equals(schedule.getRestaurantId()));
+        if (startTime != null)
+            schedules = schedules.filter(schedule -> schedule.compareTo(startTime) >= 0 && !schedule.contains(startTime));
+        if (endTime != null)
+            schedules = schedules.filter(schedule -> schedule.compareTo(endTime) < 0 && !schedule.contains(endTime));
+        return schedules.toList();
     }
 
     public List<Schedule> getScheduleByRestaurantId(String restaurantId) {

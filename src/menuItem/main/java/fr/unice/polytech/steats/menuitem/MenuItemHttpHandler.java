@@ -24,7 +24,7 @@ public class MenuItemHttpHandler extends AbstractManagerHandler<MenuItemManager,
     @Override
     protected void register() {
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), ((exchange, params) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery()))));
+        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, params) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
@@ -36,5 +36,4 @@ public class MenuItemHttpHandler extends AbstractManagerHandler<MenuItemManager,
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
         }
     }
-
 }
