@@ -134,16 +134,14 @@ public class Restaurant {
 
     /**
      * Check if the restaurant can handle an order at a given time
-     * <p>
-     * //* @param order        The order to check
      *
-     * @param deliveryTime The time of delivery
+     * @param preparationTime The time it takes to prepare the order
+     * @param deliveryTime    The time of delivery
      */
-
-    public boolean canHandle(Order order, LocalDateTime deliveryTime) throws IOException {
+    public boolean canHandle(Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
         if (deliveryTime == null) return true;
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(order.preparationTime()) >= 0 && canAddOrder(deliveryTime, maxCapacity);
+        return maxCapacity.compareTo(preparationTime) >= 0 && canAddOrder(deliveryTime, maxCapacity);
     }
 
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
