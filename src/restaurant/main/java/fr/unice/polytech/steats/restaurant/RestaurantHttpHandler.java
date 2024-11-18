@@ -2,6 +2,8 @@ package fr.unice.polytech.steats.restaurant;
 
 import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.utils.*;
+import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -11,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@ApiMasterRoute(name = "Restaurants", path = "/api/restaurants")
 public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantManager, Restaurant> {
     public RestaurantHttpHandler(String subPath, Logger logger) {
         super(subPath, Restaurant.class, logger);
@@ -32,6 +35,7 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
+    @ApiRoute(path = "/{restaurantId}/canHandle", method = HttpUtils.POST, body = {"preparationTime", "deliveryTime"})
     private void canHandle(HttpExchange exchange, Map<String, String> param) throws IOException {
         String restaurantId = param.get("restaurantId");
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
@@ -57,6 +61,7 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.canHandle(preparationTime, deliveryTime));
     }
 
+    @ApiRoute(path = "/{id}/opening-times/{dayOfWeek}", method = HttpUtils.GET)
     private void getOpeningTimes(HttpExchange exchange, Map<String, String> param) throws IOException {
         String restaurantId = param.get("id");
         String dayOfWeek = param.get("dayOfWeek");
@@ -74,6 +79,7 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         }
     }
 
+    @ApiRoute(path = "/{id}/menu", method = HttpUtils.GET, queryParams = {"deliveryTime"})
     private void getMenu(HttpExchange exchange, Map<String, String> param, Map<String, String> query) throws IOException {
         String restaurantId = param.get("id");
         String deliveryTimeString = query.get("deliveryTime");

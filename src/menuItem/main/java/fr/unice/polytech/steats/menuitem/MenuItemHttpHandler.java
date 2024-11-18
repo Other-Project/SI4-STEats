@@ -5,11 +5,14 @@ import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@ApiMasterRoute(name = "Menu items", path = "/api/menu-items")
 public class MenuItemHttpHandler extends AbstractManagerHandler<MenuItemManager, MenuItem> {
 
     protected MenuItemHttpHandler(String subPath, Logger logger) {
@@ -29,6 +32,7 @@ public class MenuItemHttpHandler extends AbstractManagerHandler<MenuItemManager,
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
+    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId"})
     private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
         if (query.containsKey("restaurantId")) {
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getByRestaurant(query.get("restaurantId")));

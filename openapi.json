@@ -11,6 +11,483 @@
     }
   ],
   "paths": {
+    "/api/orders/groups/{id}/users": {
+      "get": {
+        "tags": [
+          "Group Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/orders/groups/{id}": {
+      "get": {
+        "tags": [
+          "Group Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Group Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/orders/singles/{id}/deliveryTime": {
+      "post": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/address/": {
+      "get": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      },
+      "put": {
+        "tags": [
+          "Addresses"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/payments/{id}": {
+      "get": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/orders/singles/": {
+      "post": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      },
+      "get": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          {
+            "name": "restaurantId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          {
+            "name": "groupCode",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/orders/singles/{id}/pay": {
+      "post": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/orders/singles/{id}": {
+      "get": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/orders/groups/": {
+      "post": {
+        "tags": [
+          "Group Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      },
+      "get": {
+        "tags": [
+          "Group Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Group Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/restaurants/{id}": {
+      "get": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/restaurants/{id}/opening-times/{dayOfWeek}": {
+      "get": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          {
+            "name": "{dayOfWeek}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/restaurants/{restaurantId}/canHandle": {
+      "post": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{restaurantId}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/schedules/{id}": {
+      "get": {
+        "tags": [
+          "Schedules"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Schedules"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/payments/pay": {
+      "post": {
+        "tags": [
+          "Payments"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
     "/api/users/{id}": {
       "get": {
         "tags": [
@@ -38,6 +515,37 @@
         "summary": "",
         "description": "",
         "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/restaurants/{id}/menu": {
+      "get": {
+        "tags": [
+          "Restaurants"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "deliveryTime",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+          }
+          },
           {
             "name": "{id}",
             "in": "path",
@@ -108,10 +616,60 @@
         "parameters": []
       }
     },
-    "/api/address/": {
+    "/api/menu-items/": {
       "get": {
         "tags": [
-          "Addresses"
+          "Menu items"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Menu items"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/orders/singles/{id}/status": {
+      "post": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/restaurants/": {
+      "get": {
+        "tags": [
+          "Restaurants"
         ],
         "summary": "",
         "description": "",
@@ -119,17 +677,17 @@
       },
       "put": {
         "tags": [
-          "Addresses"
+          "Restaurants"
         ],
         "summary": "",
         "description": "",
         "parameters": []
       }
     },
-    "/api/payments/{id}": {
+    "/api/menu-items/{id}": {
       "get": {
         "tags": [
-          "Payments"
+          "Menu items"
         ],
         "summary": "",
         "description": "",
@@ -148,7 +706,7 @@
       },
       "delete": {
         "tags": [
-          "Payments"
+          "Menu items"
         ],
         "summary": "",
         "description": "",
@@ -166,10 +724,78 @@
         ]
       }
     },
-    "/api/payments/pay": {
-      "post": {
+    "/api/orders/": {
+      "get": {
         "tags": [
-          "Payments"
+          "Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
+    "/api/schedules/": {
+      "get": {
+        "tags": [
+          "Schedules"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "restaurantId",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+          }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Schedules"
         ],
         "summary": "",
         "description": "",
