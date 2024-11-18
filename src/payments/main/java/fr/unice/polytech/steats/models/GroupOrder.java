@@ -6,13 +6,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record Order(
-        String id,
+public record GroupOrder(
         String groupCode,
         LocalDateTime deliveryTime,
         String addressId,
         String restaurantId,
         Status status,
+        List<String> ordersId,
         List<String> items,
         List<String> discounts,
         Duration preparationTime,

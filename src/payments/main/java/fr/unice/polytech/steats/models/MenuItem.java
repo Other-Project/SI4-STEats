@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.models;
 
+
 import java.time.Duration;
 
 /**

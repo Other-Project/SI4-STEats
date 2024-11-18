@@ -18,6 +18,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +100,7 @@ public class DiscountStepdefs {
     }
 
     @Given("I am {string} with the {string} role and {int} orders at {string} of {int} items")
-    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) {
+    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) throws IOException {
         aClientNamedWithTheRole(name, role);
         for (int i = 0; i < orders; i++) {
             SingleOrder singleOrder = new SingleOrder(username, null, "Campus SophiaTech", restaurant);

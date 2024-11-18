@@ -40,7 +40,7 @@ public class Restaurant {
      * @param typeOfFood       The type of food the restaurant serves
      * @param scheduleDuration The duration of the schedule
      */
-    public Restaurant(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("typeOfFood") TypeOfFood typeOfFood, @JsonProperty("scheduleDuration") Duration scheduleDuration) {
+    public Restaurant(@JsonProperty("id") String id, @JsonProperty("name") String id, String name, @JsonProperty("typeOfFood") TypeOfFood typeOfFood, @JsonProperty("scheduleDuration") Duration scheduleDuration) {
         this.id = id;
         this.name = name;
         this.typeOfFood = typeOfFood;
@@ -59,11 +59,19 @@ public class Restaurant {
     /**
      * Create a restaurant
      *
+     * @param id         The id of the restaurant
      * @param name       The name of the restaurant
      * @param typeOfFood The type of food the restaurant serves
      */
     public Restaurant(String id, String name, TypeOfFood typeOfFood) {
         this(id, name, typeOfFood, Duration.ofMinutes(30));
+    }
+
+    /**
+     * Get the id of the restaurant
+     */
+    public String getId() {
+        return id;
     }
 
     /**
@@ -118,26 +126,21 @@ public class Restaurant {
         return scheduleDuration;
     }
 
-    /**
-     * The discounts that can be applied to an order
-     *
-     * @param order The order to check
-     */
-    /*
-    TODO
-    public List<Discount> availableDiscounts(SingleOrder order) {
-        *//*
-        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
-        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
-        applicableDiscounts.stream()
-                .filter(discount -> !discount.isStackable())
-                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
-                .ifPresent(res::add);
-
-         *//*
-        return new ArrayList<>();
-    }*/
-
+    // TODO : Merge this in discount service
+//    /**
+//     * The discounts that can be applied to an order
+//     *
+//     * @param order The order to check
+//     */
+//    public List<Discount> availableDiscounts(SingleOrder order) {
+//        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
+//        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
+//        applicableDiscounts.stream()
+//                .filter(discount -> !discount.isStackable())
+//                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
+//                .ifPresent(res::add);
+//        return res;
+//    }
 
     /**
      * The part of the menu that can be prepared and delivered in time
@@ -245,16 +248,6 @@ public class Restaurant {
                 .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
                 .max(Comparator.comparing(Function.identity()))
                 .orElse(Duration.ZERO);*/
-    }
-
-    /**
-     * Add a menu item to the restaurant
-     *
-     * @param menuItem The menu item
-     */
-    public void addMenuItem(MenuItem menuItem) {
-        // this.menu.add(menuItem);
-        // menuItem.setRestaurantName(name);
     }
 
     /**

@@ -11,6 +11,12 @@ import fr.unice.polytech.steats.schedule.Schedule;
 import fr.unice.polytech.steats.users.Role;
 import fr.unice.polytech.steats.users.User;
 import fr.unice.polytech.steats.users.UserManager;
+import fr.unice.polytech.steats.location.Address;
+import fr.unice.polytech.steats.location.AddressManager;
+import fr.unice.polytech.steats.order.*;
+import fr.unice.polytech.steats.user.Role;
+import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

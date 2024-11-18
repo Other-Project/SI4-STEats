@@ -75,7 +75,7 @@ public class PaymentServiceHelper {
      */
     public static Payment payForOrder(String orderId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(PAYMENT_SERVICE_URI.resolve("/pay"))
+                .uri(PAYMENT_SERVICE_URI.resolve("pay"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
                 .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("orderId", orderId))))

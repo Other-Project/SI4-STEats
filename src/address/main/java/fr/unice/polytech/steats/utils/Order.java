@@ -1,9 +1,6 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.utils;
 
-import fr.unice.polytech.steats.address.Address;
-import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.users.User;
-
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +21,7 @@ public interface Order extends Saleable {
      *
      * @param status The new status of the order
      */
-    void setStatus(Status status);
+    void setStatus(Status status) throws IOException;
 
     /**
      * @return The time the user wants the order to be delivered
@@ -32,19 +29,14 @@ public interface Order extends Saleable {
     LocalDateTime getDeliveryTime();
 
     /**
-     * @return The address where the order must be delivered
-     */
-    Address getAddress();
-
-    /**
      * The id of the restaurant in which the order is made
      */
     String getRestaurantId();
 
     /**
-     * @return The restaurant in which the order is made
+     * Get the address id of the order
      */
-    Restaurant getRestaurant();
+    String getAddressId();
 
     /**
      * Get the group code of the order
@@ -54,24 +46,9 @@ public interface Order extends Saleable {
     String getGroupCode();
 
     /**
-     * @return A copy of the items of the order
-     */
-    List<MenuItem> getItems();
-
-    /**
-     * @return The menu that can be ordered at the given time
-     */
-    List<MenuItem> getAvailableMenu();
-
-    /**
-     * @return The List of users that have ordered
-     */
-    List<User> getUsers();
-
-    /**
      * @return The time it takes to prepare the order
      */
-    Duration getPreparationTime();
+    Duration getPreparationTime() throws IOException;
 
     /**
      * @return The ordering time of the order
@@ -79,9 +56,14 @@ public interface Order extends Saleable {
     LocalDateTime getOrderTime();
 
     /**
+     * Get the list of the items id's in the order
+     */
+    List<String> getItems() throws IOException;
+
+    /**
      * Set the delivery time of the order
      *
      * @param deliveryTime The time the order must be delivered
      */
-    void setDeliveryTime(LocalDateTime deliveryTime);
+    void setDeliveryTime(LocalDateTime deliveryTime) throws IOException;
 }
