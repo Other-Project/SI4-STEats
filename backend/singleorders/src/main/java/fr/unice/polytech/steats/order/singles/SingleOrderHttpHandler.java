@@ -4,12 +4,15 @@ import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.models.Status;
 import fr.unice.polytech.steats.utils.*;
+import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@ApiMasterRoute(name = "Single Orders", path = "/api/orders/singles")
 public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderManager, SingleOrder> {
     public SingleOrderHttpHandler(String subPath, Logger logger) {
         super(subPath, SingleOrder.class, logger);
@@ -31,6 +34,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
+    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"userId", "restaurantId", "groupCode"})
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String userId = params.get("userId");
         String restaurantId = params.get("restaurantId");
@@ -59,6 +63,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         }
     }
 
+    @ApiRoute(path = "/{id}/pay", method = HttpUtils.POST)
     private void pay(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
         Payment payment = null;
@@ -74,6 +79,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         } else HttpUtils.sendJsonResponse(exchange, HttpUtils.CREATED_CODE, payment);
     }
 
+    @ApiRoute(path = "/", method = HttpUtils.POST)
     private void create(HttpExchange exchange) throws IOException {
         try {
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
@@ -91,6 +97,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         exchange.getResponseBody().close();
     }
 
+    @ApiRoute(path = "/{id}/status", method = HttpUtils.POST)
     private void setStatus(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
@@ -111,6 +118,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         exchange.getResponseBody().close();
     }
 
+    @ApiRoute(path = "/{id}/deliveryTime", method = HttpUtils.POST)
     private void setDeliveryTime(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
