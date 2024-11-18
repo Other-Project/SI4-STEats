@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.other;
+package fr.unice.polytech.steats.utils;
 
 import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.address.AddressManager;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AbstractManagerTest {
 

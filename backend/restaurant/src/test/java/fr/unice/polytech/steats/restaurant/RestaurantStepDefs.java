@@ -1,6 +1,5 @@
-package fr.unice.polytech.steats.stepsDef.backend;
+package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.restaurant.Restaurant;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

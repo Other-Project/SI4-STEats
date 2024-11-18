@@ -1,6 +1,5 @@
-package fr.unice.polytech.steats.restaurant;
+package fr.unice.polytech.steats.schedule;
 
-import fr.unice.polytech.steats.schedule.Schedule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

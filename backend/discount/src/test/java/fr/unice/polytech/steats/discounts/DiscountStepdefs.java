@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.stepsDef.backend;
+package fr.unice.polytech.steats.discounts;
 
 import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.address.Address;
@@ -23,7 +23,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DiscountStepdefs {
     private String restaurant;

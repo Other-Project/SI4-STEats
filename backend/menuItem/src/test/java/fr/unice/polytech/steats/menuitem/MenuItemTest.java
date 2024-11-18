@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.restaurant;
+package fr.unice.polytech.steats.menuitem;
 
 import org.junit.jupiter.api.Test;
 
