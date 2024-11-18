@@ -5,11 +5,14 @@ import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@ApiMasterRoute(name = "Group Orders", path = "/api/orders/groups")
 public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderManager, GroupOrder> {
     public GroupOrderHttpHandler(String subPath, Logger logger) {
         super(subPath, GroupOrder.class, logger);
@@ -30,6 +33,7 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
+    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId"})
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
 
@@ -40,6 +44,7 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
         }
     }
 
+    @ApiRoute(path = "/", method = HttpUtils.POST)
     private void close(HttpExchange exchange, Map<String, String> params) throws IOException {
         String groupOrderId = params.get("id");
 
@@ -56,6 +61,7 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
         }
     }
 
+    @ApiRoute(path = "/{id}/users", method = HttpUtils.GET)
     private void getUsers(HttpExchange exchange, Map<String, String> params) throws IOException {
         String groupOrderId = params.get("id");
         HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getUsers(groupOrderId));

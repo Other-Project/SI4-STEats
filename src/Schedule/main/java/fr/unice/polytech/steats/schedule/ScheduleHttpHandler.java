@@ -4,12 +4,15 @@ import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.logging.Logger;
 
+@ApiMasterRoute(name = "Schedules", path = "/api/schedules")
 public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager, Schedule> {
     public ScheduleHttpHandler(String subPath, Logger logger) {
         super(subPath, Schedule.class, logger);
@@ -28,6 +31,7 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
+    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId", "startTime", "endTime"})
     private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
         if (query.isEmpty()) {
             super.getAll(exchange);

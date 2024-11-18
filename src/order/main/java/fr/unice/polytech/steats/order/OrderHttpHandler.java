@@ -9,6 +9,8 @@ import fr.unice.polytech.steats.order.singles.SingleOrderManager;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.logging.Logger;
 
 // TODO : make a class that AbstractManager will inherit of
 
+@ApiMasterRoute(name = "Orders", path = "/api/orders")
 public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager, SingleOrder> {
     public OrderHttpHandler(String subPath, Logger logger) {
         super(subPath, SingleOrder.class, logger);
@@ -34,6 +37,7 @@ public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager,
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
     }
 
+    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId"})
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
         List<IOrder> orders = new ArrayList<>();

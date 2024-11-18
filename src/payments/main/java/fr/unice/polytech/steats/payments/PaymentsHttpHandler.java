@@ -6,12 +6,15 @@ import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
+import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+@ApiMasterRoute(name = "Payments", path = "/api/payments")
 public class PaymentsHttpHandler extends AbstractManagerHandler<PaymentManager, Payment> {
     public PaymentsHttpHandler(String subPath, Logger logger) {
         super(subPath, Payment.class, logger);
@@ -29,6 +32,7 @@ public class PaymentsHttpHandler extends AbstractManagerHandler<PaymentManager, 
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/pay", (exchange, param) -> pay(exchange));
     }
 
+    @ApiRoute(method = HttpUtils.GET, path = "/", queryParams = {"orderId", "userId"})
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId;
         String userId;
@@ -39,6 +43,7 @@ public class PaymentsHttpHandler extends AbstractManagerHandler<PaymentManager, 
         else HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
     }
 
+    @ApiRoute(method = HttpUtils.POST, path = "/pay")
     private void pay(HttpExchange exchange) throws IOException {
         Map<String, Object> params = JacksonUtils.mapFromJson(exchange.getRequestBody());
         String orderId = params == null ? null : params.get("orderId").toString();
