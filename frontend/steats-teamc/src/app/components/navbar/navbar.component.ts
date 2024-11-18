@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {PopupService} from '../../services/popup.service';
 
 @Component({
   selector: 'app-navbar',
@@ -7,4 +8,10 @@ import {Component} from '@angular/core';
 })
 export class NavbarComponent {
 
+  constructor(private popupService: PopupService) {
+  }
+
+  public openGroupOrderPopup() {
+    this.popupService.openPopup();
+  }
 }
