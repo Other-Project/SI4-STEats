@@ -1,6 +1,6 @@
-package fr.unice.polytech.steats.restaurant;
+package fr.unice.polytech.steats.schedule;
 
-import fr.unice.polytech.steats.order.Order;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -12,10 +12,12 @@ import java.util.Objects;
  * @author Team C
  */
 public class Schedule implements Comparable<Schedule> {
+    private final String id;
     private final DayOfWeek dayOfWeek;
     private final LocalTime start;
     private final Duration duration;
     private final int nbPerson;
+    private final String restaurantId;
 
     /**
      * @param start     The Localtime at which the schedule start
@@ -23,11 +25,21 @@ public class Schedule implements Comparable<Schedule> {
      * @param nbPerson  The number of person that works during the schedule
      * @param dayOfWeek The day of the week of the schedule
      */
-    public Schedule(LocalTime start, Duration duration, int nbPerson, DayOfWeek dayOfWeek) {
+    public Schedule(@JsonProperty("id") String id, @JsonProperty("start") LocalTime start, @JsonProperty("duration") Duration duration,
+                    @JsonProperty("nbPerson") int nbPerson, @JsonProperty("dayOfWeek") DayOfWeek dayOfWeek, @JsonProperty("restaurantId") String restaurantId) {
+        this.id = id;
         this.start = start;
         this.duration = duration;
         this.nbPerson = nbPerson;
         this.dayOfWeek = dayOfWeek;
+        this.restaurantId = restaurantId;
+    }
+
+    /**
+     * @return the schedule's id
+     */
+    public String getId() {
+        return id;
     }
 
     /**
@@ -44,6 +56,9 @@ public class Schedule implements Comparable<Schedule> {
         return this.duration;
     }
 
+    /**
+     * @return The end of the schedule
+     */
     public LocalTime getEnd() {
         return start.plus(duration);
     }
@@ -70,20 +85,17 @@ public class Schedule implements Comparable<Schedule> {
     }
 
     /**
+     * @return the associated restaurant's id
+     */
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    /**
      * @return If the schedule corresponds to the delivery time given in args
      */
     public boolean contains(LocalDateTime deliveryTime) {
         return deliveryTime.getDayOfWeek() == dayOfWeek && start.isBefore(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
-    }
-
-    /**
-     * If the schedule contains the order
-     *
-     * @param order The order to check
-     */
-    public boolean contains(Order order) {
-        LocalDateTime deliveryTime = order.getDeliveryTime();
-        return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
     }
 
     /**
@@ -124,7 +136,8 @@ public class Schedule implements Comparable<Schedule> {
     @SuppressWarnings("java:S4351")
     public int compareTo(LocalDateTime dateTime) {
         int compareDayOfWeek = dayOfWeek.compareTo(dateTime.getDayOfWeek());
-        if (compareDayOfWeek != 0) return ((Math.absExact(compareDayOfWeek) + 3) % 7 - 3) * (compareDayOfWeek > 0 ? 1 : -1);
+        if (compareDayOfWeek != 0)
+            return ((Math.absExact(compareDayOfWeek) + 3) % 7 - 3) * (compareDayOfWeek > 0 ? 1 : -1);
         if (start.isAfter(dateTime.toLocalTime())) return 1;
         if (!getEnd().isAfter(dateTime.toLocalTime())) return -1;
         return 0;

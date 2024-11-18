@@ -9,31 +9,42 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 
-/**
- * Helper class for calling the MenuItem service.
- *
- * @author Team C
- */
 public class MenuItemServiceHelper {
-
-    public static final URI MENUITEM_SERVICE_URI = URI.create("http://localhost:5007/api/menu-items/");
+    public static final URI MENU_ITEM_SERVICE_URI = URI.create("http://localhost:5007/api/menu-items/");
 
     private MenuItemServiceHelper() {
+
     }
 
-    /**
-     * Get a menu item by its id.
-     *
-     * @param menuItemId The id of the menu item
-     */
     public static MenuItem getMenuItem(String menuItemId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(MENUITEM_SERVICE_URI.resolve(menuItemId))
+                .uri(MENU_ITEM_SERVICE_URI.resolve(menuItemId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.fromJson(response.body(), MenuItem.class);
+    }
+
+    public static MenuItem getAllMenuItem() throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(MENU_ITEM_SERVICE_URI)
+                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
+                .GET()
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        return JacksonUtils.fromJson(response.body(), MenuItem.class);
+    }
+
+    public static List<MenuItem> getMenuItemByRestaurantId(String restaurantId) throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(MENU_ITEM_SERVICE_URI.resolve("?restaurantId=" + restaurantId))
+                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
+                .GET()
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        return JacksonUtils.listFromJson(response.body(), MenuItem.class);
     }
 }

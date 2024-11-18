@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.restaurant;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalTime;
 import java.util.Objects;
 
@@ -12,7 +14,7 @@ public class OpeningTime {
     private final LocalTime start;
     private LocalTime end;
 
-    OpeningTime(LocalTime start, LocalTime end) {
+    OpeningTime(@JsonProperty("start") LocalTime start, @JsonProperty("end") LocalTime end) {
         this.start = start;
         this.end = end;
     }

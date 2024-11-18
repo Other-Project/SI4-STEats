@@ -1,7 +1,10 @@
 package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.utils.AbstractManager;
+import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.TypeOfFood;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,6 +14,7 @@ import java.util.List;
  *
  * @author Team C
  */
+@SuppressWarnings("java:S6548")
 public class RestaurantManager extends AbstractManager<Restaurant> {
     private static final RestaurantManager INSTANCE = new RestaurantManager();
 
@@ -29,7 +33,7 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
 
     @Override
     public void add(Restaurant item) {
-        super.add(item.getName(), item);
+        super.add(item.getId(), item);
     }
 
     /**
@@ -80,13 +84,18 @@ public class RestaurantManager extends AbstractManager<Restaurant> {
         return filterRestaurant(null, null, deliveryTime);
     }
 
+    public static Duration getScheduleDurationForRestaurant(String restaurantId) throws NotFoundException {
+        return getInstance().get(restaurantId).getScheduleDuration();
+    }
+
     /**
-     * Fill the manager with some demo data
+     * Fill the restaurant manager with demo data
      */
     public void demo() {
-        add(new Restaurant("1", "McDonald's"));
-        add(new Restaurant("2", "KFC"));
-        add(new Restaurant("3", "Burger King"));
-        add(new Restaurant("4", "Quick"));
+        add(new Restaurant("1", "La Cafet", TypeOfFood.SNACKS));
+        add(new Restaurant("2", "Le RU", TypeOfFood.CLASSIC));
+        add(new Restaurant("3", "Restaurant Alban", TypeOfFood.CLASSIC));
+        add(new Restaurant("4", "McAlban", TypeOfFood.FAST_FOOD));
+        add(new Restaurant("5", "SushiRestaurant", TypeOfFood.CLASSIC));
     }
 }

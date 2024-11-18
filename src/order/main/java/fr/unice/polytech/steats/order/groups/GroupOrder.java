@@ -120,7 +120,7 @@ public class GroupOrder implements Order {
     @Override
     public void setDeliveryTime(LocalDateTime deliveryTime) throws IOException {
         if (this.deliveryTime != null) throw new IllegalStateException("Delivery time already set");
-        if (getOrders().stream().noneMatch(order -> order.items().isEmpty()) && !RestaurantServiceHelper.canHandle(restaurantId, deliveryTime))
+        if (getOrders().stream().noneMatch(order -> order.items().isEmpty()) && !RestaurantServiceHelper.canHandle(restaurantId, getPreparationTime(), deliveryTime))
             throw new IllegalStateException("Delivery time not available");
         this.deliveryTime = deliveryTime;
         for (SingleOrder order : getOrders())
@@ -180,7 +180,7 @@ public class GroupOrder implements Order {
         List<LocalDateTime> availableTimes = new ArrayList<>();
         LocalDateTime time = from;
         while (availableTimes.size() < numberOfTimes && time.isBefore(from.plusMonths(1))) {
-            if (RestaurantServiceHelper.canHandle(restaurantId, time)) availableTimes.add(time);
+            if (RestaurantServiceHelper.canHandle(restaurantId, getPreparationTime(), time)) availableTimes.add(time);
             time = time.plusMinutes(30);
         }
         return availableTimes;

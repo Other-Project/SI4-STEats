@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +49,11 @@ public class RestaurantServiceHelper {
      * @param restaurantId The id of the restaurant
      * @param deliveryTime The time the client wants the order to be delivered
      */
-    public static boolean canHandle(String restaurantId, LocalDateTime deliveryTime) throws IOException {
+    public static boolean canHandle(String restaurantId, Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(RESTAURANT_SERVICE_URI.resolve(restaurantId + "/canHandle"))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
-                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("deliveryTime", deliveryTime))))
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("deliveryTime", deliveryTime, "preparationTime", preparationTime))))
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.fromJson(response.body(), Boolean.class);

@@ -1,7 +1,9 @@
 package fr.unice.polytech.steats.order.singles;
 
+import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +33,12 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
 
     @Override
     public void add(SingleOrder item) {
+        try {
+            if (!RestaurantServiceHelper.canHandle(item.getRestaurantId(), item.getPreparationTime(), item.getDeliveryTime()))
+                throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
+        } catch (IOException e) {
+            throw new IllegalStateException("This order's restaurant does not exist (order's restaurantId : " + item.getRestaurantId() + ")");
+        }
         super.add(item.getId(), item);
     }
 
@@ -113,10 +121,12 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         String johnDoe = "123456";
         String janeDoe = "654321";
         String albanFalcoz = "140403";
-        add(new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"));
-        add(new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"));
-        add(new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"));
-        add(new SingleOrder(johnDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "EURECOM", "2"));
-        add(new SingleOrder(albanFalcoz, "1", LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"));
+        List.of(
+                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"),
+                new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"),
+                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"),
+                new SingleOrder(johnDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "EURECOM", "2"),
+                new SingleOrder(albanFalcoz, "1", LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1")
+        ).forEach(singleOrder -> add(singleOrder.getId(), singleOrder));
     }
 }
