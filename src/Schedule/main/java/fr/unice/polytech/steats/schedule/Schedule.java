@@ -99,18 +99,6 @@ public class Schedule implements Comparable<Schedule> {
     }
 
     /**
-     * If the schedule contains the order
-     *
-     * @param order The order to check
-     */
-    /*
-    TODO
-    public boolean contains(Order order) {
-        LocalDateTime deliveryTime = order.getDeliveryTime();
-        return deliveryTime.getDayOfWeek() == dayOfWeek && !start.isAfter(deliveryTime.toLocalTime()) && getEnd().isAfter(deliveryTime.toLocalTime());
-    }*/
-
-    /**
      * Check if the schedule is between two dates
      *
      * @param start The start of the period
