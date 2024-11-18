@@ -45,7 +45,7 @@ public class PaymentsHttpHandler extends AbstractManagerHandler<PaymentManager, 
 
     @ApiRoute(method = HttpUtils.POST, path = "/pay")
     private void pay(HttpExchange exchange) throws IOException {
-        Map<String, Object> params = JacksonUtils.fromJson(exchange.getRequestBody());
+        Map<String, Object> params = JacksonUtils.mapFromJson(exchange.getRequestBody());
         String orderId = params == null ? null : params.get("orderId").toString();
         if (orderId == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, 0);

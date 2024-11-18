@@ -1,12 +1,11 @@
 package fr.unice.polytech.steats.stepsDef.backend;
 
 import fr.unice.polytech.steats.NotFoundException;
-import fr.unice.polytech.steats.discounts.DiscountBuilder;
 import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
+import fr.unice.polytech.steats.discounts.DiscountBuilder;
 import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.SingleOrderManager;
-import fr.unice.polytech.steats.restaurant.MenuItem;
 import fr.unice.polytech.steats.restaurant.Restaurant;
 import fr.unice.polytech.steats.restaurant.RestaurantManager;
 import fr.unice.polytech.steats.restaurant.TypeOfFood;
@@ -19,6 +18,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +100,7 @@ public class DiscountStepdefs {
     }
 
     @Given("I am {string} with the {string} role and {int} orders at {string} of {int} items")
-    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) {
+    public void iAmAClientWithTheRole(String name, String role, int orders, String restaurant, int items) throws IOException {
         aClientNamedWithTheRole(name, role);
         for (int i = 0; i < orders; i++) {
             SingleOrder singleOrder = new SingleOrder(username, null, "Campus SophiaTech", restaurant);

@@ -42,7 +42,6 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> im
         try {
             U object = getManager().get(params.get("id"));
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, object);
-
         } catch (NotFoundException e) {
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
             exchange.getResponseBody().close();
