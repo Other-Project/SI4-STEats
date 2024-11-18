@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.utils;
+package fr.unice.polytech.steats.models;
 
 /**
  * The different states an order goes through between the moment the user chooses to pay and the moment the order is delivered

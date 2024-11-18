@@ -6,7 +6,7 @@ import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.models.SingleOrder;
 import fr.unice.polytech.steats.utils.Order;
-import fr.unice.polytech.steats.utils.Status;
+import fr.unice.polytech.steats.models.Status;
 
 import java.io.IOException;
 import java.time.Duration;

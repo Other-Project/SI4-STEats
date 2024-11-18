@@ -4,8 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.IOrder;
-import fr.unice.polytech.steats.order.singles.SingleOrder;
-import fr.unice.polytech.steats.order.singles.SingleOrderManager;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
@@ -15,9 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-
-
-// TODO : make a class that AbstractManager will inherit of
 
 public class OrderHttpHandler extends AbstractManagerHandler<SingleOrderManager, SingleOrder> {
     public OrderHttpHandler(String subPath, Logger logger) {

@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.users;
+package fr.unice.polytech.steats.models;
 
 
 /**

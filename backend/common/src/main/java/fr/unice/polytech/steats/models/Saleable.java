@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.utils;
+package fr.unice.polytech.steats.models;
 
 import java.io.IOException;
 

@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.order.singles;
 
 import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.models.Payment;
+import fr.unice.polytech.steats.models.Status;
 import fr.unice.polytech.steats.utils.*;
 
 import java.io.IOException;

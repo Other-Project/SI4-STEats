@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.users;
 
+import fr.unice.polytech.steats.models.Role;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.util.List;

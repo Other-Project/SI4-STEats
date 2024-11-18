@@ -5,7 +5,7 @@ import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.models.SingleOrder;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
-import fr.unice.polytech.steats.utils.Status;
+import fr.unice.polytech.steats.models.Status;
 
 import java.io.IOException;
 import java.io.InputStream;

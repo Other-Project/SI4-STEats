@@ -8,8 +8,8 @@ import fr.unice.polytech.steats.helpers.ScheduleServiceHelper;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Order;
 import fr.unice.polytech.steats.models.Schedule;
-import fr.unice.polytech.steats.utils.Status;
-import fr.unice.polytech.steats.utils.TypeOfFood;
+import fr.unice.polytech.steats.models.Status;
+import fr.unice.polytech.steats.models.TypeOfFood;
 
 import java.io.IOException;
 import java.time.*;

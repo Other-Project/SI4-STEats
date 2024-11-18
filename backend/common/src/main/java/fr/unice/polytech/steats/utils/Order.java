@@ -1,5 +1,8 @@
 package fr.unice.polytech.steats.utils;
 
+import fr.unice.polytech.steats.models.Saleable;
+import fr.unice.polytech.steats.models.Status;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;

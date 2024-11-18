@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.utils;
+package fr.unice.polytech.steats.models;
 
 public enum TypeOfFood {
     FAST_FOOD,

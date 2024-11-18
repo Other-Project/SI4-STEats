@@ -1,7 +1,7 @@
 package fr.unice.polytech.steats.discount;
 
 import fr.unice.polytech.steats.models.MenuItem;
-import fr.unice.polytech.steats.users.Role;
+import fr.unice.polytech.steats.models.Role;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

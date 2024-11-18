@@ -1,7 +1,5 @@
 package fr.unice.polytech.steats.models;
 
-import fr.unice.polytech.steats.utils.Status;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;

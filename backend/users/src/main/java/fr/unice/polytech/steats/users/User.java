@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import fr.unice.polytech.steats.models.Role;
 
 /**
  * The person that is currently using the system
