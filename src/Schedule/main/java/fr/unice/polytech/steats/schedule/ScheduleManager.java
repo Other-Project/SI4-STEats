@@ -47,17 +47,13 @@ public class ScheduleManager extends AbstractManager<Schedule> {
     }
 
     public void demo() {
-        Schedule schedule = new Schedule("1", LocalTime.of(10, 0), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1");
-        add(schedule.getId(), schedule);
-        Schedule schedule2 = new Schedule("2", LocalTime.of(10, 30), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1");
-        add(schedule2.getId(), schedule2);
-        Schedule schedule3 = new Schedule("3", LocalTime.of(11, 0), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1");
-        add(schedule3.getId(), schedule3);
-        Schedule schedule4 = new Schedule("4", LocalTime.of(11, 30), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1");
-        add(schedule4.getId(), schedule4);
-        Schedule schedule5 = new Schedule("5", LocalTime.of(12, 0), Duration.ofMinutes(30), 5, DayOfWeek.MONDAY, "1");
-        add(schedule5.getId(), schedule5);
-        Schedule schedule6 = new Schedule("6", LocalTime.of(12, 30), Duration.ofMinutes(30), 5, DayOfWeek.MONDAY, "2");
-        add(schedule6.getId(), schedule6);
+        List.of(
+                new Schedule("1", LocalTime.of(10, 0), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1"),
+                new Schedule("2", LocalTime.of(10, 30), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1"),
+                new Schedule("3", LocalTime.of(11, 0), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1"),
+                new Schedule("4", LocalTime.of(11, 30), Duration.ofMinutes(30), 5, DayOfWeek.FRIDAY, "1"),
+                new Schedule("5", LocalTime.of(12, 0), Duration.ofMinutes(30), 5, DayOfWeek.MONDAY, "1"),
+                new Schedule("6", LocalTime.of(12, 30), Duration.ofMinutes(30), 5, DayOfWeek.MONDAY, "2")
+        ).forEach(schedule -> add(schedule.getId(), schedule));
     }
 }
