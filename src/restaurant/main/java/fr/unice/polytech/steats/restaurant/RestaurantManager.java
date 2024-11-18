@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.utils.AbstractManager;
 import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.TypeOfFood;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.items;
 
-import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.util.List;
@@ -28,13 +28,13 @@ public class MenuItemManager extends AbstractManager<MenuItem> {
      *
      * @param restaurantId The id of the restaurant
      */
-    public List<MenuItem> getByRestaurant(String restaurantId){
+    public List<MenuItem> getByRestaurant(String restaurantId) {
         return getInstance().getAll().stream()
-                .filter(menuItem -> Objects.equals(menuItem.getRestaurantId(), restaurantId)).toList();
+                .filter(menuItem -> Objects.equals(menuItem.restaurantId(), restaurantId)).toList();
     }
 
     @Override
     public void add(MenuItem item) {
-        super.add(item.getId(), item);
+        super.add(item.id(), item);
     }
 }

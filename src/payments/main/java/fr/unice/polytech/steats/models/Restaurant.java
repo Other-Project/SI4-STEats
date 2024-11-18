@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.models;
 
-import fr.unice.polytech.steats.restaurant.TypeOfFood;
+import fr.unice.polytech.steats.utils.TypeOfFood;
 
 import java.time.Duration;
 

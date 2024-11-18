@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.items;
 
-import fr.unice.polytech.steats.discounts.Discount;
+import fr.unice.polytech.steats.discount.Discount;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 @SuppressWarnings("java:S6548")

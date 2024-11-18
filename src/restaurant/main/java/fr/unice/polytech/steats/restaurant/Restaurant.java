@@ -7,6 +7,7 @@ import fr.unice.polytech.steats.helpers.ScheduleServiceHelper;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Order;
 import fr.unice.polytech.steats.models.Schedule;
+import fr.unice.polytech.steats.utils.TypeOfFood;
 
 import java.io.IOException;
 import java.time.*;
@@ -40,7 +41,7 @@ public class Restaurant {
      * @param typeOfFood       The type of food the restaurant serves
      * @param scheduleDuration The duration of the schedule
      */
-    public Restaurant(@JsonProperty("id") String id, @JsonProperty("name") String id, String name, @JsonProperty("typeOfFood") TypeOfFood typeOfFood, @JsonProperty("scheduleDuration") Duration scheduleDuration) {
+    public Restaurant(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("typeOfFood") TypeOfFood typeOfFood, @JsonProperty("scheduleDuration") Duration scheduleDuration) {
         this.id = id;
         this.name = name;
         this.typeOfFood = typeOfFood;
@@ -65,13 +66,6 @@ public class Restaurant {
      */
     public Restaurant(String id, String name, TypeOfFood typeOfFood) {
         this(id, name, typeOfFood, Duration.ofMinutes(30));
-    }
-
-    /**
-     * Get the id of the restaurant
-     */
-    public String getId() {
-        return id;
     }
 
     /**

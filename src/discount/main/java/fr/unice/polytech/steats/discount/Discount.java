@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.discount;
 
-import fr.unice.polytech.steats.restaurant.MenuItem;
+import fr.unice.polytech.steats.models.MenuItem;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -83,7 +83,7 @@ public class Discount {
      */
     public double value(double price) {
         return discounts.orderCredit
-                + Arrays.stream(discounts.freeItems).mapToDouble(MenuItem::getPrice).sum()
+                + Arrays.stream(discounts.freeItems).mapToDouble(MenuItem::price).sum()
                 + price * discounts.orderDiscount;
     }
 
