@@ -144,37 +144,29 @@ public class Restaurant {
         return maxCapacity.compareTo(preparationTime) >= 0 && canAddOrder(deliveryTime, maxCapacity);
     }
 
-    private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
-        /*
-        TODO
+    private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) throws IOException {
+        List<Order> orders = OrderServiceHelper.getOrderByRestaurant(id);
         if (deliveryTime == null || orders.isEmpty()) return true;
         long averagePreparationTime = getAveragePreparationTime().toMinutes();
         if (averagePreparationTime == 0) return true;
         long maxNbOfOrder = maxCapacity.toMinutes() / averagePreparationTime;
         long currentNbOfOrder = orders.stream()
-                .filter(order -> order.getStatus() == Status.INITIALISED)
+                .filter(order -> order.status() == Status.INITIALISED)
                 .count();
         return currentNbOfOrder < maxNbOfOrder;
-
-         */
-        return true;
     }
 
-    private Duration getAveragePreparationTime() {
-        /*
-        TODO
+    private Duration getAveragePreparationTime() throws IOException {
+        List<Order> orders = OrderServiceHelper.getOrderByRestaurant(id);
         List<Duration> lastOrderDurations = orders.reversed().stream()
-                .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0 && order.getDeliveryTime() != null)
+                .filter(order -> order.status().compareTo(Status.PAID) >= 0 && order.deliveryTime() != null)
                 .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
-                .map(Order::getPreparationTime)
+                .map(Order::preparationTime)
                 .toList();
         if (lastOrderDurations.isEmpty()) return Duration.ZERO;
         return lastOrderDurations.stream()
                 .reduce(Duration.ZERO, Duration::plus)
                 .dividedBy(lastOrderDurations.size());
-
-         */
-        return null;
     }
 
     /**
