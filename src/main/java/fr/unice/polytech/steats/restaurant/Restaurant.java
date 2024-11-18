@@ -2,7 +2,6 @@ package fr.unice.polytech.steats.restaurant;
 
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.order.Order;
-import fr.unice.polytech.steats.order.SingleOrder;
 import fr.unice.polytech.steats.order.Status;
 
 import java.time.*;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
  * @author Team C
  */
 public class Restaurant {
+    private final String id;
     private final String name;
     private final TypeOfFood typeOfFood;
     private final Duration scheduleDuration;
@@ -31,11 +31,13 @@ public class Restaurant {
     /**
      * Create a restaurant
      *
+     * @param id               The id of the restaurant
      * @param name             The name of the restaurant
      * @param typeOfFood       The type of food the restaurant serves
      * @param scheduleDuration The duration of the schedule
      */
-    public Restaurant(String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
+    public Restaurant(String id, String name, TypeOfFood typeOfFood, Duration scheduleDuration) {
+        this.id = id;
         this.name = name;
         this.typeOfFood = typeOfFood;
         this.scheduleDuration = scheduleDuration;
@@ -46,18 +48,26 @@ public class Restaurant {
      *
      * @param name The name of the restaurant
      */
-    public Restaurant(String name) {
-        this(name, TypeOfFood.CLASSIC);
+    public Restaurant(String id, String name) {
+        this(id, name, TypeOfFood.CLASSIC);
     }
 
     /**
      * Create a restaurant
      *
+     * @param id         The id of the restaurant
      * @param name       The name of the restaurant
      * @param typeOfFood The type of food the restaurant serves
      */
-    public Restaurant(String name, TypeOfFood typeOfFood) {
-        this(name, typeOfFood, Duration.ofMinutes(30));
+    public Restaurant(String id, String name, TypeOfFood typeOfFood) {
+        this(id, name, typeOfFood, Duration.ofMinutes(30));
+    }
+
+    /**
+     * Get the id of the restaurant
+     */
+    public String getId(){
+        return id;
     }
 
     /**
@@ -102,20 +112,21 @@ public class Restaurant {
         return scheduleDuration;
     }
 
-    /**
-     * The discounts that can be applied to an order
-     *
-     * @param order The order to check
-     */
-    public List<Discount> availableDiscounts(SingleOrder order) {
-        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
-        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
-        applicableDiscounts.stream()
-                .filter(discount -> !discount.isStackable())
-                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
-                .ifPresent(res::add);
-        return res;
-    }
+    // TODO : Merge this in discount service
+//    /**
+//     * The discounts that can be applied to an order
+//     *
+//     * @param order The order to check
+//     */
+//    public List<Discount> availableDiscounts(SingleOrder order) {
+//        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
+//        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
+//        applicableDiscounts.stream()
+//                .filter(discount -> !discount.isStackable())
+//                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
+//                .ifPresent(res::add);
+//        return res;
+//    }
 
     /**
      * The part of the menu that can be prepared and delivered in time
@@ -199,16 +210,6 @@ public class Restaurant {
                 .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
                 .max(Comparator.comparing(Function.identity()))
                 .orElse(Duration.ZERO);
-    }
-
-    /**
-     * Add a menu item to the restaurant
-     *
-     * @param menuItem The menu item
-     */
-    public void addMenuItem(MenuItem menuItem) {
-        this.menu.add(menuItem);
-        menuItem.setRestaurantName(name);
     }
 
     /**

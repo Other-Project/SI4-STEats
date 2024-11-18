@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.address;
 
-import fr.unice.polytech.steats.payments.PaymentManager;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 /**

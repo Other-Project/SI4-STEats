@@ -54,26 +54,7 @@ public class User {
     }
 
 // TODO: Migrate this
-//
-//    /**
-//     * Gets all the orders of the user
-//     */
-//    public List<SingleOrder> getOrders() {
-//        return SingleOrderManager.getInstance().getOrdersByUser(userId);
-//    }
-//
-//    /**
-//     * Gets all the orders of the user made in a specific restaurant
-//     *
-//     * @param restaurantId The id of the restaurant to filter the orders
-//     */
-//    public List<SingleOrder> getOrders(String restaurantId) {
-//        return getOrders().stream()
-//                .filter(order -> order.getRestaurantId().equals(restaurantId))
-//                .filter(order -> order.getStatus().compareTo(Status.PAID) >= 0)
-//                .toList();
-//    }
-//
+
 //    /**
 //     * Get the discounts to apply to the next order
 //     *

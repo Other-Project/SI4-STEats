@@ -1,27 +1,32 @@
 package fr.unice.polytech.steats.restaurant;
 
-import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.order.Saleable;
+import fr.unice.polytech.steats.utils.NotFoundException;
 
 import java.time.Duration;
+import java.util.UUID;
 
 public class MenuItem implements Saleable {
     private final String name;
     private final double price;
     private final Duration preparationTime;
-    private String restaurantName;
+    private final String restaurantId;
+    private String id;
 
     /**
      * Create a menu item
      *
      * @param name            The name of the menu item
+     * @param restaurantId    The id of the restaurant
      * @param price           The price of the menu item
      * @param preparationTime The time needed to prepare the menu item
      */
-    public MenuItem(String name, double price, Duration preparationTime) {
+    public MenuItem(String name, String restaurantId, double price, Duration preparationTime) {
         this.name = name;
+        this.restaurantId = restaurantId;
         this.price = price;
         this.preparationTime = preparationTime;
+        this.id = UUID.randomUUID().toString();
     }
 
     /**
@@ -40,6 +45,13 @@ public class MenuItem implements Saleable {
     }
 
     /**
+     * Get the id of the menu item
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
      * Get the preparation time of the menu item
      */
     public Duration getPreparationTime() {
@@ -47,20 +59,17 @@ public class MenuItem implements Saleable {
     }
 
     /**
-     * Links the menu item with a restaurant
-     *
-     * @param restaurantName The name of the restaurant
-     * @implNote This method is package-private because it should only be used by the Restaurant class.
-     */
-    void setRestaurantName(String restaurantName) {
-        this.restaurantName = restaurantName;
-    }
-
-    /**
      * Get the restaurant that serves the menu item
      */
     public Restaurant getRestaurant() throws NotFoundException {
-        return RestaurantManager.getInstance().get(restaurantName);
+        return RestaurantManager.getInstance().get(restaurantId);
+    }
+
+    /**
+     * Get the restaurant id
+     */
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
     @Override

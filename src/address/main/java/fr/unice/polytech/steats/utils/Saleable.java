@@ -1,4 +1,6 @@
-package fr.unice.polytech.steats.order;
+package fr.unice.polytech.steats.utils;
+
+import java.io.IOException;
 
 /**
  * Means that the item is saleable.
@@ -9,5 +11,5 @@ public interface Saleable {
     /**
      * Returns the price of the item.
      */
-    double getPrice();
+    double getPrice() throws IOException;
 }

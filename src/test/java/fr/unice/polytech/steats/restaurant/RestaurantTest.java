@@ -4,11 +4,18 @@ import fr.unice.polytech.steats.address.Address;
 import fr.unice.polytech.steats.address.AddressManager;
 import fr.unice.polytech.steats.NotFoundException;
 import fr.unice.polytech.steats.STEats;
+import fr.unice.polytech.steats.*;
 import fr.unice.polytech.steats.discounts.Discount;
 import fr.unice.polytech.steats.discounts.DiscountBuilder;
 import fr.unice.polytech.steats.users.Role;
 import fr.unice.polytech.steats.users.User;
 import fr.unice.polytech.steats.users.UserManager;
+import fr.unice.polytech.steats.location.Address;
+import fr.unice.polytech.steats.location.AddressManager;
+import fr.unice.polytech.steats.order.*;
+import fr.unice.polytech.steats.user.Role;
+import fr.unice.polytech.steats.user.User;
+import fr.unice.polytech.steats.user.UserManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
