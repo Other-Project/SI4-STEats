@@ -1,9 +1,9 @@
 package fr.unice.polytech.steats.schedule;
 
-import fr.unice.polytech.steats.restaurant.RestaurantManager;
+import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.utils.AbstractManager;
-import fr.unice.polytech.steats.utils.NotFoundException;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -33,8 +33,8 @@ public class ScheduleManager extends AbstractManager<Schedule> {
     public void add(Schedule schedule) {
         Duration restaurantScheduleDuration;
         try {
-            restaurantScheduleDuration = RestaurantManager.getScheduleDurationForRestaurant(schedule.getRestaurantId());
-        } catch (NotFoundException e) {
+            restaurantScheduleDuration = RestaurantServiceHelper.getRestaurant(schedule.getRestaurantId()).scheduleDuration();
+        } catch (IOException e) {
             throw new IllegalStateException("This schedule's restaurant does not exist (schedule's restaurantId : " + schedule.getRestaurantId() + ")");
         }
         if (!schedule.getDuration().equals(restaurantScheduleDuration))

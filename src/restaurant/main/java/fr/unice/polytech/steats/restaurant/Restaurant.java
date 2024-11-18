@@ -3,16 +3,17 @@ package fr.unice.polytech.steats.restaurant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
+import fr.unice.polytech.steats.helpers.OrderServiceHelper;
 import fr.unice.polytech.steats.helpers.ScheduleServiceHelper;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Order;
 import fr.unice.polytech.steats.models.Schedule;
+import fr.unice.polytech.steats.utils.Status;
 import fr.unice.polytech.steats.utils.TypeOfFood;
 
 import java.io.IOException;
 import java.time.*;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * A restaurant that serves food
@@ -24,10 +25,6 @@ public class Restaurant {
     private final String name;
     private final TypeOfFood typeOfFood;
     private final Duration scheduleDuration;
-    // private final List<MenuItem> menu = new ArrayList<>();
-    // private final List<Discount> discounts = new ArrayList<>();
-    // private final List<Order> orders = new ArrayList<>();
-    // private final Set<Schedule> schedules = new TreeSet<>();
     private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
 
@@ -98,22 +95,6 @@ public class Restaurant {
     }
 
     /**
-     * All the discounts the restaurant proposes
-     */
-    public void discounts() {
-        // TODO : call the discount micro-service
-        // return Collections.unmodifiableList(discounts);
-    }
-
-    /**
-     * All the orders received by the restaurant
-     */
-    public void getOrders() {
-        // TODO : call the Order Service
-        // return new ArrayList<>(orders);
-    }
-
-    /**
      * The duration of each schedule
      */
     public Duration getScheduleDuration() {
@@ -158,13 +139,13 @@ public class Restaurant {
      *
      * @param deliveryTime The time of delivery
      */
-    /*
-    TODO
-    public boolean canHandle(Order order, LocalDateTime deliveryTime) {
+
+    public boolean canHandle(Order order, LocalDateTime deliveryTime) throws IOException {
         if (deliveryTime == null) return true;
         Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(order.getPreparationTime()) >= 0 && canAddOrder(deliveryTime, maxCapacity);
-    }*/
+        return maxCapacity.compareTo(order.preparationTime()) >= 0 && canAddOrder(deliveryTime, maxCapacity);
+    }
+
     private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) {
         /*
         TODO
@@ -205,7 +186,6 @@ public class Restaurant {
      * @return True if the restaurant can deliver at the given time, false otherwise
      */
     public boolean canDeliverAt(LocalDateTime deliveryTime) {
-
         try {
             Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
             return MenuItemServiceHelper.getMenuItemByRestaurantId(id).stream().anyMatch(menuItem -> maxCapacity.compareTo(menuItem.preparationTime()) >= 0);
@@ -214,62 +194,24 @@ public class Restaurant {
         }
     }
 
-    private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) {
-        /*
-        List<Order> ordersTakenAccountSchedule = orders.stream()
-                .filter(order -> order.getStatus().compareTo(Status.PAID) > 0 || (order.getStatus() == Status.PAID && order.getDeliveryTime() != null))
-                .filter(order -> order.getDeliveryTime().getDayOfYear() == deliveryDate.getDayOfYear())
-                .filter(schedule::contains)
-                .toList();
+    private Duration capacityLeft(Schedule schedule, LocalDate deliveryDate) throws IOException {
+        List<Order> ordersTakenAccountSchedule = OrderServiceHelper.getOrderPastStatus(id, Status.PAID, LocalDateTime.of(deliveryDate, schedule.start()), LocalDateTime.of(deliveryDate, schedule.end()));
         Duration totalPreparationTimeOrders = ordersTakenAccountSchedule.stream()
-                .map(Order::getPreparationTime)
+                .map(Order::preparationTime)
                 .reduce(Duration.ZERO, Duration::plus);
-        return schedule.getTotalCapacity().minus(totalPreparationTimeOrders);
-         */
-        return null;
+        return schedule.totalCapacity().minus(totalPreparationTimeOrders);
     }
 
     private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) throws IOException {
         LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
         Set<Schedule> schedulesBefore2Hours = new HashSet<>(ScheduleServiceHelper.getScheduleForDeliveryTime(getId(), deliveryTime, MAX_PREPARATION_DURATION_BEFORE_DELIVERY));
-        return schedulesBefore2Hours.stream()
-                .map(Schedule::totalCapacity)
-                .max(Comparator.comparing(Function.identity()))
-                .orElse(Duration.ZERO);
-        /*
-        Todo : change the return when capacityLeft will work
-        return schedulesBefore2Hours.stream()
-                .map(schedule -> capacityLeft(schedule, deliveryTime.toLocalDate()))
-                .max(Comparator.comparing(Function.identity()))
-                .orElse(Duration.ZERO);*/
+        Duration maxCapacity = Duration.ZERO;
+        for (Schedule schedule : schedulesBefore2Hours) {
+            Duration capacity = capacityLeft(schedule, deliveryTime.toLocalDate());
+            if (capacity.compareTo(maxCapacity) > 0) maxCapacity = capacity;
+        }
+        return maxCapacity;
     }
-
-    /**
-     * Remove a menu item to the restaurant
-     *
-     * @param menuItem The menu item
-     */
-    public void removeMenuItem(MenuItem menuItem) {
-        // this.menu.remove(menuItem);
-    }
-
-    /**
-     * Add a discount to the restaurant
-     *
-     * @param discount The discount
-     */
-    /*public void addDiscount(Discount discount) {
-        // this.discounts.add(discount);
-    }*/
-
-    /**
-     * Remove a discount of the restaurant
-     *
-     * @param discount The discount
-     */
-    /*public void removeDiscount(Discount discount) {
-        // this.discounts.remove(discount);
-    }*/
 
     /**
      * Get the opening times of the restaurant for a given day
@@ -292,31 +234,6 @@ public class Restaurant {
         if (currentInterval != null) intervals.add(currentInterval);
         return intervals;
     }
-
-    /**
-     * Add an order for the restaurant
-     *
-     * @param order the order to add
-     */
-    public void addOrder(Order order) {
-        // this.orders.add(order);
-    }
-
-    /**
-     * Add a schedule to the restaurant
-     *
-     * @param schedule The schedule to add
-     */
-    /*public void addSchedule(Schedule schedule) {
-     *//*
-        if (!schedule.getDuration().equals(scheduleDuration))
-            throw new IllegalArgumentException("This schedule's duration does not coincide with the restaurant' schedule duration");
-        if (schedules.stream().anyMatch(s -> s.overlap(schedule)))
-            throw new IllegalArgumentException("This schedule overlaps with another schedule of the restaurant");
-        schedules.add(schedule);
-
-         *//*
-    }*/
 
     /**
      * Add schedules for a period of time
