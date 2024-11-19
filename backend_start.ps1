@@ -6,7 +6,7 @@ try
 
     Get-ChildItem -Directory -Path ".\backend" | ForEach-Object {
         $directory = $_.FullName
-        if ($_.Name -ne "common")
+        if ($_.Name -notin @("common", "openapi"))
         {
             Write-Output "Building $( $_.Name )"
             $global:p += Start-Job { mvn -q -f "$using:directory/pom.xml" clean compile exec:java "-Dmaven.test.skip=true" }

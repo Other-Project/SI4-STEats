@@ -2,13 +2,9 @@ package fr.unice.polytech.steats.utils.openapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -16,14 +12,23 @@ public class OpenAPIGenerator {
     private OpenAPIGenerator() {
     }
 
-    public static void generate(Class<?> ...handlers) throws IOException {
+    private static List<Method> getMethods(Class<?> handler) {
+        List<Method> result = new ArrayList<>();
+        while (handler != null) {
+            result.addAll(Arrays.asList(handler.getDeclaredMethods()));
+            handler = handler.getSuperclass();
+        }
+        return result;
+    }
+
+
+    public static String generate(Class<?>... handlers) throws IOException {
         Map<String, Map<String, OpenAPI.Path>> routes = new HashMap<>();
         Pattern urlParamPattern = Pattern.compile("\\{([^/]+)}");
         Arrays.stream(handlers)
                 .filter(handler -> handler.isAnnotationPresent(ApiMasterRoute.class))
                 .flatMap(handler ->
-                        Stream.concat(Arrays.stream(handler.getDeclaredMethods()),
-                                        Arrays.stream(handler.getSuperclass().getDeclaredMethods()))
+                        getMethods(handler).stream()
                                 .filter(method -> method.isAnnotationPresent(ApiRoute.class))
                                 .map(method -> {
                                     var handlerAnnotation = handler.getAnnotation(ApiMasterRoute.class);
@@ -58,11 +63,6 @@ public class OpenAPIGenerator {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
-        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(openAPI);
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter("openapi.json"));
-        writer.write(json);
-        writer.close();
-        System.out.println(json);
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(openAPI);
     }
 }
