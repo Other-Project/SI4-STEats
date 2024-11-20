@@ -1,8 +1,6 @@
-package fr.unice.polytech.steats.gateway;
+package fr.unice.polytech.steats.utils;
 
 import com.sun.net.httpserver.HttpExchange;
-import fr.unice.polytech.steats.utils.AbstractHandler;
-import fr.unice.polytech.steats.utils.HttpUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +20,7 @@ public class GatewayHttpHandler extends AbstractHandler {
 
     private final URI serviceUrl;
 
-    protected GatewayHttpHandler(String subPath, URI serviceUrl, Logger logger) {
+    public GatewayHttpHandler(String subPath, URI serviceUrl, Logger logger) {
         super(subPath, logger);
         this.serviceUrl = serviceUrl;
     }

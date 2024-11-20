@@ -1,6 +1,7 @@
 package fr.unice.polytech.steats.gateway;
 
 import fr.unice.polytech.steats.utils.AbstractHttpServer;
+import fr.unice.polytech.steats.utils.GatewayHttpHandler;
 
 import java.io.IOException;
 import java.net.URI;
