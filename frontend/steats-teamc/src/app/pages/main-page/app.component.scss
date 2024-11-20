@@ -4,11 +4,21 @@
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 9fr;
 
-  h1 {
+  p {
+    font-size: 6rem;
     color: greenyellow;
   }
 
   app-navbar {
     grid-row: 1;
+    min-height: 10vh;
   }
+
+  main {
+    width: 95%;
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+  }
+
 }

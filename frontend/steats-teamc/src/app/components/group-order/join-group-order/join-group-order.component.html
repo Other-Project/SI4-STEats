@@ -1,0 +1,6 @@
+<div class="join-group-order-container">
+  <mat-form-field>
+    <input matInput type="text" [formControl]="groupCode">
+  </mat-form-field>
+  <button mat-button (click)="joinGroupOrder()" [disabled]="groupCode.value === ''">Join group order</button>
+</div>
