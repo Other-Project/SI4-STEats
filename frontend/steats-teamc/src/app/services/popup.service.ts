@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {PopupComponent} from '../components/popup/popup.component';
+import {GroupOrderComponent} from '../components/popup/group-order.component';
 import {CreateOrderComponent} from '../components/popup/create-order/create-order.component';
 import {LoginComponent} from '../components/popup/login/login.component';
 
@@ -12,7 +12,7 @@ export class PopupService {
   }
 
   openGroupPopup() {
-    this.dialog.open(PopupComponent);
+    this.dialog.open(GroupOrderComponent);
   }
 
   closePopup() {
