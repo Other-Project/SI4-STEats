@@ -4,5 +4,5 @@ export interface MenuItem {
   price: number;
   preparationTime: string;
   restaurantId: string;
-  imageUrl: string;
+  imageUrl: string | null;
 }

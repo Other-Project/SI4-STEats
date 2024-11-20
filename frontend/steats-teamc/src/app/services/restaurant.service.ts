@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import {map, Observable} from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 import {Restaurant} from '../../models/restaurant.model';
 import {MenuItem} from '../../models/menuItem.model';
 
@@ -16,25 +16,10 @@ export class RestaurantService {
   constructor(private http: HttpClient) {}
 
   getRestaurants(): Observable<Restaurant[]> {
-    return this.http.get<Restaurant[]>(this.apiUrl).pipe(
-      map(restaurants => restaurants.map(restaurant => ({
-        name: restaurant.name,
-        imageUrl: this.defaultImageUrl,
-        id: restaurant.id
-      })))
-    );
+    return this.http.get<Restaurant[]>(this.apiUrl);
   }
 
   getMenu(restaurantId: string) : Observable<MenuItem[]> {
-    return this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`).pipe(
-      map((menu: any) => menu.map((menuItem: any) => ({
-        imageUrl: this.defaultImageUrl2,
-        id: menuItem.id,
-        name: menuItem.name,
-        price: menuItem.price,
-        preparationTime: menuItem.preparationTime,
-        restaurantId: menuItem.restaurantId,
-      })))
-    );
+    return this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`);
   }
 }
