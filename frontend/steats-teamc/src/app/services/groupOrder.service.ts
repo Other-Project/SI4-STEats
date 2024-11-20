@@ -16,12 +16,13 @@ export class GroupOrderService {
 
   joinGroupOrder(groupCode: string, userId: string): Observable<void> {
     return new Observable<void>((observer) => {
-      this.http.post<void>(`${this.singleApiUrl}`, { userId, groupCode }).subscribe({
+      this.http.post<void>(`${this.singleApiUrl}`, {userId, groupCode}).subscribe({
         next: () => {
           observer.next();
           observer.complete();
         },
         error: (error) => {
+          console.log({userId, groupCode});
           observer.error(error);
         }
       });

@@ -28,8 +28,8 @@ export class UserService {
     this.isLoggedInSubject.next(false);
   }
 
-  getUser(): User | null {
-    return this.user;
+  getUserId(): string | null {
+    return this.user?.id ?? null;
   }
 
   get isLoggedIn$(): Observable<boolean> {
