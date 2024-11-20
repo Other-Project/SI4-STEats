@@ -29,10 +29,8 @@ public class GenerateOpenApi {
                 GroupOrderHttpHandler.class
         );
 
-
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("openapi.json"))) {
             writer.write(json);
         }
-        System.out.println(json);
     }
 }
