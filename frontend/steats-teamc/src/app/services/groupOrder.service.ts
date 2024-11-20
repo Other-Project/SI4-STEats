@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { GroupOrder } from '../../models/groupOrder.model';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {GroupOrder} from '../models/groupOrder.model';
 
 @Injectable({
   providedIn: 'root'

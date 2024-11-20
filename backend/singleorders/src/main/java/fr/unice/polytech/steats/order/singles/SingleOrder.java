@@ -74,7 +74,7 @@ public class SingleOrder implements Order {
      * @param userId    The user that initialized the order
      */
     public SingleOrder(@JsonProperty("groupCode") String groupCode, @JsonProperty("userId") String userId) throws IOException {
-        GroupOrder groupOrder= GroupOrderServiceHelper.getGroupOrder(groupCode);
+        GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
         this.userId = userId;

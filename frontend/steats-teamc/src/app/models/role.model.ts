@@ -1,5 +1,5 @@
 export type Role =
-  ' STUDENT'
+  'STUDENT'
   | 'FACULTY'
   | 'RESTAURANT_MANAGER'
   | 'RESTAURANT_STAFF'

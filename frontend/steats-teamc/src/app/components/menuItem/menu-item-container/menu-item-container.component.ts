@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {RestaurantService} from '../../../services/restaurant.service';
-import {MenuItem} from '../../../../models/menuItem.model';
+import {MenuItem} from '../../../models/menuItem.model';
 import {MenuItemComponent} from '../menu-item/menu-item.component';
 import {NgForOf} from '@angular/common';
 

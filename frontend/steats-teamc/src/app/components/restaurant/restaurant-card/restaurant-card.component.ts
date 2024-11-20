@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {Router} from '@angular/router';
-import {Restaurant} from '../../../../models/restaurant.model';
+import {Restaurant} from '../../../models/restaurant.model';
 
 @Component({
   selector: 'app-restaurant-card',
@@ -17,5 +17,3 @@ export class RestaurantCardComponent {
     this.router.navigate(['/restaurant', this.restaurant.id]).then(r => console.log(r));
   }
 }
-
-
