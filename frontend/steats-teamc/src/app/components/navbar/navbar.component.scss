@@ -2,10 +2,9 @@
 
 .navbar-container {
   height: 100%;
-  background-color: $primary;
-  border: 1px solid black;
+  background-color: #57d9bb;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
 }

@@ -1,0 +1,25 @@
+.group-order-container {
+  text-align: center;
+
+  .popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mat-tab-content {
+    margin-top: 20px;
+  }
+
+  .toggle-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  mat-form-field {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
