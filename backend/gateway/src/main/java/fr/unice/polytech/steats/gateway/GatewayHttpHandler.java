@@ -11,42 +11,24 @@ import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class GatewayHttpHandler extends AbstractHandler {
-    public static final Map<String, String> SERVICES = Map.of(
-            "/api/address", "localhost:5001",
-            "/api/users", "localhost:5002",
-            "/api/payments", "localhost:5003",
-            "/api/restaurants", "localhost:5006",
-            "/api/menu-items", "localhost:5007",
-            "/api/schedules", "localhost:5008",
-            "/api/orders", "localhost:5010"
-    );
     public static final List<String> RESTRICTED_HEADERS = List.of(
             "host", "connection", "content-length", "transfer-encoding", "date", "server", "expect", "upgrade", "via", "warning"
     );
 
-    protected GatewayHttpHandler(String subPath, Logger logger) {
+    private final URI serviceUrl;
+
+    protected GatewayHttpHandler(String subPath, URI serviceUrl, Logger logger) {
         super(subPath, logger);
+        this.serviceUrl = serviceUrl;
     }
 
     @Override
     protected void handle(HttpExchange exchange, String requestPath) throws IOException {
-        String service = SERVICES.entrySet().stream()
-                .filter(e -> requestPath.startsWith(e.getKey()))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(null);
-        if (service == null) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-            exchange.close();
-            return;
-        }
-
         URI uri = exchange.getRequestURI();
         HttpRequest request;
         String[] headers = exchange.getRequestHeaders().entrySet().stream()
@@ -56,7 +38,7 @@ public class GatewayHttpHandler extends AbstractHandler {
                 .toArray(String[]::new);
         try {
             request = HttpRequest.newBuilder()
-                    .uri(new URI("http", service, uri.getPath(), uri.getQuery(), uri.getFragment()))
+                    .uri(new URI(serviceUrl.getScheme(), serviceUrl.getAuthority(), uri.getPath(), uri.getQuery(), uri.getFragment()))
                     .headers(headers)
                     .method(exchange.getRequestMethod(),
                             exchange.getRequestBody() == null ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofInputStream(exchange::getRequestBody))
