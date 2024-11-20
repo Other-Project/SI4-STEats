@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.order.singles;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.models.Status;
@@ -14,6 +16,8 @@ import java.util.logging.Logger;
 
 @ApiMasterRoute(name = "Single Orders", path = "/api/orders/singles")
 public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderManager, SingleOrder> {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public SingleOrderHttpHandler(String subPath, Logger logger) {
         super(subPath, SingleOrder.class, logger);
     }
@@ -83,7 +87,22 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
     private void create(HttpExchange exchange) throws IOException {
         try {
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
-            SingleOrder singleOrder = JacksonUtils.fromJson(exchange.getRequestBody(), SingleOrder.class);
+            JsonNode jsonNode = objectMapper.readTree(exchange.getRequestBody());
+
+            String userId = jsonNode.get("userId").asText();
+            String groupCode = jsonNode.has("groupCode") ? jsonNode.get("groupCode").asText() : null;
+
+            SingleOrder singleOrder;
+
+            if (groupCode != null) {
+                singleOrder = new SingleOrder(userId, groupCode);
+            } else {
+                LocalDateTime deliveryTime = LocalDateTime.parse(jsonNode.get("deliveryTime").asText());
+                String addressId = jsonNode.get("addressId").asText();
+                String restaurantId = jsonNode.get("restaurantId").asText();
+                singleOrder = new SingleOrder(userId, deliveryTime, addressId, restaurantId);
+            }
+
             if (!singleOrder.checkGroupOrder()) {
                 exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
                 exchange.close();

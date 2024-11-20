@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
-import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.GroupOrder;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Payment;
@@ -68,22 +67,7 @@ public class SingleOrder implements Order {
      * @param groupCode The group code of the order
      * @param userId    The user that initialized the order
      */
-    public SingleOrder(String groupCode, String userId) throws IOException {
-        GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
-        this.id = UUID.randomUUID().toString();
-        this.orderTime = LocalDateTime.now();
-        this.userId = userId;
-        this.groupCode = groupCode;
-        this.deliveryTime = groupOrder.deliveryTime();
-        this.addressId = groupOrder.addressId();
-        this.restaurantId = groupOrder.restaurantId();
-    }
-
-    /**
-     * @param groupCode The group code of the order
-     * @param userId    The user that initialized the order
-     */
-    public SingleOrder(@JsonProperty("groupCode") String groupCode, @JsonProperty("userId") String userId) throws IOException {
+    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("groupCode") String groupCode) throws IOException {
         GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
@@ -97,7 +81,7 @@ public class SingleOrder implements Order {
     public boolean checkGroupOrder() throws IOException {
         if (groupCode == null) return true;
         GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
-        return groupOrder.deliveryTime() == deliveryTime
+        return Objects.equals(groupOrder.deliveryTime(), deliveryTime)
                 && Objects.equals(groupOrder.addressId(), addressId)
                 && Objects.equals(groupOrder.restaurantId(), restaurantId);
     }
