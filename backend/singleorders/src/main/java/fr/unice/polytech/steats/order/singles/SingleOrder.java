@@ -7,8 +7,8 @@ import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
 import fr.unice.polytech.steats.models.GroupOrder;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Payment;
-import fr.unice.polytech.steats.utils.Order;
 import fr.unice.polytech.steats.models.Status;
+import fr.unice.polytech.steats.utils.Order;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -41,7 +41,8 @@ public class SingleOrder implements Order {
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
+                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
         this(userId, null, deliveryTime, addressId, restaurantId);
     }
 
@@ -52,8 +53,7 @@ public class SingleOrder implements Order {
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("groupCode") String groupCode, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
-                @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
+    public SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
         this.userId = userId;
@@ -61,11 +61,21 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
-        // TODO: let the creation of the order to the restaurant
-        //if (!RestaurantServiceHelper.canHandle(id, deliveryTime))
-        //    throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
-        //SingleOrderManager.getInstance().add(this);
-        //if (groupCode == null) RestaurantServiceHelper.addOrder(id);
+    }
+
+    /**
+     * @param groupCode The group code of the order
+     * @param userId    The user that initialized the order
+     */
+    public SingleOrder(String groupCode, String userId) throws IOException {
+        GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
+        this.id = UUID.randomUUID().toString();
+        this.orderTime = LocalDateTime.now();
+        this.userId = userId;
+        this.groupCode = groupCode;
+        this.deliveryTime = groupOrder.deliveryTime();
+        this.addressId = groupOrder.addressId();
+        this.restaurantId = groupOrder.restaurantId();
     }
 
     public boolean checkGroupOrder() throws IOException {
@@ -189,26 +199,6 @@ public class SingleOrder implements Order {
         if (status.compareTo(this.status) < 0 || this.status.compareTo(Status.PAID) < 0)
             throw new IllegalArgumentException("Can't change the status");
         this.status = status;
-    }
-
-    /**
-     * Add a menu item to the items of the order
-     *
-     * @param item The id of the menu item the user chose to add to the order
-     */
-    public void addMenuItem(String item) throws IOException {
-        items.add(item);
-        //updateDiscounts();
-    }
-
-    /**
-     * Remove a menu item from the items of the order
-     *
-     * @param item The id of the menu item the user chose to remove from the order
-     */
-    public void removeMenuItem(String item) throws IOException {
-        items.remove(item);
-        //updateDiscounts();
     }
 
     //TODO : Discount

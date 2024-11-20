@@ -91,7 +91,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
             }
             getManager().add(singleOrder);
             exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, -1);
-        } catch (Exception e) {
+        } catch (IOException e) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
         }
         exchange.getResponseBody().close();
