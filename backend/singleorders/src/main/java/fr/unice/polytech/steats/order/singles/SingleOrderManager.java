@@ -1,6 +1,8 @@
 package fr.unice.polytech.steats.order.singles;
 
+import fr.unice.polytech.steats.helpers.AddressServiceHelper;
 import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
+import fr.unice.polytech.steats.helpers.UserServiceHelper;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.io.IOException;
@@ -36,8 +38,10 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         try {
             if (!RestaurantServiceHelper.canHandle(item.getRestaurantId(), item.getPreparationTime(), item.getDeliveryTime()))
                 throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
+            AddressServiceHelper.getAddress(item.getAddressId());
+            UserServiceHelper.getUser(item.getUserId());
         } catch (IOException e) {
-            throw new IllegalStateException("This order's restaurant does not exist (order's restaurantId : " + item.getRestaurantId() + ")");
+            throw new IllegalStateException("This order's restaurant or address or user doesn't exist" + e.getMessage());
         }
         super.add(item.getId(), item);
     }
