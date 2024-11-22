@@ -38,10 +38,12 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         try {
             if (!RestaurantServiceHelper.canHandle(item.getRestaurantId(), item.getPreparationTime(), item.getDeliveryTime()))
                 throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
-            AddressServiceHelper.getAddress(item.getAddressId());
-            UserServiceHelper.getUser(item.getUserId());
+            if (AddressServiceHelper.getAddress(item.getAddressId()) == null)
+                throw new IllegalArgumentException("The address doesn't exist");
+            if (UserServiceHelper.getUser(item.getUserId()) == null)
+                throw new IllegalArgumentException("The user doesn't exist");
         } catch (IOException e) {
-            throw new IllegalStateException("This order's restaurant or address or user doesn't exist" + e.getMessage());
+            throw new IllegalStateException("Bad request" + e.getMessage());
         }
         super.add(item.getId(), item);
     }
@@ -127,8 +129,8 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         String albanFalcoz = "140403";
         List.of(
                 new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"),
-                new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"),
-                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"),
+                new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus-Sophia-Tech", "2"),
+                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus-Sophia-Tech", "1"),
                 new SingleOrder(johnDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "EURECOM", "2"),
                 new SingleOrder(albanFalcoz, "1", LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1")
         ).forEach(singleOrder -> add(singleOrder.getId(), singleOrder));
