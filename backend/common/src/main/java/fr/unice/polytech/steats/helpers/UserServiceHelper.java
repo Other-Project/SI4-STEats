@@ -16,7 +16,7 @@ import java.net.http.HttpResponse;
  * @author Team C
  */
 public class UserServiceHelper {
-    public static final URI User_SERVICE_URI = URI.create("http://localhost:5002/api/address/");
+    public static final URI USER_SERVICE_URI = URI.create("http://localhost:5002/api/users/");
 
     private UserServiceHelper() {
 
@@ -29,7 +29,7 @@ public class UserServiceHelper {
      */
     public static User getUser(String userId) throws IOException {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(User_SERVICE_URI.resolve(userId))
+                .uri(USER_SERVICE_URI.resolve(userId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

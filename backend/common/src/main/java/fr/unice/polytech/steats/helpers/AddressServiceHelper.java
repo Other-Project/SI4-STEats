@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.helpers;
 
-import fr.unice.polytech.steats.address.Address;
+import fr.unice.polytech.steats.models.Address;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
 
