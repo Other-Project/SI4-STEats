@@ -32,6 +32,8 @@ export class CreateGroupOrderComponent {
         this.orderService.joinGroupOrder(groupOrder.groupCode, userId).subscribe({
           next: (singleOrder) => {
             // Redirect to the order page if needed
+            this.orderService.setOrderId(singleOrder.id);
+            this.orderService.setGroupCode(singleOrder.groupCode);
             this.router.navigate(['/order', singleOrder.id]).then(r => console.log(r));
           },
           error: (error) => console.error('Failed to join group order:', error)

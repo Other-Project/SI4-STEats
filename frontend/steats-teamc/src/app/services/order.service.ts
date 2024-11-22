@@ -9,6 +9,9 @@ import {SingleOrder} from '../models/singleOrder.model';
 })
 export class OrderService {
 
+  private orderId: string | null = null;
+  private groupCode: string | null = null;
+
   constructor(private http: HttpClient) {
   }
 
@@ -62,5 +65,21 @@ export class OrderService {
 
   payForOrder(orderId: string): Observable<void> {
     return this.http.post<void>(`${this.singleApiUrl}/${orderId}/pay`, {});
+  }
+
+  setOrderId(orderId: string) {
+    this.orderId = orderId;
+  }
+
+  getOrderId(): string | null {
+    return this.orderId;
+  }
+
+  setGroupCode(groupCode: string) {
+    this.groupCode = groupCode;
+  }
+
+  getGroupCode(): string | null {
+    return this.groupCode;
   }
 }

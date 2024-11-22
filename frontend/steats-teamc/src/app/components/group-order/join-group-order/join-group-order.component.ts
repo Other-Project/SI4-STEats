@@ -20,10 +20,12 @@ export class JoinGroupOrderComponent {
     let userId: string | null = this.userService.getUserId();
     if (!userId) {
       //TODO: Show error message saying user is not logged in
-      return;
+      userId = "123456" //TODO: Remove this line when user is able to login
     }
     this.orderService.joinGroupOrder(this.groupCode.value, userId).subscribe({
       next: (order) => {
+        this.orderService.setOrderId(order.id);
+        this.orderService.setGroupCode(order.groupCode);
         this.router.navigate(['/order', order.id]).then(r => console.log(r));
         this.popupService.closePopup();
       },
