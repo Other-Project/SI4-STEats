@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {lastValueFrom, Observable} from 'rxjs';
 import {GroupOrder} from '../models/groupOrder.model';
 import {SingleOrder} from '../models/singleOrder.model';
 
@@ -18,32 +18,20 @@ export class OrderService {
   groupApiUrl: string = 'http://localhost:5008/api/orders/groups';
   singleApiUrl: string = 'http://localhost:5004/api/orders/singles';
 
-  joinGroupOrder(groupCode: string, userId: string): Observable<SingleOrder> {
-    return this.http.post<SingleOrder>(`${this.singleApiUrl}`, {userId, groupCode});
+  async joinGroupOrder(groupCode: string, userId: string): Promise<SingleOrder> {
+    return lastValueFrom(this.http.post<SingleOrder>(`${this.singleApiUrl}`, {userId, groupCode}));
   }
 
-  getGroupOrder(groupCode: string): GroupOrder | null {
-    this.http.get<GroupOrder>(`${this.groupApiUrl}/${groupCode}`).subscribe({
-      next: (groupOrder) => {
-        return groupOrder;
-      },
-      error: (error) => console.error('Failed to fetch group order:', error)
-    });
-    return null;
+  async getGroupOrder(groupCode: string): Promise<GroupOrder> {
+    return lastValueFrom(this.http.get<GroupOrder>(`${this.groupApiUrl}/${groupCode}`));
   }
 
-  getSingleOrder(groupCode: string): SingleOrder | null {
-    this.http.get<SingleOrder>(`${this.singleApiUrl}?groupCode=${groupCode}`).subscribe({
-      next: (singleOrder) => {
-        return singleOrder;
-      },
-      error: (error) => console.error('Failed to fetch single order:', error)
-    });
-    return null;
+  async getSingleOrder(groupCode: string): Promise<SingleOrder> {
+    return lastValueFrom(this.http.get<SingleOrder>(`${this.singleApiUrl}?groupCode=${groupCode}`));
   }
 
-  createGroupOrder(restaurantId: string, addressId: string, deliveryTime: string): Observable<GroupOrder> {
-    return this.http.post<GroupOrder>(`${this.groupApiUrl}`, {restaurantId, addressId, deliveryTime});
+  async createGroupOrder(restaurantId: string, addressId: string, deliveryTime: string): Promise<GroupOrder> {
+    return lastValueFrom(this.http.post<GroupOrder>(`${this.groupApiUrl}`, {restaurantId, addressId, deliveryTime}));
   }
 
   // maybe this should be in a different service

@@ -16,23 +16,20 @@ export class JoinGroupOrderComponent {
   constructor(private orderService: OrderService, private popupService: PopupService, private userService: UserService, private router: Router) {
   }
 
-  public joinGroupOrder() {
+  public async joinGroupOrder() {
     let userId: string | null = this.userService.getUserId();
     if (!userId) {
       //TODO: Show error message saying user is not logged in
-      userId = "123456" //TODO: Remove this line when user is able to login
+      return;
     }
-    this.orderService.joinGroupOrder(this.groupCode.value, userId).subscribe({
-      next: (order) => {
-        this.orderService.setOrderId(order.id);
-        this.orderService.setGroupCode(order.groupCode);
-        this.router.navigate(['/order', order.id]).then(r => console.log(r));
-        this.popupService.closePopup();
-      },
-      error: (error) => {
-        //TODO: Show error message saying group order does not exist
-        console.error('Failed to join group order:', error);
-      }
-    });
+    try {
+      let singleOrder = await this.orderService.joinGroupOrder(this.groupCode.value, userId);
+      this.orderService.setOrderId(singleOrder.id);
+      this.orderService.setGroupCode(singleOrder.groupCode);
+      this.router.navigate(['/order', singleOrder.id]).then(r => console.log(r));
+      this.popupService.closePopup();
+    } catch (error) {
+      console.error('Failed to join group order:', error);
+    }
   }
 }
