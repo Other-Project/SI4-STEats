@@ -18,7 +18,7 @@ public class JacksonUtils {
     private JacksonUtils() {
     }
 
-    private static ObjectMapper getMapper() {
+    public static ObjectMapper getMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.findAndRegisterModules();
         mapper.registerModule(new JavaTimeModule());

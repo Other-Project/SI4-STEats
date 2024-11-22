@@ -201,6 +201,26 @@ public class SingleOrder implements Order {
         this.status = status;
     }
 
+    /**
+     * Add a menu item to the items of the order
+     *
+     * @param menuItemId The id of the menu item the user chose to add to the order
+     */
+    public void addMenuItem(String menuItemId) throws IOException {
+        items.add(MenuItemServiceHelper.getMenuItem(menuItemId).id());
+        //updateDiscounts();
+    }
+
+    /**
+     * Remove a menu item from the items of the order
+     *
+     * @param menuItemId The id of the menu item the user chose to remove from the order
+     */
+    public void removeMenuItem(String menuItemId) throws IOException {
+        items.remove(MenuItemServiceHelper.getMenuItem(menuItemId).id());
+        //updateDiscounts();
+    }
+
     //TODO : Discount
 
 //    private void updateDiscounts() throws IOException {
