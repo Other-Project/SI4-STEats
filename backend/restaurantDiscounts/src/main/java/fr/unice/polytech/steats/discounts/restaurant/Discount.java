@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.discount;
+package fr.unice.polytech.steats.discounts.restaurant;
 
 import fr.unice.polytech.steats.models.MenuItem;
 
