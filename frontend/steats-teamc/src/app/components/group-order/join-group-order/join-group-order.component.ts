@@ -1,7 +1,9 @@
 import {Component} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
-import {GroupOrderService} from '../../../services/groupOrder.service';
+import {OrderService} from '../../../services/order.service';
 import {PopupService} from '../../../services/popup.service';
+import {UserService} from '../../../services/user.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-join-group-order',
@@ -11,14 +13,23 @@ import {PopupService} from '../../../services/popup.service';
 export class JoinGroupOrderComponent {
   public groupCode: FormControl<string> = new FormControl('', {validators: [Validators.required], nonNullable: true});
 
-  constructor(private groupOrderService: GroupOrderService, private popupService: PopupService) {
+  constructor(private orderService: OrderService, private popupService: PopupService, private userService: UserService, private router: Router) {
   }
 
-  public joinGroupOrder() {
-    this.groupOrderService.joinGroupOrder(this.groupCode.value, "1").subscribe({
-      next: () => console.log('Joined group order'),
-      error: (error) => console.error('Failed to join group order:', error)
-    });
-    this.popupService.closePopup();
+  public async joinGroupOrder() {
+    let userId: string | null = this.userService.getUserId();
+    if (!userId) {
+      //TODO: Show error message saying user is not logged in
+      return;
+    }
+    try {
+      let singleOrder = await this.orderService.joinGroupOrder(this.groupCode.value, userId);
+      this.orderService.setOrderId(singleOrder.id);
+      this.orderService.setGroupCode(singleOrder.groupCode);
+      this.router.navigate(['/order', singleOrder.id]).then(r => console.log(r));
+      this.popupService.closePopup();
+    } catch (error) {
+      console.error('Failed to join group order:', error);
+    }
   }
 }

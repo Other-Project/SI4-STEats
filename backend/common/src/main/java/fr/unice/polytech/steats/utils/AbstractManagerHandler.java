@@ -47,7 +47,7 @@ public abstract class AbstractManagerHandler<T extends AbstractManager<U>, U> ex
             exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
             U object = JacksonUtils.fromJson(exchange.getRequestBody(), clazz);
             getManager().add(object);
-            exchange.sendResponseHeaders(HttpUtils.CREATED_CODE, -1);
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.CREATED_CODE, object);
         } catch (Exception e) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
         }

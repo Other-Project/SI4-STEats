@@ -1,6 +1,8 @@
 package fr.unice.polytech.steats.order.singles;
 
+import fr.unice.polytech.steats.helpers.AddressServiceHelper;
 import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
+import fr.unice.polytech.steats.helpers.UserServiceHelper;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.io.IOException;
@@ -36,8 +38,12 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         try {
             if (!RestaurantServiceHelper.canHandle(item.getRestaurantId(), item.getPreparationTime(), item.getDeliveryTime()))
                 throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
+            if (AddressServiceHelper.getAddress(item.getAddressId()) == null)
+                throw new IllegalArgumentException("The address doesn't exist");
+            if (UserServiceHelper.getUser(item.getUserId()) == null)
+                throw new IllegalArgumentException("The user doesn't exist");
         } catch (IOException e) {
-            throw new IllegalStateException("This order's restaurant does not exist (order's restaurantId : " + item.getRestaurantId() + ")");
+            throw new IllegalStateException("Bad request" + e.getMessage());
         }
         super.add(item.getId(), item);
     }
@@ -118,9 +124,9 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * Fill the manager with some demo data
      */
     public void demo() {
-        String johnDoe = "123456";
-        String janeDoe = "654321";
-        String albanFalcoz = "140403";
+        String johnDoe = "John Doe";
+        String janeDoe = "Jane Doe";
+        String albanFalcoz = "Alban Falcoz";
         List.of(
                 new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"),
                 new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"),

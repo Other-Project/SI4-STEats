@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core'
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core'
 import {NavbarComponent} from './components/navbar/navbar.component'
 import {SearchbarComponent} from './components/navbar/searchbar/searchbar.component';
 import {NgForOf, NgIf, NgOptimizedImage} from '@angular/common';
@@ -11,9 +11,9 @@ import {
 } from './components/restaurant/restaurant-container/restaurant-container.component';
 import {CreateGroupOrderComponent} from './components/group-order/create-group-order/create-group-order.component';
 import {JoinGroupOrderComponent} from './components/group-order/join-group-order/join-group-order.component';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatFormField, MatFormFieldModule, MatLabel} from '@angular/material/form-field';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatInput} from '@angular/material/input';
+import {MatInput, MatInputModule} from '@angular/material/input';
 import {GroupOrderComponent} from './components/popup/group-order.component';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
@@ -36,6 +36,8 @@ import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/mater
     MatDialogContent,
     MatDialogActions,
     ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   providers: [],
   declarations: [
@@ -46,8 +48,8 @@ import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/mater
     CreateGroupOrderComponent,
     JoinGroupOrderComponent,
     GroupOrderComponent,
-
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [NavbarComponent, SearchbarComponent, RestaurantContainerComponent, CreateGroupOrderComponent, JoinGroupOrderComponent],
 })
 export class AppModule {
