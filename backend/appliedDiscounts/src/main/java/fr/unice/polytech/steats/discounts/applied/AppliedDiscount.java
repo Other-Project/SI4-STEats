@@ -15,7 +15,7 @@ import java.util.Objects;
 public record AppliedDiscount(String discountId, String userId, String unlockOrderId, String appliedOrderId) {
     @JsonProperty("id")
     public String id() {
-        return String.valueOf(hashCode());
+        return Integer.toUnsignedString(hashCode());
     }
 
     @Override

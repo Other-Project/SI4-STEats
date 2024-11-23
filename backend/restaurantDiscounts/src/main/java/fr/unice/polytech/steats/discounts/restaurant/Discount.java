@@ -48,6 +48,6 @@ public record Discount(String restaurantId, Options options, Criteria criteria, 
      */
     @JsonProperty("id")
     public String id() {
-        return String.valueOf(hashCode());
+        return Integer.toUnsignedString(hashCode(), 16);
     }
 }
