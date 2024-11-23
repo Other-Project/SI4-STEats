@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.discounts.applied;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 /**
@@ -11,6 +13,7 @@ import java.util.Objects;
  * @param appliedOrderId The id of the order to which the discount has been applied
  */
 public record AppliedDiscount(String discountId, String userId, String unlockOrderId, String appliedOrderId) {
+    @JsonProperty("id")
     public String id() {
         return String.valueOf(hashCode());
     }

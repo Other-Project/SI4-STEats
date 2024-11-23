@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.discounts.restaurant;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.models.*;
 
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public record Discount(String restaurantId, Options options, Criteria criteria, 
     /**
      * Gets the id of the discount
      */
+    @JsonProperty("id")
     public String id() {
         return String.valueOf(hashCode());
     }

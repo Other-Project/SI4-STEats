@@ -1,6 +1,6 @@
 package fr.unice.polytech.steats.models;
 
-public record RestaurantDiscount(String restaurantId, Options options, Criteria criteria, Effects effects) {
+public record RestaurantDiscount(String id, String restaurantId, Options options, Criteria criteria, Effects effects) {
     /**
      * Gets the price of the order once the discount has been applied
      *
