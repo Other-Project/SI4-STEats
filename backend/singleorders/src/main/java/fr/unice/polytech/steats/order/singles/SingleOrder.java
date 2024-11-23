@@ -14,10 +14,8 @@ import fr.unice.polytech.steats.utils.Order;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a single order taken by a client.
@@ -140,8 +138,8 @@ public class SingleOrder implements Order {
      */
     public double getSubPrice() throws IOException {
         double price = 0;
-        for (String item : items)
-            price += MenuItemServiceHelper.getMenuItem(item).price();
+        for (Map.Entry<String, Integer> item : items.stream().collect(Collectors.toMap(i -> i, i -> 1, Integer::sum)).entrySet())
+            price += MenuItemServiceHelper.getMenuItem(item.getKey()).price() * item.getValue();
         return price;
     }
 
@@ -254,8 +252,8 @@ public class SingleOrder implements Order {
     @Override
     public Duration getPreparationTime() throws IOException {
         Duration preparationTime = Duration.ZERO;
-        for (String item : items)
-            preparationTime = preparationTime.plus(MenuItemServiceHelper.getMenuItem(item).preparationTime());
+        for (var item : items.stream().collect(Collectors.toMap(i -> i, i -> 1, Integer::sum)).entrySet())
+            preparationTime = preparationTime.plus(MenuItemServiceHelper.getMenuItem(item.getKey()).preparationTime().multipliedBy(item.getValue()));
         return preparationTime;
     }
 
