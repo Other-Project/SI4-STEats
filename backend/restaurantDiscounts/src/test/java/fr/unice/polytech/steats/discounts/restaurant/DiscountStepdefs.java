@@ -1,17 +1,6 @@
-package fr.unice.polytech.steats.discounts;
+package fr.unice.polytech.steats.discounts.restaurant;
 
-import fr.unice.polytech.steats.NotFoundException;
-import fr.unice.polytech.steats.address.Address;
-import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.discounts.DiscountBuilder;
-import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.order.SingleOrderManager;
-import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.restaurant.TypeOfFood;
-import fr.unice.polytech.steats.users.Role;
-import fr.unice.polytech.steats.users.User;
-import fr.unice.polytech.steats.users.UserManager;
+import fr.unice.polytech.steats.models.*;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -38,18 +27,20 @@ public class DiscountStepdefs {
         SingleOrderManager.getInstance().clear();
         AddressManager.getInstance().clear();
         AddressManager.getInstance().add("Campus SophiaTech", new Address("Campus SophiaTech", "930 Rt des Colles", "Biot", "06410", ""));
+
+        RestaurantDiscountManager.getInstance().clear();
     }
 
     @Given("a restaurant named {string} of type {string}")
     public void givenARestaurant(String restaurantName, String foodType) {
         if (!RestaurantManager.getInstance().contains(restaurantName))
-            RestaurantManager.getInstance().add(restaurantName, new Restaurant(restaurantName, TypeOfFood.valueOf(foodType)));
+            RestaurantManager.getInstance().add(restaurantName, new Restaurant(restaurantName, restaurantName, TypeOfFood.valueOf(foodType), Duration.ofMinutes(30)));
         restaurant = restaurantName;
     }
 
     @And("a discount of {double}% each {int} orders")
-    public void aDiscountOfEachOrders(double percent, int orderAmount) throws NotFoundException {
-        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
+    public void aDiscountOfEachOrders(double percent, int orderAmount) {
+        RestaurantDiscountManager.getInstance().add(new DiscountBuilder(restaurant)
                 .setOrderDiscount(percent / 100.0)
                 .setOrdersAmount(orderAmount)
                 .appliesDuringOrder()
@@ -57,8 +48,8 @@ public class DiscountStepdefs {
     }
 
     @And("a discount of {double}% if the client has the {string} role")
-    public void aDiscountOfIfTheClientHasTheRole(double percent, String role) throws NotFoundException {
-        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
+    public void aDiscountOfIfTheClientHasTheRole(double percent, String role) {
+        RestaurantDiscountManager.getInstance().add(new DiscountBuilder(restaurant)
                 .setOrderDiscount(percent / 100.0)
                 .setUserRoles(Role.valueOf(role))
                 .appliesDuringOrder()
@@ -67,13 +58,9 @@ public class DiscountStepdefs {
     }
 
     @And("each {int} orders, an offer of the following free products:")
-    public void eachOrdersAnOfferOfTheFollowingFreeProducts(int orderAmount, List<Map<String, String>> items) throws NotFoundException {
-        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
-                .setFreeItems(items.stream().map(item -> new MenuItem(
-                        item.get("name"),
-                        0,
-                        Duration.ofSeconds(15)
-                )).toArray(MenuItem[]::new))
+    public void eachOrdersAnOfferOfTheFollowingFreeProducts(int orderAmount, List<Map<String, String>> items) {
+        RestaurantDiscountManager.getInstance().add(new DiscountBuilder(restaurant)
+                .setFreeItems(items.stream().map(item -> item.get("name")).toArray(String[]::new))
                 .setOrdersAmount(orderAmount)
                 .appliesDuringOrder()
                 .stackable()
@@ -81,8 +68,8 @@ public class DiscountStepdefs {
     }
 
     @And("a discount of {double}€ the next time if the order has more than {int} items")
-    public void aDiscountOfEuroTheNextTimeIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) throws NotFoundException {
-        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
+    public void aDiscountOfEuroTheNextTimeIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
+        RestaurantDiscountManager.getInstance().add(new DiscountBuilder(restaurant)
                 .setOrderCredit(moneyAmount)
                 .setCurrentOrderItemsAmount(minItemAmount)
                 .appliesAfterOrder()
@@ -91,8 +78,8 @@ public class DiscountStepdefs {
     }
 
     @And("a discount of {double}€ if the order has more than {int} items")
-    public void aDiscountOfEuroIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) throws NotFoundException {
-        RestaurantManager.getInstance().get(restaurant).addDiscount(new DiscountBuilder()
+    public void aDiscountOfEuroIfTheOrderHasMoreThanItems(double moneyAmount, int minItemAmount) {
+        RestaurantDiscountManager.getInstance().add(new DiscountBuilder(restaurant)
                 .setOrderCredit(moneyAmount)
                 .setCurrentOrderItemsAmount(minItemAmount)
                 .appliesDuringOrder()
@@ -106,7 +93,7 @@ public class DiscountStepdefs {
         for (int i = 0; i < orders; i++) {
             SingleOrder singleOrder = new SingleOrder(username, null, "Campus SophiaTech", restaurant);
             for (int j = 0; j < items; j++)
-                singleOrder.addMenuItem(new MenuItem("P1", 5, Duration.ofMinutes(1)));
+                singleOrder.addMenuItem(new MenuItem("P1", "P1", 5, Duration.ofMinutes(1), restaurant));
             assertTrue(singleOrder.pay());
         }
     }
@@ -120,23 +107,23 @@ public class DiscountStepdefs {
     @When("I place an order at {string} with the following items:")
     public void iPlaceAnOrderWithTheFollowingItems(String restaurant, List<Map<String, String>> items) {
         order = new SingleOrder(username, null, "Campus SophiaTech", restaurant);
-        items.forEach(item -> order.addMenuItem(new MenuItem(item.get("name"), 5, Duration.ofMinutes(1))));
+        items.forEach(item -> order.addMenuItem(new MenuItem(item.get("name"), item.get("name"), 5, Duration.ofMinutes(1), restaurant)));
     }
 
     @Then("I should receive a {double}% discount")
     public void iShouldReceiveADiscount(double percent) {
-        assertEquals(1 - percent / 100.0, order.getPrice() / order.getSubPrice(), 0.001);
+        assertEquals(1 - percent / 100.0, order.price() / order.getSubPrice(), 0.001);
     }
 
     @Then("I should receive a {double}€ discount")
     public void iShouldReceiveAEuroDiscount(double amount) {
-        assertEquals(amount, order.getSubPrice() - order.getPrice());
+        assertEquals(amount, order.getSubPrice() - order.price());
     }
 
     @Then("My cart should contain the following items:")
     public void myCartShouldContainTheFollowingItems(List<Map<String, String>> items) {
-        List<MenuItem> orderItems = order.getItems();
-        assertAll(items.stream().map(item -> () -> assertTrue(orderItems.stream().anyMatch(orderItem -> orderItem.getName().equals(item.get("name"))))));
+        List<String> orderItems = order.items();
+        assertAll(items.stream().map(item -> () -> assertTrue(orderItems.stream().anyMatch(orderItem -> orderItem.equals(item.get("name"))))));
     }
 
     @Then("I shouldn't receive a discount")

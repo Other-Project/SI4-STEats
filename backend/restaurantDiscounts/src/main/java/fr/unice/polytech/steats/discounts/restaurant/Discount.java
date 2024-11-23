@@ -1,9 +1,5 @@
 package fr.unice.polytech.steats.discounts.restaurant;
 
-import fr.unice.polytech.steats.models.MenuItem;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,16 +11,27 @@ import java.util.UUID;
  */
 public class Discount {
 
-    private String id;
-    private final DiscountBuilder.Options options;
-    private final DiscountBuilder.Criteria criteria;
-    private final DiscountBuilder.Discounts discounts;
+    private final String id;
+    private final String restaurantId;
 
-    Discount(DiscountBuilder builder) {
+    private final Options options;
+    private final Criteria criteria;
+    private final Effects effects;
+
+    Discount(String restaurantId, DiscountBuilder builder) {
         this.id = UUID.randomUUID().toString();
+        this.restaurantId = restaurantId;
         this.options = builder.getOptions();
         this.criteria = builder.getCriteria();
-        this.discounts = builder.getDiscounts();
+        this.effects = builder.getEffects();
+    }
+
+    public Discount(String id, String restaurantId, Options options, Criteria criteria, Effects effects) {
+        this.id = id;
+        this.restaurantId = restaurantId;
+        this.options = options;
+        this.criteria = criteria;
+        this.effects = effects;
     }
 
 //    /**
@@ -44,35 +51,35 @@ public class Discount {
 //        }).toList();
 //        List<SingleOrder> orders = null;
 //        try {
-//            orders = OrderServiceHelper.getOrdersByUserInRestaurant(order.getUser().getUserId(), order.getRestaurantId());
+//            orders = OrderServiceHelper.getOrdersByUserInRestaurant(order.userId(), order.restaurantId());
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-//        return items.size() >= criteria.currentOrderItemsAmount
-//                && (criteria.ordersAmount <= 0 || (orders.size() + 1) % criteria.ordersAmount == 0)
-//                && (criteria.itemsAmount <= 0 || orders.stream().mapToLong(o -> o.getItems().size()).sum() % criteria.itemsAmount == 0)
-//                && (criteria.clientRole == null || criteria.clientRole.contains(order.getUser().getRole()));
+//        return items.size() >= criteria.currentOrderItemsAmount()
+//                && (criteria.ordersAmount() <= 0 || (orders.size() + 1) % criteria.ordersAmount() == 0)
+//                && (criteria.itemsAmount() <= 0 || orders.stream().mapToLong(o -> o.items().size()).sum() % criteria.itemsAmount() == 0)
+//                && (criteria.clientRole().length == 0 || criteria.clientRole().contains(order.getUser().getRole()));
 //    }
 
     /**
      * Can the discount be cumulated with other discounts
      */
     public boolean isStackable() {
-        return options.stackable;
+        return options.stackable();
     }
 
     /**
      * Can the discount be applied to order that triggered it
      */
     public boolean canBeAppliedDirectly() {
-        return !options.appliesAfterOrder;
+        return !options.appliesAfterOrder();
     }
 
     /**
      * Items given by the discount
      */
-    public List<MenuItem> freeItems() {
-        return List.of(discounts.freeItems);
+    public List<String> freeItems() {
+        return List.of(effects.freeItemIds());
     }
 
     /**
@@ -82,9 +89,9 @@ public class Discount {
      * @implNote Used to compare discounts
      */
     public double value(double price) {
-        return discounts.orderCredit
-                + Arrays.stream(discounts.freeItems).mapToDouble(MenuItem::price).sum()
-                + price * discounts.orderDiscount;
+        return effects.orderCredit()
+                //+ Arrays.stream(discounts.freeItemIds).mapToDouble(MenuItem::price).sum() // TODO : fix this
+                + price * effects.orderDiscount();
     }
 
     /**
@@ -93,7 +100,7 @@ public class Discount {
      * @param price The price of the order
      */
     public double getNewPrice(double price) {
-        return (price - discounts.orderCredit) * (1 - discounts.orderDiscount);
+        return (price - effects.orderCredit()) * (1 - effects.orderDiscount());
     }
 
     /**
@@ -104,10 +111,30 @@ public class Discount {
     }
 
     /**
-     * Is the discount expired
+     * Gets the id of the restaurant
      */
-    public boolean isExpired() {
-        return (options.expirationDate == null && !options.appliesAfterOrder)
-                || (options.expirationDate != null && options.expirationDate.isBefore(LocalDateTime.now()));
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    /**
+     * Gets the options of the discount
+     */
+    public Options getOptions() {
+        return options;
+    }
+
+    /**
+     * Gets the criteria of the discount
+     */
+    public Criteria getCriteria() {
+        return criteria;
+    }
+
+    /**
+     * Gets the effects of the discount
+     */
+    public Effects getEffects() {
+        return effects;
     }
 }

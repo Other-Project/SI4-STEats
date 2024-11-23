@@ -1,19 +1,14 @@
-package fr.unice.polytech.steats.discounts;
+package fr.unice.polytech.steats.discounts.restaurant;
 
-import fr.unice.polytech.steats.address.Address;
-import fr.unice.polytech.steats.address.AddressManager;
-import fr.unice.polytech.steats.order.SingleOrder;
-import fr.unice.polytech.steats.restaurant.Restaurant;
-import fr.unice.polytech.steats.restaurant.RestaurantManager;
-import fr.unice.polytech.steats.restaurant.TypeOfFood;
-import fr.unice.polytech.steats.users.Role;
-import fr.unice.polytech.steats.users.User;
-import fr.unice.polytech.steats.users.UserManager;
+import fr.unice.polytech.steats.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DiscountBuilderTest {
 
@@ -45,42 +40,42 @@ class DiscountBuilderTest {
 
     @Test
     void testOneTimeOffer() {
-        Discount discount = new DiscountBuilder()
+        Discount discount = new DiscountBuilder("")
                 .oneTimeOffer()
                 .build();
-        assertTrue(discount.isExpired());
+        assertTrue(discount.getOptions().isExpired());
     }
 
     @Test
     void testSetItemsAmount() {
-        Discount discount = new DiscountBuilder()
+        Discount discount = new DiscountBuilder(restaurant.id())
                 .setCurrentOrderItemsAmount(2)
                 .build();
         restaurant.addDiscount(discount);
         restaurant.addOrder(order);
-        order.addMenuItem(new MenuItem("Burger", 5, Duration.ofMinutes(10)));
+        order.addMenuItem(new MenuItem("1", "Burger", 5, Duration.ofMinutes(10), "1"));
         assertEquals(0, restaurant.availableDiscounts(order).size());
-        order.addMenuItem(new MenuItem("Burger", 5, Duration.ofMinutes(10)));
+        order.addMenuItem(new MenuItem("2", "Burger", 5, Duration.ofMinutes(10), "1"));
         assertEquals(1, restaurant.availableDiscounts(order).size());
     }
 
     @Test
     void testExpiresAt() {
-        Discount discountExpired = new DiscountBuilder()
+        Discount discountExpired = new DiscountBuilder("")
                 .expiresAt(LocalDateTime.of(2024, 10, 12, 12, 0))
                 .build();
-        assertTrue(discountExpired.isExpired());
-        Discount discount = new DiscountBuilder()
+        assertTrue(discountExpired.getOptions().isExpired());
+        Discount discount = new DiscountBuilder("")
                 .expiresAt(LocalDateTime.now().plusDays(1))
                 .build();
-        assertFalse(discount.isExpired());
+        assertFalse(discount.getOptions().isExpired());
     }
 
     @Test
     void testNeverExpires() {
-        Discount discount = new DiscountBuilder()
+        Discount discount = new DiscountBuilder("")
                 .neverExpires()
                 .build();
-        assertFalse(discount.isExpired());
+        assertFalse(discount.getOptions().isExpired());
     }
 }

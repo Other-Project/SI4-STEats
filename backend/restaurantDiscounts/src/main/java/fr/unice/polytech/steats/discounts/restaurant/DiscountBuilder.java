@@ -1,11 +1,8 @@
 package fr.unice.polytech.steats.discounts.restaurant;
 
-import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Role;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class used to create a {@link Discount}
@@ -14,45 +11,51 @@ import java.util.List;
  */
 public class DiscountBuilder {
 
+    private final String restaurantId;
+
+    public DiscountBuilder(String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
     // Options
-    static class Options {
+    static class OptionsConstructor {
         boolean stackable = false;
         boolean appliesAfterOrder = false;
         LocalDateTime expirationDate = null;
     }
 
-    private final Options options = new Options();
+    private final OptionsConstructor options = new OptionsConstructor();
 
     Options getOptions() {
-        return options;
+        return new Options(options.stackable, options.appliesAfterOrder, options.expirationDate);
     }
 
     // Criteria
-    static class Criteria {
+    static class CriteriaConstructor {
         int ordersAmount = 0;
         int currentOrderItemsAmount = 0;
         int itemsAmount = 0;
-        List<Role> clientRole = null;
+        Role[] clientRole = new Role[0];
     }
 
-    private final Criteria criteria = new Criteria();
+    private final CriteriaConstructor criteria = new CriteriaConstructor();
 
     Criteria getCriteria() {
-        return criteria;
+        return new Criteria(criteria.ordersAmount, criteria.currentOrderItemsAmount, criteria.itemsAmount, criteria.clientRole);
     }
 
 
     // Discounts
-    static class Discounts {
+    static class EffectsConstructor {
         double orderDiscount = 0;
         double orderCredit = 0;
-        MenuItem[] freeItems = new MenuItem[0];
+        String[] freeItemIds = new String[0];
     }
 
-    private final Discounts discounts = new Discounts();
+    private final EffectsConstructor effects = new EffectsConstructor();
 
-    Discounts getDiscounts() {
-        return discounts;
+    Effects getEffects() {
+        return new Effects(effects.orderDiscount, effects.orderCredit, effects.freeItemIds);
     }
 
     //region Options
@@ -157,7 +160,7 @@ public class DiscountBuilder {
      * @param roles A list of roles that are eligible
      */
     public DiscountBuilder setUserRoles(Role... roles) {
-        criteria.clientRole = new ArrayList<>(List.of(roles));
+        criteria.clientRole = roles;
         return this;
     }
 
@@ -171,7 +174,7 @@ public class DiscountBuilder {
      * @param orderDiscount The discount percentage
      */
     public DiscountBuilder setOrderDiscount(double orderDiscount) {
-        discounts.orderDiscount = orderDiscount;
+        effects.orderDiscount = orderDiscount;
         return this;
     }
 
@@ -181,17 +184,17 @@ public class DiscountBuilder {
      * @param orderCredit Amount of money to be credited
      */
     public DiscountBuilder setOrderCredit(double orderCredit) {
-        discounts.orderCredit = orderCredit;
+        effects.orderCredit = orderCredit;
         return this;
     }
 
     /**
      * Add items to give
      *
-     * @param freeItems The products to be gifted
+     * @param freeItemIds Ids of the items to be gifted
      */
-    public DiscountBuilder setFreeItems(MenuItem... freeItems) {
-        discounts.freeItems = freeItems;
+    public DiscountBuilder setFreeItems(String... freeItemIds) {
+        effects.freeItemIds = freeItemIds;
         return this;
     }
 
@@ -201,6 +204,6 @@ public class DiscountBuilder {
      * Creates a discount
      */
     public Discount build() {
-        return new Discount(this);
+        return new Discount(restaurantId, this);
     }
 }
