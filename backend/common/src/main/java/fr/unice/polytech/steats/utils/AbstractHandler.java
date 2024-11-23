@@ -45,11 +45,15 @@ public class AbstractHandler implements HttpHandler {
             return;
         }
 
-        String requestMethod = exchange.getRequestMethod();
         String requestPath = exchange.getRequestURI().getPath().replaceAll("/$", "");
+        getLogger().info(() -> "Received " + exchange.getRequestMethod() + " at " + requestPath);
+        handle(exchange, requestPath);
+    }
 
-        getLogger().info(() -> "Received " + requestMethod + " at " + requestPath);
-        Optional<RouteInfo> routeInfoOptional = ApiRegistry.getRoutes().stream().filter(r -> r.matches(requestMethod, requestPath)).findFirst();
+    protected void handle(HttpExchange exchange, String requestPath) throws IOException {
+        Optional<RouteInfo> routeInfoOptional = ApiRegistry.getRoutes().stream()
+                .filter(r -> r.matches(exchange.getRequestMethod(), requestPath))
+                .findFirst();
         if (routeInfoOptional.isEmpty()) {
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
             exchange.getResponseBody().close();

@@ -28,6 +28,7 @@ public class HttpUtils {
     public static final int BAD_REQUEST_CODE = 400;
     public static final int NOT_FOUND_CODE = 404;
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;
+    public static final int BAD_GATEWAY_CODE = 502;
 
     public static final String GET = "GET";
     public static final String POST = "POST";

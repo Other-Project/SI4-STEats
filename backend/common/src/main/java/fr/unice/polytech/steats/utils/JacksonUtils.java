@@ -20,7 +20,6 @@ public class JacksonUtils {
 
     public static ObjectMapper getMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.disable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS);

@@ -1,13 +1,18 @@
-﻿trap terminate SIGINT
+﻿#!/bin/bash
+trap terminate SIGINT
 terminate(){
+  echo "Stopping all processes"
     pkill -SIGINT -P $$
     exit
 }
 
-cd backend
-mvn -f common/pom.xml clean install -Dmaven.test.skip=true
+cd backend || exit
+echo "Building common"
+mvn -q -f common/pom.xml clean install -Dmaven.test.skip=true
 for dir in ./*/
 do
-  [dir != "./common/"] && [dir != "./openapi/"] && mvn -f $dir/pom.xml clean compile exec:java -Dmaven.test.skip=true &
-fi
+  [ "$dir" != "./common/" ] && [ "$dir" != "./openapi/" ] \
+    && echo "Building $dir" \
+    && mvn -q -f "$dir/pom.xml" clean compile exec:java -Dmaven.test.skip=true -Dexec.args="$1" &
+done
 wait
