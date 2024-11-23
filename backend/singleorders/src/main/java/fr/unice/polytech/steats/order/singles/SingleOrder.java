@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
+import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.GroupOrder;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Payment;
@@ -66,6 +67,21 @@ public class SingleOrder implements Order {
         //    throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
         //SingleOrderManager.getInstance().add(this);
         //if (groupCode == null) RestaurantServiceHelper.addOrder(id);
+    }
+
+    /**
+     * @param groupCode The group code of the order
+     * @param userId    The user that initialized the order
+     */
+    public SingleOrder(@JsonProperty("groupCode") String groupCode, @JsonProperty("userId") String userId) throws IOException {
+        GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
+        this.id = UUID.randomUUID().toString();
+        this.orderTime = LocalDateTime.now();
+        this.userId = userId;
+        this.groupCode = groupCode;
+        this.deliveryTime = groupOrder.deliveryTime();
+        this.addressId = groupOrder.addressId();
+        this.restaurantId = groupOrder.restaurantId();
     }
 
     public boolean checkGroupOrder() throws IOException {

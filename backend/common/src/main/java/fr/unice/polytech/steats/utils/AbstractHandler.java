@@ -37,7 +37,7 @@ public class AbstractHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         // CORS
         exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*"); // Remplacez par votre origine cliente
-        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Accept, X-Requested-With, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization");
 
         String requestPath = exchange.getRequestURI().getPath().replaceAll("/$", "");

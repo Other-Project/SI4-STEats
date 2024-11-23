@@ -1,3 +1,13 @@
 <div class="navbar-container">
   <app-searchbar></app-searchbar>
+  <button class="join-group-order" mat-raised-button (click)="openGroupOrderPopup()">
+    Group order
+  </button>
+  <button class="create-order" mat-raised-button (click)="createOrder()">
+    Make a order
+  </button>
+  <div>
+    <button mat-raised-button *ngIf="!isLoggedIn" (click)="openLoginPopup()">Login</button>
+    <button mat-raised-button *ngIf="isLoggedIn" (click)="logout()">Logout</button>
+  </div>
 </div>
