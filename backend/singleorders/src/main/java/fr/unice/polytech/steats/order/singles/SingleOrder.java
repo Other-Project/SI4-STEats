@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
-import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.GroupOrder;
 import fr.unice.polytech.steats.models.MenuItem;
 import fr.unice.polytech.steats.models.Payment;
-import fr.unice.polytech.steats.utils.Order;
 import fr.unice.polytech.steats.models.Status;
+import fr.unice.polytech.steats.utils.Order;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -42,7 +41,8 @@ public class SingleOrder implements Order {
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    public SingleOrder(String userId, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
+                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
         this(userId, null, deliveryTime, addressId, restaurantId);
     }
 
@@ -53,8 +53,7 @@ public class SingleOrder implements Order {
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("groupCode") String groupCode, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
-                @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
+    public SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
         this.userId = userId;
@@ -62,18 +61,13 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
-        // TODO: let the creation of the order to the restaurant
-        //if (!RestaurantServiceHelper.canHandle(id, deliveryTime))
-        //    throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
-        //SingleOrderManager.getInstance().add(this);
-        //if (groupCode == null) RestaurantServiceHelper.addOrder(id);
     }
 
     /**
      * @param groupCode The group code of the order
      * @param userId    The user that initialized the order
      */
-    public SingleOrder(@JsonProperty("groupCode") String groupCode, @JsonProperty("userId") String userId) throws IOException {
+    public SingleOrder(String userId, String groupCode) throws IOException {
         GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
@@ -87,7 +81,7 @@ public class SingleOrder implements Order {
     public boolean checkGroupOrder() throws IOException {
         if (groupCode == null) return true;
         GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
-        return groupOrder.deliveryTime() == deliveryTime
+        return Objects.equals(groupOrder.deliveryTime(), deliveryTime)
                 && Objects.equals(groupOrder.addressId(), addressId)
                 && Objects.equals(groupOrder.restaurantId(), restaurantId);
     }
@@ -210,20 +204,21 @@ public class SingleOrder implements Order {
     /**
      * Add a menu item to the items of the order
      *
-     * @param item The id of the menu item the user chose to add to the order
+     * @param menuItemId The id of the menu item the user chose to add to the order
      */
-    public void addMenuItem(String item) throws IOException {
-        items.add(item);
+    public void addMenuItem(String menuItemId) throws IOException {
+        MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId);
+        items.add(menuItem.id());
         //updateDiscounts();
     }
 
     /**
      * Remove a menu item from the items of the order
      *
-     * @param item The id of the menu item the user chose to remove from the order
+     * @param menuItemId The id of the menu item the user chose to remove from the order
      */
-    public void removeMenuItem(String item) throws IOException {
-        items.remove(item);
+    public void removeMenuItem(String menuItemId) {
+        items.remove(menuItemId);
         //updateDiscounts();
     }
 

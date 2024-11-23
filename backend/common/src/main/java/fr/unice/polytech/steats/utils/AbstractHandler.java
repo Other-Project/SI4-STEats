@@ -40,11 +40,20 @@ public class AbstractHandler implements HttpHandler {
         exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Accept, X-Requested-With, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization");
 
-        String requestMethod = exchange.getRequestMethod();
-        String requestPath = exchange.getRequestURI().getPath().replaceAll("/$", "");
+        if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+            exchange.sendResponseHeaders(HttpUtils.NO_CONTENT_CODE, -1);
+            return;
+        }
 
-        getLogger().info(() -> "Received " + requestMethod + " at " + requestPath);
-        Optional<RouteInfo> routeInfoOptional = ApiRegistry.getRoutes().stream().filter(r -> r.matches(requestMethod, requestPath)).findFirst();
+        String requestPath = exchange.getRequestURI().getPath().replaceAll("/$", "");
+        getLogger().info(() -> "Received " + exchange.getRequestMethod() + " at " + requestPath);
+        handle(exchange, requestPath);
+    }
+
+    protected void handle(HttpExchange exchange, String requestPath) throws IOException {
+        Optional<RouteInfo> routeInfoOptional = ApiRegistry.getRoutes().stream()
+                .filter(r -> r.matches(exchange.getRequestMethod(), requestPath))
+                .findFirst();
         if (routeInfoOptional.isEmpty()) {
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
             exchange.getResponseBody().close();

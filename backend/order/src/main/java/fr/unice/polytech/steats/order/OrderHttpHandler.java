@@ -35,12 +35,10 @@ public class OrderHttpHandler extends AbstractHandler {
         if (restaurantId == null) {
             orders.addAll(GroupOrderServiceHelper.getAll());
             orders.addAll(SingleOrderServiceHelper.getAll());
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, orders);
-            return;
+        } else {
+            orders.addAll(GroupOrderServiceHelper.getGroupOrdersByRestaurant(restaurantId));
+            orders.addAll(SingleOrderServiceHelper.getSingleOrdersNotInGroupByRestaurant(restaurantId));
         }
-
-        orders.addAll(GroupOrderServiceHelper.getGroupOrdersByRestaurant(restaurantId));
-        orders.addAll(SingleOrderServiceHelper.getSingleOrdersNotInGroupByRestaurant(restaurantId));
 
         HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, orders);
     }

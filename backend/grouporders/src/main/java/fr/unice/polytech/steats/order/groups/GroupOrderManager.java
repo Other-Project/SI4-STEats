@@ -1,5 +1,7 @@
 package fr.unice.polytech.steats.order.groups;
 
+import fr.unice.polytech.steats.helpers.AddressServiceHelper;
+import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.SingleOrder;
 import fr.unice.polytech.steats.utils.AbstractManager;
@@ -33,6 +35,14 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
 
     @Override
     public void add(GroupOrder item) {
+        try {
+            if(AddressServiceHelper.getAddress(item.getAddressId()) == null)
+                throw new IllegalArgumentException("The address doesn't exist");
+            if(RestaurantServiceHelper.getRestaurant(item.getRestaurantId()) == null)
+                throw new IllegalArgumentException("The restaurant doesn't exist");
+        } catch (IOException e) {
+            throw new IllegalStateException("Bad request" + e.getMessage());
+        }
         super.add(item.getGroupCode(), item);
     }
 
@@ -58,9 +68,11 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
      * Fill the manager with some demo data
      */
     public void demo() {
-        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 12, 0), "1", "1"));
-        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 15, 0), "2", "1"));
-        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 20, 0), "1", "2"));
-        add(new GroupOrder(LocalDateTime.of(2025, 1, 1, 8, 30), "2", "2"));
+        List.of(
+                new GroupOrder(LocalDateTime.of(2025, 1, 1, 12, 0), "EURECOM", "1"),
+                new GroupOrder(LocalDateTime.of(2025, 1, 1, 15, 0), "Campus Sophia Tech", "1"),
+                new GroupOrder(LocalDateTime.of(2025, 1, 1, 20, 0), "INRIA", "2"),
+                new GroupOrder(LocalDateTime.of(2025, 1, 1, 8, 30), "INRIA", "2")
+        ).forEach(groupOrder -> this.add(groupOrder.getGroupCode(), groupOrder));
     }
 }
