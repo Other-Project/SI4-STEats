@@ -35,10 +35,10 @@ public class UserManager extends AbstractManager<User> {
      */
     public void demo() {
         List.of(
-                new User("John Doe", "123456", Role.STUDENT),
-                new User("Jane Doe", "654321", Role.STUDENT),
-                new User("Alban Falcoz", "140403", Role.STUDENT),
-                new User("Théo Lassauniere", "141103", Role.STUDENT)
+                new User("John Doe", "John Doe", Role.STUDENT),
+                new User("Jane Doe", "Jane Doe", Role.STUDENT),
+                new User("Alban Falcoz", "Alban Falcoz", Role.STUDENT),
+                new User("Théo Lassauniere", "Theo Lassauniere", Role.STUDENT)
         ).forEach(user -> add(user.getUserId(), user));
     }
 }

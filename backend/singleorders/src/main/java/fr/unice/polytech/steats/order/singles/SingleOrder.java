@@ -67,7 +67,7 @@ public class SingleOrder implements Order {
      * @param groupCode The group code of the order
      * @param userId    The user that initialized the order
      */
-    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("groupCode") String groupCode) throws IOException {
+    public SingleOrder(String userId, String groupCode) throws IOException {
         GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
         this.id = UUID.randomUUID().toString();
         this.orderTime = LocalDateTime.now();
@@ -207,7 +207,8 @@ public class SingleOrder implements Order {
      * @param menuItemId The id of the menu item the user chose to add to the order
      */
     public void addMenuItem(String menuItemId) throws IOException {
-        items.add(MenuItemServiceHelper.getMenuItem(menuItemId).id());
+        MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId);
+        items.add(menuItem.id());
         //updateDiscounts();
     }
 
@@ -216,8 +217,8 @@ public class SingleOrder implements Order {
      *
      * @param menuItemId The id of the menu item the user chose to remove from the order
      */
-    public void removeMenuItem(String menuItemId) throws IOException {
-        items.remove(MenuItemServiceHelper.getMenuItem(menuItemId).id());
+    public void removeMenuItem(String menuItemId) {
+        items.remove(menuItemId);
         //updateDiscounts();
     }
 

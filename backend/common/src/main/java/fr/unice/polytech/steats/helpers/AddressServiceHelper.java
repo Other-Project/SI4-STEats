@@ -28,8 +28,9 @@ public class AddressServiceHelper {
      * @param addressId The id of the address
      */
     public static Address getAddress(String addressId) throws IOException {
+        String encodedAddressId = addressId.replace(" ", "%20");
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(ADDRESS_SERVICE_URI.resolve(addressId))
+                .uri(ADDRESS_SERVICE_URI.resolve(encodedAddressId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

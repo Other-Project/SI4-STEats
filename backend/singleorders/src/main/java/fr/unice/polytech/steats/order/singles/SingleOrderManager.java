@@ -124,13 +124,13 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * Fill the manager with some demo data
      */
     public void demo() {
-        String johnDoe = "123456";
-        String janeDoe = "654321";
-        String albanFalcoz = "140403";
+        String johnDoe = "John Doe";
+        String janeDoe = "Jane Doe";
+        String albanFalcoz = "Alban Falcoz";
         List.of(
                 new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"),
-                new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus-Sophia-Tech", "2"),
-                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus-Sophia-Tech", "1"),
+                new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"),
+                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"),
                 new SingleOrder(johnDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "EURECOM", "2"),
                 new SingleOrder(albanFalcoz, "1", LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1")
         ).forEach(singleOrder -> add(singleOrder.getId(), singleOrder));

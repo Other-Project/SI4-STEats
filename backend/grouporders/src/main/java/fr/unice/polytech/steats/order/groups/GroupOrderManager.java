@@ -70,7 +70,7 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
     public void demo() {
         List.of(
                 new GroupOrder(LocalDateTime.of(2025, 1, 1, 12, 0), "EURECOM", "1"),
-                new GroupOrder(LocalDateTime.of(2025, 1, 1, 15, 0), "Campus-Sophia-Tech", "1"),
+                new GroupOrder(LocalDateTime.of(2025, 1, 1, 15, 0), "Campus Sophia Tech", "1"),
                 new GroupOrder(LocalDateTime.of(2025, 1, 1, 20, 0), "INRIA", "2"),
                 new GroupOrder(LocalDateTime.of(2025, 1, 1, 8, 30), "INRIA", "2")
         ).forEach(groupOrder -> this.add(groupOrder.getGroupCode(), groupOrder));

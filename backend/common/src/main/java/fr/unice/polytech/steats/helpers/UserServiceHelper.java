@@ -28,8 +28,9 @@ public class UserServiceHelper {
      * @param userId The id of the address
      */
     public static User getUser(String userId) throws IOException {
+        String encodedUserId = userId.replace(" ", "%20");
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(USER_SERVICE_URI.resolve(userId))
+                .uri(USER_SERVICE_URI.resolve(encodedUserId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
                 .GET()
                 .build();

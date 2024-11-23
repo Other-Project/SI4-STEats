@@ -133,10 +133,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
             if (groupCode != null) {
                 singleOrder = new SingleOrder(userId, groupCode);
             } else {
-                LocalDateTime deliveryTime = LocalDateTime.parse(jsonNode.get("deliveryTime").asText());
-                String addressId = jsonNode.get("addressId").asText();
-                String restaurantId = jsonNode.get("restaurantId").asText();
-                singleOrder = new SingleOrder(userId, deliveryTime, addressId, restaurantId);
+                singleOrder = objectMapper.treeToValue(jsonNode, SingleOrder.class);
             }
 
             if (!singleOrder.checkGroupOrder()) {
