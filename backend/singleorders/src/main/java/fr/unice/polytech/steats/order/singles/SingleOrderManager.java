@@ -127,9 +127,9 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
      * Fill the manager with some demo data
      */
     public void demo() {
-        String johnDoe = "John Doe";
-        String janeDoe = "Jane Doe";
-        String albanFalcoz = "Alban Falcoz";
+        String johnDoe = "JohnDoe";
+        String janeDoe = "JaneDoe";
+        String albanFalcoz = "AlbanFalcoz";
 
         String sophiaTech = "Campus Sophia Tech";
         String eurecom = "EURECOM";
