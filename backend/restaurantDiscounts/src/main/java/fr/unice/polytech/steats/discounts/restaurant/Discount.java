@@ -1,7 +1,6 @@
 package fr.unice.polytech.steats.discounts.restaurant;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * A restaurant's discount with trigger criteria.
@@ -9,29 +8,10 @@ import java.util.UUID;
  * @author Team C
  * @see DiscountBuilder
  */
-public class Discount {
-
-    private final String id;
-    private final String restaurantId;
-
-    private final Options options;
-    private final Criteria criteria;
-    private final Effects effects;
+public record Discount(String restaurantId, Options options, Criteria criteria, Effects effects) {
 
     Discount(String restaurantId, DiscountBuilder builder) {
-        this.id = UUID.randomUUID().toString();
-        this.restaurantId = restaurantId;
-        this.options = builder.getOptions();
-        this.criteria = builder.getCriteria();
-        this.effects = builder.getEffects();
-    }
-
-    public Discount(String id, String restaurantId, Options options, Criteria criteria, Effects effects) {
-        this.id = id;
-        this.restaurantId = restaurantId;
-        this.options = options;
-        this.criteria = criteria;
-        this.effects = effects;
+        this(restaurantId, builder.getOptions(), builder.getCriteria(), builder.getEffects());
     }
 
 //    /**
@@ -106,35 +86,7 @@ public class Discount {
     /**
      * Gets the id of the discount
      */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Gets the id of the restaurant
-     */
-    public String getRestaurantId() {
-        return restaurantId;
-    }
-
-    /**
-     * Gets the options of the discount
-     */
-    public Options getOptions() {
-        return options;
-    }
-
-    /**
-     * Gets the criteria of the discount
-     */
-    public Criteria getCriteria() {
-        return criteria;
-    }
-
-    /**
-     * Gets the effects of the discount
-     */
-    public Effects getEffects() {
-        return effects;
+    public String id() {
+        return String.valueOf(hashCode());
     }
 }

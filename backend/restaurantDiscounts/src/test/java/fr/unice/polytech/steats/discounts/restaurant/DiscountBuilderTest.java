@@ -64,11 +64,11 @@ class DiscountBuilderTest {
         Discount discountExpired = new DiscountBuilder("")
                 .expiresAt(LocalDateTime.of(2024, 10, 12, 12, 0))
                 .build();
-        assertTrue(discountExpired.getOptions().isExpired());
+        assertTrue(discountExpired.options().isExpired());
         Discount discount = new DiscountBuilder("")
                 .expiresAt(LocalDateTime.now().plusDays(1))
                 .build();
-        assertFalse(discount.getOptions().isExpired());
+        assertFalse(discount.options().isExpired());
     }
 
     @Test
@@ -76,6 +76,6 @@ class DiscountBuilderTest {
         Discount discount = new DiscountBuilder("")
                 .neverExpires()
                 .build();
-        assertFalse(discount.getOptions().isExpired());
+        assertFalse(discount.options().isExpired());
     }
 }

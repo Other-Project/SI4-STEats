@@ -25,7 +25,7 @@ public class RestaurantDiscountManager extends AbstractManager<Discount> {
 
     @Override
     public void add(Discount item) {
-        add(item.getId(), item);
+        add(item.id(), item);
     }
 
     /**
