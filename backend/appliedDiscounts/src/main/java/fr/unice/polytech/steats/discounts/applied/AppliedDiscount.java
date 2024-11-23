@@ -1,4 +1,4 @@
-﻿package fr.unice.polytech.steats.discounts.applied;
+package fr.unice.polytech.steats.discounts.applied;
 
 import java.util.Objects;
 

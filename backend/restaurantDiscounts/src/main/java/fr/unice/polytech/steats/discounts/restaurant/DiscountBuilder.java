@@ -1,5 +1,8 @@
 package fr.unice.polytech.steats.discounts.restaurant;
 
+import fr.unice.polytech.steats.models.Criteria;
+import fr.unice.polytech.steats.models.Effects;
+import fr.unice.polytech.steats.models.Options;
 import fr.unice.polytech.steats.models.Role;
 
 import java.time.LocalDateTime;

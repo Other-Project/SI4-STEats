@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.discounts.restaurant;
+package fr.unice.polytech.steats.models;
 
 import java.time.LocalDateTime;
 
