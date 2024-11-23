@@ -15,7 +15,7 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   login(username: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/?name=${username}`).pipe(
+    return this.http.get<User>(`${this.apiUrl}/${username}`).pipe(
       tap(user => {
         this.user = user;
         this.isLoggedInSubject.next(true);
@@ -28,8 +28,8 @@ export class UserService {
     this.isLoggedInSubject.next(false);
   }
 
-  getUser(): User | null {
-    return this.user;
+  getUserId(): string | null {
+    return this.user?.id ?? null;
   }
 
   get isLoggedIn$(): Observable<boolean> {

@@ -40,6 +40,11 @@ public class AbstractHandler implements HttpHandler {
         exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Accept, X-Requested-With, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization");
 
+        if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+            exchange.sendResponseHeaders(HttpUtils.NO_CONTENT_CODE, -1);
+            return;
+        }
+
         String requestMethod = exchange.getRequestMethod();
         String requestPath = exchange.getRequestURI().getPath().replaceAll("/$", "");
 

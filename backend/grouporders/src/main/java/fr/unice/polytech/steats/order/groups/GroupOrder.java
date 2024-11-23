@@ -37,8 +37,7 @@ public class GroupOrder implements Order {
      * @param addressId    The label of the address where the group order must be delivered
      * @param restaurantId The id of the restaurant in which the group order is made
      */
-    private GroupOrder(@JsonProperty("groupCode") String groupCode, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
-                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
+    private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
         this.orderTime = LocalDateTime.now();
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
@@ -51,7 +50,7 @@ public class GroupOrder implements Order {
      * @param addressId    The label of the address where the group order must be delivered
      * @param restaurantId The id of the restaurant in which the group order is made
      */
-    public GroupOrder(LocalDateTime deliveryTime, String addressId, String restaurantId) {
+    public GroupOrder(@JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
         this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurantId);
     }
 

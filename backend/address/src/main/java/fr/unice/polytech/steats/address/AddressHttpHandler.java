@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.address;
 
+import fr.unice.polytech.steats.models.Address;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
 
