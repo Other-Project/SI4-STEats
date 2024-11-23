@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.order.singles;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
@@ -29,21 +30,35 @@ public class SingleOrder implements Order {
     private final String groupCode;
     private LocalDateTime deliveryTime;
     private final LocalDateTime orderTime;
-    private final List<String> items = new ArrayList<>();
+    private final List<String> items;
     private final String addressId;
     private final String restaurantId;
-    private Status status = Status.INITIALISED;
-    private final List<String> appliedDiscounts = new ArrayList<>();
+    private Status status;
 
     /**
+     * @param id           The id of the order
      * @param userId       The user that initialized the order
+     * @param groupCode    The group code of the order
      * @param deliveryTime The time the client wants the order to be delivered
+     * @param orderTime    The time the order was made
+     * @param items        The items ordered by the client
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
+     * @param status       The status of the order
      */
-    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
-                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
-        this(userId, null, deliveryTime, addressId, restaurantId);
+    @JsonCreator
+    public SingleOrder(@JsonProperty("id") String id, @JsonProperty("userId") String userId, @JsonProperty("userId") String groupCode,
+                       @JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("orderTime") LocalDateTime orderTime, @JsonProperty("items") List<String> items,
+                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId, @JsonProperty("status") Status status) {
+        this.id = id;
+        this.userId = userId;
+        this.groupCode = groupCode;
+        this.deliveryTime = deliveryTime;
+        this.orderTime = orderTime;
+        this.items = new ArrayList<>(items);
+        this.addressId = addressId;
+        this.restaurantId = restaurantId;
+        this.status = status;
     }
 
     /**
@@ -54,13 +69,7 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
-        this.id = UUID.randomUUID().toString();
-        this.orderTime = LocalDateTime.now();
-        this.userId = userId;
-        this.groupCode = groupCode;
-        this.deliveryTime = deliveryTime;
-        this.addressId = addressId;
-        this.restaurantId = restaurantId;
+        this(UUID.randomUUID().toString(), userId, groupCode, deliveryTime, LocalDateTime.now(), new ArrayList<>(), addressId, restaurantId, Status.INITIALISED);
     }
 
     /**
@@ -68,14 +77,15 @@ public class SingleOrder implements Order {
      * @param userId    The user that initialized the order
      */
     public SingleOrder(String userId, String groupCode) throws IOException {
-        GroupOrder groupOrder = GroupOrderServiceHelper.getGroupOrder(groupCode);
-        this.id = UUID.randomUUID().toString();
-        this.orderTime = LocalDateTime.now();
-        this.userId = userId;
-        this.groupCode = groupCode;
-        this.deliveryTime = groupOrder.deliveryTime();
-        this.addressId = groupOrder.addressId();
-        this.restaurantId = groupOrder.restaurantId();
+        this(userId, GroupOrderServiceHelper.getGroupOrder(groupCode));
+    }
+
+    /**
+     * @param userId     The user that initialized the order
+     * @param groupOrder The group order
+     */
+    private SingleOrder(String userId, GroupOrder groupOrder) {
+        this(userId, groupOrder.groupCode(), groupOrder.deliveryTime(), groupOrder.addressId(), groupOrder.restaurantId());
     }
 
     public boolean checkGroupOrder() throws IOException {
@@ -123,26 +133,22 @@ public class SingleOrder implements Order {
         return groupCode;
     }
 
-    //TODO : Menu Item
-//    /**
-//     * The price without discounts
-//     *
-//     * @implNote Returns the sum of the price of all the {@link fr.unice.polytech.steats.restaurant.MenuItem MenuItem} it contains.
-//     */
-//    public double getSubPrice() {
-//        return items.stream().map(item -> {
-//            try {
-//                return MenuItemServiceHelper.getMenuItem(item);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }).mapToDouble(MenuItem::getPrice).sum();
-//    }
+    /**
+     * The price without discounts
+     *
+     * @implNote Returns the sum of the price of all the {@link MenuItem MenuItem} it contains.
+     */
+    public double getSubPrice() throws IOException {
+        double price = 0;
+        for (String item : items)
+            price += MenuItemServiceHelper.getMenuItem(item).price();
+        return price;
+    }
 
     @Override
-    public double getPrice() {
+    public double getPrice() throws IOException {
         //Todo : Discount
-        /*List<Discount> oldDiscountsToApplied;
+        /*List<RestaurantDiscount> oldDiscountsToApplied;
         try {
             oldDiscountsToApplied = DiscountServiceHelper.getDiscountToApplyNext(userId, restaurantId);
         } catch (IOException e) {
@@ -158,7 +164,7 @@ public class SingleOrder implements Order {
                 }),
                 oldDiscountsToApplied.stream()
         ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);*/
-        return 0;
+        return getSubPrice();
     }
 
     @Override
@@ -243,25 +249,14 @@ public class SingleOrder implements Order {
 //    }
 
     /**
-     * Get the list of discounts id triggered by the order
-     */
-    public List<String> getDiscounts() {
-        return appliedDiscounts;
-    }
-
-    /**
      * @implNote The total preparation time of all the items in the order
      */
     @Override
-    public Duration getPreparationTime() {
-        return items.stream().map(addMenuItem -> {
-                    try {
-                        return MenuItemServiceHelper.getMenuItem(addMenuItem);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        ).map(MenuItem::preparationTime).reduce(Duration.ZERO, Duration::plus);
+    public Duration getPreparationTime() throws IOException {
+        Duration preparationTime = Duration.ZERO;
+        for (String item : items)
+            preparationTime = preparationTime.plus(MenuItemServiceHelper.getMenuItem(item).preparationTime());
+        return preparationTime;
     }
 
     @Override

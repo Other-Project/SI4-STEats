@@ -16,6 +16,7 @@ public record SingleOrder(
         List<String> discounts,
         Duration preparationTime,
         LocalDateTime orderTime,
+        double subPrice,
         double price
 ) implements IOrder {
 }

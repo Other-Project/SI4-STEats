@@ -3,10 +3,13 @@ package fr.unice.polytech.steats.order.singles;
 import fr.unice.polytech.steats.helpers.AddressServiceHelper;
 import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.helpers.UserServiceHelper;
+import fr.unice.polytech.steats.models.Status;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -127,12 +130,72 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         String johnDoe = "John Doe";
         String janeDoe = "Jane Doe";
         String albanFalcoz = "Alban Falcoz";
+
+        String sophiaTech = "Campus Sophia Tech";
+        String eurecom = "EURECOM";
+        String inria = "INRIA";
+
+        String[] itemsR1 = {"1", "2"};
+        String[] itemsR2 = {"3"};
+
+        LocalDate today = LocalTime.now().isBefore(LocalTime.of(18, 0)) ? LocalDate.now() : LocalDate.now().plusDays(1);
+
         List.of(
-                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1"),
-                new SingleOrder(janeDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "Campus Sophia Tech", "2"),
-                new SingleOrder(albanFalcoz, LocalDateTime.of(2025, 10, 5, 18, 20), "Campus Sophia Tech", "1"),
-                new SingleOrder(johnDoe, LocalDateTime.of(2025, 11, 8, 10, 35), "EURECOM", "2"),
-                new SingleOrder(albanFalcoz, "1", LocalDateTime.of(2025, 10, 5, 18, 20), "EURECOM", "1")
+                new SingleOrder("1", albanFalcoz, null,
+                        LocalDateTime.of(2023, 10, 5, 18, 20), LocalDateTime.of(2023, 10, 5, 10, 20),
+                        List.of(itemsR1[1]),
+                        eurecom, "1", Status.DELIVERED),
+                new SingleOrder("2", janeDoe, null,
+                        LocalDateTime.of(2023, 11, 8, 10, 35), LocalDateTime.of(2023, 11, 7, 10, 35),
+                        List.of(itemsR2[0], itemsR2[0]),
+                        sophiaTech, "2", Status.DELIVERED),
+                new SingleOrder("3", albanFalcoz, null,
+                        LocalDateTime.of(2024, 5, 21, 18, 20), LocalDateTime.of(2024, 5, 21, 16, 16),
+                        List.of(itemsR1[1], itemsR1[1], itemsR1[0]),
+                        sophiaTech, "1", Status.DELIVERED),
+                new SingleOrder("4", johnDoe, null,
+                        LocalDateTime.of(2024, 7, 8, 12, 35), LocalDateTime.of(2024, 7, 8, 10, 24),
+                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        eurecom, "2", Status.DELIVERED),
+
+                new SingleOrder("5", albanFalcoz, "1",
+                        LocalDateTime.of(2024, 10, 5, 18, 20), LocalDateTime.of(2024, 10, 5, 15, 57),
+                        List.of(itemsR1[0], itemsR1[1], itemsR1[1], itemsR1[0], itemsR1[1]),
+                        eurecom, "1", Status.DELIVERED),
+                new SingleOrder("6", janeDoe, "1",
+                        LocalDateTime.of(2024, 10, 5, 18, 20), LocalDateTime.of(2024, 10, 5, 16, 6),
+                        List.of(itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[0], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[0]),
+                        eurecom, "1", Status.DELIVERED),
+
+                new SingleOrder("7", johnDoe, "2",
+                        LocalDateTime.of(2024, 10, 5, 20, 56), LocalDateTime.of(2024, 10, 5, 17, 32),
+                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        sophiaTech, "2", Status.DELIVERED),
+                new SingleOrder("8", janeDoe, "2",
+                        LocalDateTime.of(2024, 10, 5, 20, 56), LocalDateTime.of(2024, 10, 5, 18, 20),
+                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        sophiaTech, "2", Status.DELIVERED),
+
+                new SingleOrder("9", albanFalcoz, null,
+                        LocalDateTime.of(today, LocalTime.of(21, 41)), LocalDateTime.of(today, LocalTime.of(18, 39)),
+                        List.of(itemsR1[1], itemsR1[0], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[0]),
+                        eurecom, "1", Status.PAID),
+                new SingleOrder("10", johnDoe, "3",
+                        LocalDateTime.of(today, LocalTime.of(21, 46)), LocalDateTime.of(today, LocalTime.of(19, 10)),
+                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        inria, "2", Status.INITIALISED),
+                new SingleOrder("11", janeDoe, null,
+                        LocalDateTime.of(today, LocalTime.of(21, 53)), LocalDateTime.of(today, LocalTime.of(19, 20)),
+                        List.of(itemsR1[0]),
+                        eurecom, "1", Status.PAID),
+                new SingleOrder("12", janeDoe, "3",
+                        LocalDateTime.of(today, LocalTime.of(21, 46)), LocalDateTime.of(today, LocalTime.of(19, 26)),
+                        List.of(itemsR2[0]),
+                        inria, "2", Status.INITIALISED),
+                new SingleOrder("13", johnDoe, "3",
+                        LocalDateTime.of(today, LocalTime.of(21, 46)), LocalDateTime.of(today, LocalTime.of(19, 32)),
+                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        inria, "2", Status.PAID)
         ).forEach(singleOrder -> add(singleOrder.getId(), singleOrder));
     }
 }
