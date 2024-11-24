@@ -29,9 +29,9 @@ public record Discount(String restaurantId, Options options, Criteria criteria, 
      * @return True if the discount can be applied to the order
      */
     public boolean isApplicable(SingleOrder order, User user, List<SingleOrder> userOrders) {
-        return getItemsAmount(order.items().values()) >= criteria.currentOrderItemsAmount()
+        return getItemsAmount(order.orderedItems().values()) >= criteria.currentOrderItemsAmount()
                 && (criteria.ordersAmount() <= 0 || (userOrders.size() + 1) % criteria.ordersAmount() == 0)
-                && (criteria.itemsAmount() <= 0 || userOrders.stream().mapToLong(o -> getItemsAmount(o.items().values())).sum() % criteria.itemsAmount() == 0)
+                && (criteria.itemsAmount() <= 0 || userOrders.stream().mapToLong(o -> getItemsAmount(o.orderedItems().values())).sum() % criteria.itemsAmount() == 0)
                 && (criteria.clientRole().length == 0 || Arrays.stream(criteria.clientRole()).anyMatch(role -> role == user.role()));
     }
 

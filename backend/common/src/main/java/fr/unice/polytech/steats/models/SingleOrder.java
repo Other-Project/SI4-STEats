@@ -13,6 +13,7 @@ public record SingleOrder(
         String addressId,
         String restaurantId,
         Status status,
+        Map<String, Integer> orderedItems,
         Map<String, Integer> items,
         List<String> discounts,
         Duration preparationTime,

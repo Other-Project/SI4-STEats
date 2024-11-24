@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,13 +47,17 @@ public class JacksonUtils {
         return fromJson(new String(json.readAllBytes(), StandardCharsets.UTF_8), TypeFactory.defaultInstance().constructType(clazz));
     }
 
-    public static <T extends Map<K, V>, K, V> T mapFromJson(InputStream json) throws IOException {
-        return fromJson(new String(json.readAllBytes(), StandardCharsets.UTF_8), TypeFactory.defaultInstance().constructType(new TypeReference<T>() {
+    public static <K, V> Map<K, V> mapFromJson(InputStream json) throws IOException {
+        Map<K, V> result = fromJson(new String(json.readAllBytes(), StandardCharsets.UTF_8), TypeFactory.defaultInstance().constructType(new TypeReference<Map<K, V>>() {
         }));
+        if (result == null) return Collections.emptyMap();
+        return result;
     }
 
-    public static <T extends List<K>, K> T listFromJson(InputStream json, Class<K> clazz) throws IOException {
-        return fromJson(new String(json.readAllBytes(), StandardCharsets.UTF_8), TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
+    public static <T> List<T> listFromJson(InputStream json, Class<T> clazz) throws IOException {
+        List<T> result = fromJson(new String(json.readAllBytes(), StandardCharsets.UTF_8), TypeFactory.defaultInstance().constructCollectionType(List.class, clazz));
+        if (result == null) return Collections.emptyList();
+        return result;
     }
 
     public static <T> T fromJson(String json, JavaType type) throws JsonProcessingException {

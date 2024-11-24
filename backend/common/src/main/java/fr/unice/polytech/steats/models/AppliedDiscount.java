@@ -1,4 +1,4 @@
-package fr.unice.polytech.steats.discounts.applied;
+package fr.unice.polytech.steats.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

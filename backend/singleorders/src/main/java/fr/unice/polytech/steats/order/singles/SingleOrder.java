@@ -2,22 +2,15 @@ package fr.unice.polytech.steats.order.singles;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.unice.polytech.steats.helpers.GroupOrderServiceHelper;
-import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
-import fr.unice.polytech.steats.helpers.PaymentServiceHelper;
-import fr.unice.polytech.steats.models.GroupOrder;
-import fr.unice.polytech.steats.models.MenuItem;
-import fr.unice.polytech.steats.models.Payment;
-import fr.unice.polytech.steats.models.Status;
+import fr.unice.polytech.steats.helpers.*;
+import fr.unice.polytech.steats.models.*;
 import fr.unice.polytech.steats.utils.Order;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents a single order taken by a client.
@@ -30,7 +23,10 @@ public class SingleOrder implements Order {
     private final String groupCode;
     private LocalDateTime deliveryTime;
     private final LocalDateTime orderTime;
+    private final Map<String, Integer> orderedItems;
     private final Map<String, Integer> items;
+    private double subPrice;
+    private double price;
     private final String addressId;
     private final String restaurantId;
     private Status status;
@@ -41,14 +37,19 @@ public class SingleOrder implements Order {
      * @param groupCode    The group code of the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param orderTime    The time the order was made
-     * @param items        The items ordered by the client
+     * @param items        The items in the order (discounts included)
+     * @param orderedItems The items ordered by the client
+     * @param subPrice     The price without discounts
+     * @param price        The price with discounts
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      * @param status       The status of the order
      */
     @JsonCreator
     public SingleOrder(@JsonProperty("id") String id, @JsonProperty("userId") String userId, @JsonProperty("userId") String groupCode,
-                       @JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("orderTime") LocalDateTime orderTime, @JsonProperty("items") Map<String, Integer> items,
+                       @JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("orderTime") LocalDateTime orderTime,
+                       @JsonProperty("items") Map<String, Integer> items, @JsonProperty("orderedItems") Map<String, Integer> orderedItems,
+                       @JsonProperty("subPrice") double subPrice, @JsonProperty("price") double price,
                        @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId, @JsonProperty("status") Status status) {
         this.id = id;
         this.userId = userId;
@@ -56,6 +57,9 @@ public class SingleOrder implements Order {
         this.deliveryTime = deliveryTime;
         this.orderTime = orderTime;
         this.items = new HashMap<>(items);
+        this.orderedItems = new HashMap<>(orderedItems);
+        this.subPrice = subPrice;
+        this.price = price;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
         this.status = status;
@@ -69,7 +73,7 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
-        this(UUID.randomUUID().toString(), userId, groupCode, deliveryTime, LocalDateTime.now(), Map.of(), addressId, restaurantId, Status.INITIALISED);
+        this(UUID.randomUUID().toString(), userId, groupCode, deliveryTime, LocalDateTime.now(), Map.of(), Map.of(), 0, 0, addressId, restaurantId, Status.INITIALISED);
     }
 
     /**
@@ -138,42 +142,21 @@ public class SingleOrder implements Order {
      *
      * @implNote Returns the sum of the price of all the {@link MenuItem MenuItem} it contains.
      */
-    public double getSubPrice() throws IOException {
-        double price = 0;
-        for (Map.Entry<String, Integer> item : items.entrySet())
-            price += MenuItemServiceHelper.getMenuItem(item.getKey()).price() * item.getValue();
-        return price;
+    public double getSubPrice() {
+        return subPrice;
     }
 
     @Override
-    public double getPrice() throws IOException {
-        //Todo : Discount
-        /*List<RestaurantDiscount> oldDiscountsToApplied = DiscountServiceHelper.getDiscountToApplyNext(userId, restaurantId);
-        return Stream.concat(
-                appliedDiscounts.stream().map(discount -> {
-                    try {
-                        return DiscountServiceHelper.getDiscount(discount);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }),
-                oldDiscountsToApplied.stream()
-        ).reduce(getSubPrice(), (price, discount) -> discount.getNewPrice(price), Double::sum);*/
-        return getSubPrice();
+    public double getPrice() {
+        return price;
+    }
+
+    public Map<String, Integer> getOrderedItems() {
+        return orderedItems;
     }
 
     @Override
     public Map<String, Integer> getItems() {
-        //TODO : Menu Item
-        /*List<String> res = new ArrayList<>(items);
-        res.addAll(appliedDiscounts.stream().map(item -> {
-            try {
-                return DiscountServiceHelper.getDiscount(item);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).filter(Discount::canBeAppliedDirectly).map(Discount::freeItems).flatMap(List::stream).map(MenuItem::getId).toList());
-        return res;*/
         return items;
     }
 
@@ -210,9 +193,9 @@ public class SingleOrder implements Order {
      */
     public void addMenuItem(String menuItemId, int quantity) throws IOException {
         MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId);
-        items.putIfAbsent(menuItemId, 0);
-        items.merge(menuItem.id(), quantity, Integer::sum);
-        //updateDiscounts();
+        orderedItems.putIfAbsent(menuItemId, 0);
+        orderedItems.merge(menuItem.id(), quantity, Integer::sum);
+        updateDiscounts();
     }
 
     /**
@@ -220,30 +203,41 @@ public class SingleOrder implements Order {
      *
      * @param menuItemId The id of the menu item the user chose to remove from the order
      */
-    public void removeMenuItem(String menuItemId) {
-        items.remove(menuItemId);
-        //updateDiscounts();
+    public void removeMenuItem(String menuItemId) throws IOException {
+        if (orderedItems.merge(menuItemId, -1, Integer::sum) <= 0) orderedItems.remove(menuItemId);
+        updateDiscounts();
     }
 
-    //TODO : Discount
+    private void updateDiscounts() throws IOException {
+        List<RestaurantDiscount> discounts = getDiscounts();
 
-//    private void updateDiscounts() throws IOException {
-//        appliedDiscounts.clear();
-//        appliedDiscounts.addAll(RestaurantServiceHelper.getRestaurant(restaurantId).availableDiscounts(this).stream().map(Discount::getId).toList());
-//    }
+        subPrice = 0;
+        for (Map.Entry<String, Integer> item : items.entrySet())
+            subPrice += MenuItemServiceHelper.getMenuItem(item.getKey()).price() * item.getValue();
+        price = discounts.stream().reduce(getSubPrice(), (p, d) -> d.getNewPrice(p), Double::sum);
 
-//    /**
-//     * Get the discounts to apply to the next order
-//     */
-//    public List<Discount> getDiscountsToApplyNext() {
-//        return appliedDiscounts.stream().map(discount -> {
-//            try {
-//                return DiscountServiceHelper.getDiscount(discount);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }).filter(discount -> !discount.canBeAppliedDirectly() && !discount.isExpired()).toList();
-//    }
+        items.clear();
+        items.putAll(getOrderedItems());
+        discounts.stream()
+                .map(discount -> discount.effects().freeItemIds())
+                .flatMap(Arrays::stream)
+                .collect(Collectors.toMap(itemId -> itemId, itemId -> 1, Integer::sum))
+                .forEach((key, value) -> items.merge(key, value, Integer::sum));
+    }
+
+    private List<RestaurantDiscount> getDiscounts() throws IOException {
+        List<RestaurantDiscount> discounts = new ArrayList<>();
+        if (status == Status.INITIALISED) {
+            for (AppliedDiscount appliedDiscount : AppliedDiscountServiceHelper.getUnusedDiscountsOfUser(userId))
+                discounts.add(DiscountServiceHelper.getDiscount(appliedDiscount.discountId()));
+            discounts.addAll(DiscountServiceHelper.getDiscountsApplicableToOrder(id));
+            return discounts;
+        }
+
+        for (AppliedDiscount appliedDiscount : AppliedDiscountServiceHelper.getDiscountsAppliedToOrder(id))
+            discounts.add(DiscountServiceHelper.getDiscount(appliedDiscount.discountId()));
+        return discounts;
+    }
 
     /**
      * @implNote The total preparation time of all the items in the order

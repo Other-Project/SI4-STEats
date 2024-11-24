@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.discounts.applied;
 
+import fr.unice.polytech.steats.models.AppliedDiscount;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
 /**
