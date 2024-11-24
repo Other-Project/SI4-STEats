@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -143,58 +144,58 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
         List.of(
                 new SingleOrder("1", albanFalcoz, null,
                         LocalDateTime.of(2023, 10, 5, 18, 20), LocalDateTime.of(2023, 10, 5, 10, 20),
-                        List.of(itemsR1[1]),
+                        Map.of(itemsR1[1], 1),
                         eurecom, "1", Status.DELIVERED),
                 new SingleOrder("2", janeDoe, null,
                         LocalDateTime.of(2023, 11, 8, 10, 35), LocalDateTime.of(2023, 11, 7, 10, 35),
-                        List.of(itemsR2[0], itemsR2[0]),
+                        Map.of(itemsR2[0], 2),
                         sophiaTech, "2", Status.DELIVERED),
                 new SingleOrder("3", albanFalcoz, null,
                         LocalDateTime.of(2024, 5, 21, 18, 20), LocalDateTime.of(2024, 5, 21, 16, 16),
-                        List.of(itemsR1[1], itemsR1[1], itemsR1[0]),
+                        Map.of(itemsR1[1], 2, itemsR1[0], 1),
                         sophiaTech, "1", Status.DELIVERED),
                 new SingleOrder("4", johnDoe, null,
                         LocalDateTime.of(2024, 7, 8, 12, 35), LocalDateTime.of(2024, 7, 8, 10, 24),
-                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        Map.of(itemsR2[0], 6),
                         eurecom, "2", Status.DELIVERED),
 
                 new SingleOrder("5", albanFalcoz, "1",
                         LocalDateTime.of(2024, 10, 5, 18, 20), LocalDateTime.of(2024, 10, 5, 15, 57),
-                        List.of(itemsR1[0], itemsR1[1], itemsR1[1], itemsR1[0], itemsR1[1]),
+                        Map.of(itemsR1[0], 2, itemsR1[1], 3),
                         eurecom, "1", Status.DELIVERED),
                 new SingleOrder("6", janeDoe, "1",
                         LocalDateTime.of(2024, 10, 5, 18, 20), LocalDateTime.of(2024, 10, 5, 16, 6),
-                        List.of(itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[0], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[0]),
+                        Map.of(itemsR1[1], 8, itemsR1[0], 1),
                         eurecom, "1", Status.DELIVERED),
 
                 new SingleOrder("7", johnDoe, "2",
                         LocalDateTime.of(2024, 10, 5, 20, 56), LocalDateTime.of(2024, 10, 5, 17, 32),
-                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        Map.of(itemsR2[0], 4),
                         sophiaTech, "2", Status.DELIVERED),
                 new SingleOrder("8", janeDoe, "2",
                         LocalDateTime.of(2024, 10, 5, 20, 56), LocalDateTime.of(2024, 10, 5, 18, 20),
-                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        Map.of(itemsR2[0], 8),
                         sophiaTech, "2", Status.DELIVERED),
 
                 new SingleOrder("9", albanFalcoz, null,
                         LocalDateTime.of(today, LocalTime.of(21, 41)), LocalDateTime.of(today, LocalTime.of(18, 39)),
-                        List.of(itemsR1[1], itemsR1[0], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[1], itemsR1[0]),
+                        Map.of(itemsR1[1], 9, itemsR1[0], 2),
                         eurecom, "1", Status.PAID),
                 new SingleOrder("10", johnDoe, "3",
                         LocalDateTime.of(today, LocalTime.of(21, 46)), LocalDateTime.of(today, LocalTime.of(19, 10)),
-                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        Map.of(itemsR2[0], 10),
                         inria, "2", Status.INITIALISED),
                 new SingleOrder("11", janeDoe, null,
                         LocalDateTime.of(today, LocalTime.of(21, 53)), LocalDateTime.of(today, LocalTime.of(19, 20)),
-                        List.of(itemsR1[0]),
+                        Map.of(itemsR1[0], 1),
                         eurecom, "1", Status.PAID),
                 new SingleOrder("12", janeDoe, "3",
                         LocalDateTime.of(today, LocalTime.of(21, 46)), LocalDateTime.of(today, LocalTime.of(19, 26)),
-                        List.of(itemsR2[0]),
+                        Map.of(itemsR2[0], 1),
                         inria, "2", Status.INITIALISED),
                 new SingleOrder("13", johnDoe, "3",
                         LocalDateTime.of(today, LocalTime.of(21, 46)), LocalDateTime.of(today, LocalTime.of(19, 32)),
-                        List.of(itemsR2[0], itemsR2[0], itemsR2[0], itemsR2[0]),
+                        Map.of(itemsR2[0], 4),
                         inria, "2", Status.PAID)
         ).forEach(singleOrder -> add(singleOrder.getId(), singleOrder));
     }

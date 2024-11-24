@@ -63,14 +63,19 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
 
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
         String menuItem = body == null ? null : body.get("menuItem").toString();
+        String quantity = body == null ? null : body.get("quantity").toString();
+        if (menuItem == null || quantity == null) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            return;
+        }
 
         try {
-            SingleOrderManager.getInstance().get(orderId).addMenuItem(menuItem);
+            SingleOrderManager.getInstance().get(orderId).addMenuItem(menuItem, Integer.parseInt(quantity));
             exchange.sendResponseHeaders(HttpUtils.OK_CODE, -1);
         } catch (NotFoundException e) {
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-        } catch (IOException e) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+        } catch (NumberFormatException e) {
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, "Quantity must be an integer");
         }
     }
 

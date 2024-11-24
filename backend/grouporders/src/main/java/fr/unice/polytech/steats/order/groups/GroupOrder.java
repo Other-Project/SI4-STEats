@@ -12,9 +12,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * A group order is an order that contains multiples single order, each from a different user.
@@ -87,8 +88,11 @@ public class GroupOrder implements Order {
     }
 
     @Override
-    public List<String> getItems() throws IOException {
-        return getOrders().stream().map(SingleOrder::items).flatMap(Collection::stream).toList();
+    public Map<String, Integer> getItems() throws IOException {
+        return getOrders().stream()
+                .map(SingleOrder::items)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
     }
 
     /**

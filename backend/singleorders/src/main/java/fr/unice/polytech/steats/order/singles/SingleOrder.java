@@ -14,8 +14,10 @@ import fr.unice.polytech.steats.utils.Order;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Represents a single order taken by a client.
@@ -28,7 +30,7 @@ public class SingleOrder implements Order {
     private final String groupCode;
     private LocalDateTime deliveryTime;
     private final LocalDateTime orderTime;
-    private final List<String> items;
+    private final Map<String, Integer> items;
     private final String addressId;
     private final String restaurantId;
     private Status status;
@@ -46,14 +48,14 @@ public class SingleOrder implements Order {
      */
     @JsonCreator
     public SingleOrder(@JsonProperty("id") String id, @JsonProperty("userId") String userId, @JsonProperty("userId") String groupCode,
-                       @JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("orderTime") LocalDateTime orderTime, @JsonProperty("items") List<String> items,
+                       @JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("orderTime") LocalDateTime orderTime, @JsonProperty("items") Map<String, Integer> items,
                        @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId, @JsonProperty("status") Status status) {
         this.id = id;
         this.userId = userId;
         this.groupCode = groupCode;
         this.deliveryTime = deliveryTime;
         this.orderTime = orderTime;
-        this.items = new ArrayList<>(items);
+        this.items = new HashMap<>(items);
         this.addressId = addressId;
         this.restaurantId = restaurantId;
         this.status = status;
@@ -67,7 +69,7 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      */
     public SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
-        this(UUID.randomUUID().toString(), userId, groupCode, deliveryTime, LocalDateTime.now(), new ArrayList<>(), addressId, restaurantId, Status.INITIALISED);
+        this(UUID.randomUUID().toString(), userId, groupCode, deliveryTime, LocalDateTime.now(), Map.of(), addressId, restaurantId, Status.INITIALISED);
     }
 
     /**
@@ -138,7 +140,7 @@ public class SingleOrder implements Order {
      */
     public double getSubPrice() throws IOException {
         double price = 0;
-        for (Map.Entry<String, Integer> item : items.stream().collect(Collectors.toMap(i -> i, i -> 1, Integer::sum)).entrySet())
+        for (Map.Entry<String, Integer> item : items.entrySet())
             price += MenuItemServiceHelper.getMenuItem(item.getKey()).price() * item.getValue();
         return price;
     }
@@ -166,7 +168,7 @@ public class SingleOrder implements Order {
     }
 
     @Override
-    public List<String> getItems() {
+    public Map<String, Integer> getItems() {
         //TODO : Menu Item
         /*List<String> res = new ArrayList<>(items);
         res.addAll(appliedDiscounts.stream().map(item -> {
@@ -209,10 +211,12 @@ public class SingleOrder implements Order {
      * Add a menu item to the items of the order
      *
      * @param menuItemId The id of the menu item the user chose to add to the order
+     * @param quantity   The quantity of the menu item the user chose to add to the order
      */
-    public void addMenuItem(String menuItemId) throws IOException {
+    public void addMenuItem(String menuItemId, int quantity) throws IOException {
         MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId);
-        items.add(menuItem.id());
+        items.putIfAbsent(menuItemId, 0);
+        items.merge(menuItem.id(), quantity, Integer::sum);
         //updateDiscounts();
     }
 
@@ -252,7 +256,7 @@ public class SingleOrder implements Order {
     @Override
     public Duration getPreparationTime() throws IOException {
         Duration preparationTime = Duration.ZERO;
-        for (var item : items.stream().collect(Collectors.toMap(i -> i, i -> 1, Integer::sum)).entrySet())
+        for (Map.Entry<String, Integer> item : items.entrySet())
             preparationTime = preparationTime.plus(MenuItemServiceHelper.getMenuItem(item.getKey()).preparationTime().multipliedBy(item.getValue()));
         return preparationTime;
     }
