@@ -148,12 +148,7 @@ public class SingleOrder implements Order {
     @Override
     public double getPrice() throws IOException {
         //Todo : Discount
-        /*List<RestaurantDiscount> oldDiscountsToApplied;
-        try {
-            oldDiscountsToApplied = DiscountServiceHelper.getDiscountToApplyNext(userId, restaurantId);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        /*List<RestaurantDiscount> oldDiscountsToApplied = DiscountServiceHelper.getDiscountToApplyNext(userId, restaurantId);
         return Stream.concat(
                 appliedDiscounts.stream().map(discount -> {
                     try {
