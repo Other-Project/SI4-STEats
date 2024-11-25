@@ -29,7 +29,7 @@ export class UserService {
   }
 
   getUserId(): string | null {
-    return this.user?.id ?? null;
+    return this.user?.userId ?? null;
   }
 
   get isLoggedIn$(): Observable<boolean> {
