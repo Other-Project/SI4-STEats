@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.order.singles;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.*;
 import fr.unice.polytech.steats.models.*;
@@ -45,12 +44,10 @@ public class SingleOrder implements Order {
      * @param restaurantId The id of the restaurant in which the order is made
      * @param status       The status of the order
      */
-    @JsonCreator
-    public SingleOrder(@JsonProperty("id") String id, @JsonProperty("userId") String userId, @JsonProperty("userId") String groupCode,
-                       @JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("orderTime") LocalDateTime orderTime,
-                       @JsonProperty("items") Map<String, Integer> items, @JsonProperty("orderedItems") Map<String, Integer> orderedItems,
-                       @JsonProperty("subPrice") double subPrice, @JsonProperty("price") double price,
-                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId, @JsonProperty("status") Status status) {
+    @SuppressWarnings("java:S107")
+    SingleOrder(String id, String userId, String groupCode, LocalDateTime deliveryTime, LocalDateTime orderTime,
+                Map<String, Integer> items, Map<String, Integer> orderedItems,
+                double subPrice, double price, String addressId, String restaurantId, Status status) {
         this.id = id;
         this.userId = userId;
         this.groupCode = groupCode;
@@ -72,8 +69,20 @@ public class SingleOrder implements Order {
      * @param addressId    The label of the address the client wants the order to be delivered
      * @param restaurantId The id of the restaurant in which the order is made
      */
-    public SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
-        this(UUID.randomUUID().toString(), userId, groupCode, deliveryTime, LocalDateTime.now(), Map.of(), Map.of(), 0, 0, addressId, restaurantId, Status.INITIALISED);
+    private SingleOrder(String userId, String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
+        this(UUID.randomUUID().toString(), userId, groupCode, deliveryTime, LocalDateTime.now(),
+                Map.of(), Map.of(), 0, 0, addressId, restaurantId, Status.INITIALISED);
+    }
+
+    /**
+     * @param userId       The user that initialized the order
+     * @param deliveryTime The time the client wants the order to be delivered
+     * @param addressId    The label of the address the client wants the order to be delivered
+     * @param restaurantId The id of the restaurant in which the order is made
+     */
+    public SingleOrder(@JsonProperty("userId") String userId, @JsonProperty("deliveryTime") LocalDateTime deliveryTime,
+                       @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
+        this(userId, null, deliveryTime, addressId, restaurantId);
     }
 
     /**
