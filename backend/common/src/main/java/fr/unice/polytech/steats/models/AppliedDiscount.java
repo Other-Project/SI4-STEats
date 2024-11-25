@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
@@ -12,6 +13,7 @@ import java.util.Objects;
  * @param unlockOrderId  The id of the order that unlocked the discount
  * @param appliedOrderId The id of the order to which the discount has been applied
  */
+@JsonIgnoreProperties({"id"})
 public record AppliedDiscount(String discountId, String userId, String unlockOrderId, String appliedOrderId) {
     @JsonProperty("id")
     public String id() {

@@ -46,7 +46,7 @@ public class RestaurantDiscountManager extends AbstractManager<Discount> {
     public void demo() {
         add(new DiscountBuilder("1").setOrderDiscount(0.05).setOrdersAmount(3).appliesDuringOrder().build());
         add(new DiscountBuilder("1").setOrderDiscount(0.1).setUserRoles(Role.STUDENT).appliesDuringOrder().stackable().build());
-        add(new DiscountBuilder("2").setFreeItems("2").setOrdersAmount(3).appliesDuringOrder().stackable().build());
+        add(new DiscountBuilder("2").setFreeItems("3").setOrdersAmount(3).appliesDuringOrder().stackable().build());
         add(new DiscountBuilder("2").setOrderCredit(0.5).setCurrentOrderItemsAmount(3).appliesDuringOrder().unstackable().build());
         add(new DiscountBuilder("2").setOrderCredit(1).setCurrentOrderItemsAmount(4).appliesAfterOrder().unstackable().build());
     }

@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class for calling the Discount service.
@@ -63,7 +64,6 @@ public class AppliedDiscountServiceHelper {
      * @param userId The id of the user
      */
     public static List<AppliedDiscount> getUnusedDiscountsOfUser(String userId) throws IOException {
-        // TODO: Add the filters to the endpoint
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(APPLIED_DISCOUNT_SERVICE_URI.resolve("?appliedOrderId=&userId=" + userId))
                 .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
@@ -71,5 +71,25 @@ public class AppliedDiscountServiceHelper {
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.listFromJson(response.body(), AppliedDiscount.class);
+    }
+
+    /**
+     * Save the discounts unlocked by an order.
+     *
+     * @param unlockOrderId The id of the order that unlocked the discounts
+     * @param userId        The id of the user
+     * @param discounts     The discounts to unlock (map of discount id and the order id to which it has been applied)
+     */
+    public static void unlockDiscounts(String unlockOrderId, String userId, List<Map.Entry<String, String>> discounts) throws IOException {
+        // TODO : Create endpoint
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(APPLIED_DISCOUNT_SERVICE_URI)
+                .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("userId", userId, "unlockOrderId", unlockOrderId, "discounts", discounts))))
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        if (response.statusCode() != HttpUtils.OK_CODE) {
+            throw new IOException("Failed to unlock discounts");
+        }
     }
 }

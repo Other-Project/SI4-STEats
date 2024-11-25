@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents a single order taken by a client.
@@ -36,8 +37,8 @@ public class SingleOrder implements Order {
      * @param groupCode    The group code of the order
      * @param deliveryTime The time the client wants the order to be delivered
      * @param orderTime    The time the order was made
-     * @param items        The items in the order (discounts included)
      * @param orderedItems The items ordered by the client
+     * @param items        The items in the order (free items from discounts included)
      * @param subPrice     The price without discounts
      * @param price        The price with discounts
      * @param addressId    The label of the address the client wants the order to be delivered
@@ -46,15 +47,15 @@ public class SingleOrder implements Order {
      */
     @SuppressWarnings("java:S107")
     SingleOrder(String id, String userId, String groupCode, LocalDateTime deliveryTime, LocalDateTime orderTime,
-                Map<String, Integer> items, Map<String, Integer> orderedItems,
+                Map<String, Integer> orderedItems, Map<String, Integer> items,
                 double subPrice, double price, String addressId, String restaurantId, Status status) {
         this.id = id;
         this.userId = userId;
         this.groupCode = groupCode;
         this.deliveryTime = deliveryTime;
         this.orderTime = orderTime;
-        this.items = new HashMap<>(items);
         this.orderedItems = new HashMap<>(orderedItems);
+        this.items = new HashMap<>(items);
         this.subPrice = subPrice;
         this.price = price;
         this.addressId = addressId;
@@ -161,12 +162,12 @@ public class SingleOrder implements Order {
     }
 
     public Map<String, Integer> getOrderedItems() {
-        return orderedItems;
+        return Collections.unmodifiableMap(orderedItems);
     }
 
     @Override
     public Map<String, Integer> getItems() {
-        return items;
+        return Collections.unmodifiableMap(items);
     }
 
     /**
@@ -201,6 +202,7 @@ public class SingleOrder implements Order {
      * @param quantity   The quantity of the menu item the user chose to add to the order
      */
     public void addMenuItem(String menuItemId, int quantity) throws IOException {
+        if (status != Status.INITIALISED) throw new IllegalStateException("Can't add an item to an order that has already been paid");
         MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId);
         orderedItems.putIfAbsent(menuItemId, 0);
         orderedItems.merge(menuItem.id(), quantity, Integer::sum);
@@ -213,39 +215,55 @@ public class SingleOrder implements Order {
      * @param menuItemId The id of the menu item the user chose to remove from the order
      */
     public void removeMenuItem(String menuItemId) throws IOException {
+        if (status != Status.INITIALISED) throw new IllegalStateException("Can't remove an item from an order that has already been paid");
         if (orderedItems.merge(menuItemId, -1, Integer::sum) <= 0) orderedItems.remove(menuItemId);
         updateDiscounts();
     }
 
-    private void updateDiscounts() throws IOException {
-        List<RestaurantDiscount> discounts = getDiscounts();
+    public void updateDiscounts() throws IOException {
+        Pair discounts = getDiscounts();
 
         subPrice = 0;
-        for (Map.Entry<String, Integer> item : items.entrySet())
+        for (Map.Entry<String, Integer> item : getOrderedItems().entrySet())
             subPrice += MenuItemServiceHelper.getMenuItem(item.getKey()).price() * item.getValue();
-        price = discounts.stream().reduce(getSubPrice(), (p, d) -> d.getNewPrice(p), Double::sum);
+        price = discounts.currentOrder.stream().reduce(subPrice, (p, d) -> d.getNewPrice(p), Double::sum);
 
         items.clear();
         items.putAll(getOrderedItems());
-        discounts.stream()
+        discounts.currentOrder.stream()
                 .map(discount -> discount.effects().freeItemIds())
                 .flatMap(Arrays::stream)
                 .collect(Collectors.toMap(itemId -> itemId, itemId -> 1, Integer::sum))
                 .forEach((key, value) -> items.merge(key, value, Integer::sum));
+
+        if (status != Status.INITIALISED)
+            AppliedDiscountServiceHelper.unlockDiscounts(id, userId, discounts.toMap(id));
     }
 
-    private List<RestaurantDiscount> getDiscounts() throws IOException {
-        List<RestaurantDiscount> discounts = new ArrayList<>();
+    private record Pair(List<RestaurantDiscount> currentOrder, List<RestaurantDiscount> nextOrder) {
+        List<Map.Entry<String, String>> toMap(String orderId) {
+            return Stream.concat(
+                    currentOrder.stream().map(discount -> Map.entry(discount.id(), orderId)),
+                    nextOrder.stream().map(discount -> new AbstractMap.SimpleEntry<>(discount.id(), (String) null))
+            ).toList();
+        }
+    }
+
+    private Pair getDiscounts() throws IOException {
+        Pair result = new Pair(new ArrayList<>(), new ArrayList<>());
         if (status == Status.INITIALISED) {
             for (AppliedDiscount appliedDiscount : AppliedDiscountServiceHelper.getUnusedDiscountsOfUser(userId))
-                discounts.add(DiscountServiceHelper.getDiscount(appliedDiscount.discountId()));
-            discounts.addAll(DiscountServiceHelper.getDiscountsApplicableToOrder(id));
-            return discounts;
+                result.currentOrder.add(DiscountServiceHelper.getDiscount(appliedDiscount.discountId()));
+            for (RestaurantDiscount discount : DiscountServiceHelper.getDiscountsApplicableToOrder(id)) {
+                if (discount.options().appliesAfterOrder()) result.nextOrder.add(discount);
+                else result.currentOrder.add(discount);
+            }
+            return result;
         }
 
         for (AppliedDiscount appliedDiscount : AppliedDiscountServiceHelper.getDiscountsAppliedToOrder(id))
-            discounts.add(DiscountServiceHelper.getDiscount(appliedDiscount.discountId()));
-        return discounts;
+            result.currentOrder.add(DiscountServiceHelper.getDiscount(appliedDiscount.discountId()));
+        return result;
     }
 
     /**
@@ -274,6 +292,7 @@ public class SingleOrder implements Order {
         Payment payment = PaymentServiceHelper.payForOrder(id);
         if (payment == null) throw new IllegalStateException("Payment failed");
         status = Status.PAID;
+        updateDiscounts();
         return payment;
     }
 }
