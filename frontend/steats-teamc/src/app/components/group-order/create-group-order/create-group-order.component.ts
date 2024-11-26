@@ -3,6 +3,8 @@ import {FormControl, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
 import {Router} from '@angular/router';
 import {UserService} from '../../../services/user.service';
+import {RestaurantService} from '../../../services/restaurant.service';
+import {PopupService} from '../../../services/popup.service';
 
 @Component({
   selector: 'app-create-group-order',
@@ -15,9 +17,15 @@ export class CreateGroupOrderComponent {
     nonNullable: true
   });
   public addressId: FormControl<string> = new FormControl('', {validators: [Validators.required], nonNullable: true});
-  public restaurantId: string = '1'; // Retrieve the restaurantId as with restaurant service or url
+  public groupOrderCode: string | null = null;
 
-  constructor(private orderService: OrderService, private userService: UserService, private router: Router) {
+  constructor(
+    private orderService: OrderService,
+    private userService: UserService,
+    private router: Router,
+    private restaurantService: RestaurantService,
+    private popupService: PopupService
+  ) {
   }
 
   public async createGroupOrder() {
@@ -26,17 +34,19 @@ export class CreateGroupOrderComponent {
       // TODO: Show error message saying user is not logged in
       return;
     }
+    const restaurantId = this.restaurantService.getRestaurantId() ?? '';
     const groupOrderData = {
       deliveryTime: this.deliveryTime.value,
       addressId: this.addressId.value,
-      restaurantId: this.restaurantId
+      restaurantId: restaurantId
     };
     try {
       const groupOrder = await this.orderService.createGroupOrder(groupOrderData.restaurantId, groupOrderData.addressId, groupOrderData.deliveryTime);
       const singleOrder = await this.orderService.joinGroupOrder(groupOrder.groupCode, userId);
       this.orderService.setOrderId(singleOrder.id);
       this.orderService.setGroupCode(singleOrder.groupCode);
-      await this.router.navigate(['/order', singleOrder.id]);
+      this.groupOrderCode = groupOrder.groupCode;
+      await this.router.navigate(['/restaurant', groupOrderData.restaurantId, '/single-order', singleOrder.id]);
     } catch (error) {
       console.error('Failed to create or join group order:', error);
     }

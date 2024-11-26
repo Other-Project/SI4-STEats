@@ -17,6 +17,8 @@ import {MatInput, MatInputModule} from '@angular/material/input';
 import {GroupOrderComponent} from './components/popup/group-order.component';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
+import {MenuItemDialogComponent} from './components/menuItem/menu-item-dialog/menu-item-dialog.component';
+import {SingleOrderComponent} from './components/single-order/single-order/single-order.component';
 
 @NgModule({
   imports: [
@@ -38,6 +40,7 @@ import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/mater
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    SingleOrderComponent,
   ],
   providers: [],
   declarations: [
@@ -48,6 +51,7 @@ import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/mater
     CreateGroupOrderComponent,
     JoinGroupOrderComponent,
     GroupOrderComponent,
+    MenuItemDialogComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [NavbarComponent, SearchbarComponent, RestaurantContainerComponent, CreateGroupOrderComponent, JoinGroupOrderComponent],
