@@ -6,66 +6,63 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DiscountBuilderTest {
 
+    private User user;
     private Restaurant restaurant;
-    private SingleOrder order;
 
 
     @BeforeEach
     public void setUp() {
-        AddressManager.getInstance().clear();
-        Address address = new Address("Campus Sophia Tech", "930 Route des Colles", "Valbonne", "06560", "Bâtiment 1");
-        AddressManager.getInstance().add("Campus Sophia Tech", address);
-
-        RestaurantManager.getInstance().clear();
-        LocalDateTime deliveryTime = LocalDateTime.now().plusDays(1);
-        restaurant = new Restaurant("Mcdo", TypeOfFood.FAST_FOOD);
-        restaurant.addScheduleForPeriod(1,
-                deliveryTime.minusHours(2).getDayOfWeek(), deliveryTime.minusHours(2).toLocalTime(),
-                deliveryTime.getDayOfWeek(), deliveryTime.toLocalTime());
-        RestaurantManager.getInstance().add(restaurant.getName(), restaurant);
-
-        UserManager.getInstance().clear();
-        User user = new User("Alban", "Alban", Role.STUDENT);
-        UserManager.getInstance().add("Alban", user);
-
-        order = new SingleOrder("Alban", deliveryTime, "Campus Sophia Tech", restaurant.getName());
+        restaurant = new Restaurant("Mcdo", "Mcdo", TypeOfFood.FAST_FOOD, Duration.ofMinutes(30));
+        user = new User("Alban", "Alban", Role.STUDENT);
     }
 
 
     @Test
-    void testOneTimeOffer() {
-        Discount discount = new DiscountBuilder("")
-                .oneTimeOffer()
-                .build();
-        assertTrue(discount.getOptions().isExpired());
+    void testExpiry() {
+        SingleOrder order = new SingleOrder("orderId", user.userId(), null, LocalDateTime.now().plusHours(2), "Campus SophiaTech", restaurant.id(),
+                Status.INITIALISED, Map.of(), Map.of(), List.of(), Duration.ZERO, LocalDateTime.now(), 0, 0);
+
+        Discount discount = new DiscountBuilder(restaurant.id()).expiresAt(LocalDateTime.now().minusDays(1)).build();
+        assertTrue(discount.options().isExpired());
+        assertFalse(discount.isApplicable(order, user, List.of()));
+
+        discount = new DiscountBuilder(restaurant.id()).expiresAt(LocalDateTime.now().plusDays(1)).build();
+        assertFalse(discount.options().isExpired());
+        assertTrue(discount.isApplicable(order, user, List.of()));
+
+        discount = new DiscountBuilder(restaurant.id()).neverExpires().build();
+        assertFalse(discount.options().isExpired());
+        assertTrue(discount.isApplicable(order, user, List.of()));
     }
 
     @Test
     void testSetItemsAmount() {
-        Discount discount = new DiscountBuilder(restaurant.id())
-                .setCurrentOrderItemsAmount(2)
-                .build();
-        restaurant.addDiscount(discount);
-        restaurant.addOrder(order);
-        order.addMenuItem(new MenuItem("1", "Burger", 5, Duration.ofMinutes(10), "1"));
-        assertEquals(0, restaurant.availableDiscounts(order).size());
-        order.addMenuItem(new MenuItem("2", "Burger", 5, Duration.ofMinutes(10), "1"));
-        assertEquals(1, restaurant.availableDiscounts(order).size());
+        Discount discount = new DiscountBuilder(restaurant.id()).setCurrentOrderItemsAmount(2).build();
+        RestaurantDiscountManager.getInstance().add(discount);
+
+        SingleOrder order = new SingleOrder("orderId", user.userId(), null, LocalDateTime.now().plusHours(2), "Campus SophiaTech", restaurant.id(),
+                Status.INITIALISED, Map.of("1", 1), Map.of("1", 1), List.of(), Duration.ZERO, LocalDateTime.now(), 0, 0);
+        assertFalse(discount.isApplicable(order, user, List.of()));
+        order = new SingleOrder("orderId", user.userId(), null, LocalDateTime.now().plusHours(2), "Campus SophiaTech", restaurant.id(),
+                Status.INITIALISED, Map.of("1", 2), Map.of("1", 2), List.of(), Duration.ZERO, LocalDateTime.now(), 0, 0);
+        assertTrue(discount.isApplicable(order, user, List.of()));
     }
 
     @Test
     void testExpiresAt() {
-        Discount discountExpired = new DiscountBuilder("")
+        Discount discountExpired = new DiscountBuilder(restaurant.id())
                 .expiresAt(LocalDateTime.of(2024, 10, 12, 12, 0))
                 .build();
         assertTrue(discountExpired.options().isExpired());
-        Discount discount = new DiscountBuilder("")
+        Discount discount = new DiscountBuilder(restaurant.id())
                 .expiresAt(LocalDateTime.now().plusDays(1))
                 .build();
         assertFalse(discount.options().isExpired());
@@ -73,7 +70,7 @@ class DiscountBuilderTest {
 
     @Test
     void testNeverExpires() {
-        Discount discount = new DiscountBuilder("")
+        Discount discount = new DiscountBuilder(restaurant.id())
                 .neverExpires()
                 .build();
         assertFalse(discount.options().isExpired());
