@@ -31,6 +31,16 @@ public class AppliedDiscountManager extends AbstractManager<AppliedDiscount> {
         add(item.id(), item);
     }
 
+    /**
+     * Bulk add applied discounts
+     *
+     * @param items The applied discounts to add
+     */
+    public void add(AppliedDiscount... items) {
+        for (AppliedDiscount item : items)
+            add(item);
+    }
+
 
     /**
      * Get the discounts of an order

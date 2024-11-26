@@ -1,7 +1,5 @@
 package fr.unice.polytech.steats.helpers;
 
-//import fr.unice.polytech.steats.discount.Discount;
-
 import fr.unice.polytech.steats.models.AppliedDiscount;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
@@ -81,15 +79,12 @@ public class AppliedDiscountServiceHelper {
      * @param discounts     The discounts to unlock (map of discount id and the order id to which it has been applied)
      */
     public static void unlockDiscounts(String unlockOrderId, String userId, List<Map.Entry<String, String>> discounts) throws IOException {
-        // TODO : Create endpoint
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(APPLIED_DISCOUNT_SERVICE_URI)
                 .header(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON)
                 .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("userId", userId, "unlockOrderId", unlockOrderId, "discounts", discounts))))
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
-        if (response.statusCode() != HttpUtils.OK_CODE) {
-            throw new IOException("Failed to unlock discounts");
-        }
+        if (response.statusCode() != HttpUtils.CREATED_CODE) throw new IOException("Failed to unlock discounts");
     }
 }
