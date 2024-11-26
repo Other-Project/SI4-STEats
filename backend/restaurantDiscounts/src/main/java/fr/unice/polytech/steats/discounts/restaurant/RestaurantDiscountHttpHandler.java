@@ -52,8 +52,7 @@ public class RestaurantDiscountHttpHandler extends AbstractManagerHandler<Restau
     private ArrayNode applicableDiscounts(String orderId) throws IOException {
         SingleOrder order = SingleOrderServiceHelper.getOrder(orderId);
         User user = UserServiceHelper.getUser(order.userId());
-        List<SingleOrder> orders = SingleOrderServiceHelper.getOrdersByUserInRestaurant(order.userId(), order.restaurantId())
-                .stream().filter(o -> o.status().compareTo(Status.PAID) >= 0).toList();
+        List<SingleOrder> orders = SingleOrderServiceHelper.getOrdersByUserInRestaurantPastStatus(order.userId(), order.restaurantId(), Status.PAID);
 
         ArrayNode discounts = JacksonUtils.getMapper().createArrayNode();
         Iterator<Discount> it = getManager()
