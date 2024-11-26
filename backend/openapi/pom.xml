@@ -30,11 +30,6 @@
         </dependency>
         <dependency>
             <groupId>fr.unice.polytech.steats</groupId>
-            <artifactId>discount</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.unice.polytech.steats</groupId>
             <artifactId>order</artifactId>
             <version>1.0</version>
         </dependency>
@@ -71,6 +66,16 @@
         <dependency>
             <groupId>fr.unice.polytech.steats</groupId>
             <artifactId>users</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.unice.polytech.steats.discounts</groupId>
+            <artifactId>restaurant</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.unice.polytech.steats.discounts</groupId>
+            <artifactId>applied</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

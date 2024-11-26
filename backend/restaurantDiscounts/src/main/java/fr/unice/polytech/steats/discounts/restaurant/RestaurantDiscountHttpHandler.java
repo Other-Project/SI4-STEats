@@ -13,6 +13,7 @@ import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
 import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -37,6 +38,7 @@ public class RestaurantDiscountHttpHandler extends AbstractManagerHandler<Restau
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
     }
 
+    @ApiRoute(method = HttpUtils.GET, path = "/api/discounts/restaurant", summary = "Get all discounts")
     private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
         String orderId = query.get("orderId");
         String restaurantId = query.get("restaurantId");

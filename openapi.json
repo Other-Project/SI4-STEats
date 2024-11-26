@@ -21,6 +21,46 @@
           "required" : true,
           "schema" : {
             "type" : "string",
+            "format": "string"
+          }
+        }
+        ]
+      }
+    },
+    "/api/discounts/applied/{id}": {
+      "get": {
+        "tags": [
+          "Applied discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Applied discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
             "format" : "string"
           }
         } ]
@@ -121,6 +161,37 @@
         } ]
       }
     },
+    "/api/orders/singles/{id}/removeMenuItem": {
+      "post": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/discounts/restaurant/api/discounts/restaurant": {
+      "get": {
+        "tags": [
+          "Restaurant discounts"
+        ],
+        "summary": "Get all discounts",
+        "description": "",
+        "parameters": []
+      }
+    },
     "/api/orders/singles/" : {
       "post" : {
         "tags" : [ "Single Orders" ],
@@ -166,6 +237,24 @@
         "summary" : "",
         "description" : "",
         "parameters" : [ ]
+      }
+    },
+    "/api/discounts/restaurant/": {
+      "get": {
+        "tags": [
+          "Restaurant discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      },
+      "put": {
+        "tags": [
+          "Restaurant discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
       }
     },
     "/api/orders/singles/{id}/pay" : {
@@ -419,6 +508,24 @@
         } ]
       }
     },
+    "/api/discounts/applied/api/discounts/applied": {
+      "post": {
+        "tags": [
+          "Applied discounts"
+        ],
+        "summary": "Save a list of applied discounts",
+        "description": "",
+        "parameters": []
+      },
+      "get": {
+        "tags": [
+          "Applied discounts"
+        ],
+        "summary": "Get all applied discounts",
+        "description": "",
+        "parameters": []
+      }
+    },
     "/api/users/" : {
       "get" : {
         "tags" : [ "Users" ],
@@ -519,6 +626,24 @@
         "parameters" : [ ]
       }
     },
+    "/api/discounts/applied/": {
+      "get": {
+        "tags": [
+          "Applied discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      },
+      "put": {
+        "tags": [
+          "Applied discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": []
+      }
+    },
     "/api/menu-items/{id}" : {
       "get" : {
         "tags" : [ "Menu items" ],
@@ -564,6 +689,27 @@
           "schema" : {
             "type" : "string",
             "format" : "string"
+          }
+        }
+        ]
+      }
+    },
+    "/api/orders/singles/{id}/addMenuItem": {
+      "post": {
+        "tags": [
+          "Single Orders"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
           }
         } ]
       }
@@ -632,6 +778,46 @@
         "parameters" : [ {
           "name" : "{id}",
           "in" : "path",
+          "description": "",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "string"
+          }
+        }
+        ]
+      }
+    },
+    "/api/discounts/restaurant/{id}": {
+      "get": {
+        "tags": [
+          "Restaurant discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "string"
+            }
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Restaurant discounts"
+        ],
+        "summary": "",
+        "description": "",
+        "parameters": [
+          {
+            "name": "{id}",
+            "in": "path",
           "description" : "",
           "required" : true,
           "schema" : {
