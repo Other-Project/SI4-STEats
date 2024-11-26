@@ -1,7 +1,5 @@
 package fr.unice.polytech.steats.discounts.restaurant;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.helpers.UserServiceHelper;
@@ -11,12 +9,10 @@ import fr.unice.polytech.steats.models.User;
 import fr.unice.polytech.steats.utils.AbstractManagerHandler;
 import fr.unice.polytech.steats.utils.ApiRegistry;
 import fr.unice.polytech.steats.utils.HttpUtils;
-import fr.unice.polytech.steats.utils.JacksonUtils;
 import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
 import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -49,33 +45,10 @@ public class RestaurantDiscountHttpHandler extends AbstractManagerHandler<Restau
         else HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
     }
 
-    private ArrayNode applicableDiscounts(String orderId) throws IOException {
+    private List<Discount> applicableDiscounts(String orderId) throws IOException {
         SingleOrder order = SingleOrderServiceHelper.getOrder(orderId);
         User user = UserServiceHelper.getUser(order.userId());
         List<SingleOrder> orders = SingleOrderServiceHelper.getOrdersByUserInRestaurantPastStatus(order.userId(), order.restaurantId(), Status.PAID);
-
-        ArrayNode discounts = JacksonUtils.getMapper().createArrayNode();
-        Iterator<Discount> it = getManager()
-                .getDiscountsOfRestaurant(order.restaurantId())
-                .parallelStream()
-                .filter(discount -> discount.isApplicable(order, user, orders))
-                .iterator();
-
-        ObjectNode bestDiscount = null;
-        double bestValue = -1;
-        while (it.hasNext()) {
-            Discount discount = it.next();
-            ObjectNode node = JacksonUtils.toJsonNode(discount);
-            double value = discount.value(order.subPrice());
-            node.put("value", value);
-            if (discount.options().stackable()) discounts.add(node);
-            else if (value > bestValue) {
-                bestDiscount = node;
-                bestValue = value;
-            }
-        }
-        if (bestDiscount != null) discounts.add(bestDiscount);
-
-        return discounts;
+        return getManager().getApplicableDiscounts(order, user, orders);
     }
 }

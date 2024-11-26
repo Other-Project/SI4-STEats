@@ -1,8 +1,13 @@
 package fr.unice.polytech.steats.discounts.restaurant;
 
 import fr.unice.polytech.steats.models.Role;
+import fr.unice.polytech.steats.models.SingleOrder;
+import fr.unice.polytech.steats.models.User;
 import fr.unice.polytech.steats.utils.AbstractManager;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,6 +43,36 @@ public class RestaurantDiscountManager extends AbstractManager<Discount> {
      */
     public List<Discount> getDiscountsOfRestaurant(String restaurantId) {
         return getAll().stream().filter(discount -> Objects.equals(restaurantId, discount.restaurantId())).toList();
+    }
+
+    /**
+     * Get the applicable discounts for an order
+     *
+     * @param order  The order
+     * @param user   The user
+     * @param orders The user's orders
+     */
+    public List<Discount> getApplicableDiscounts(SingleOrder order, User user, List<SingleOrder> orders) throws IOException {
+        List<Discount> discounts = new ArrayList<>();
+        Iterator<Discount> it = getDiscountsOfRestaurant(order.restaurantId())
+                .parallelStream()
+                .filter(discount -> discount.isApplicable(order, user, orders))
+                .iterator();
+
+        Discount bestDiscount = null;
+        double bestValue = -1;
+        while (it.hasNext()) {
+            Discount discount = it.next();
+            double value = discount.value(order.subPrice());
+            if (discount.options().stackable()) discounts.add(discount);
+            else if (value > bestValue) {
+                bestDiscount = discount;
+                bestValue = value;
+            }
+        }
+        if (bestDiscount != null) discounts.add(bestDiscount);
+
+        return discounts;
     }
 
     /**
