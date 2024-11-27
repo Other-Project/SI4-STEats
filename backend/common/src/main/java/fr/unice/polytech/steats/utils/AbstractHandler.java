@@ -2,8 +2,15 @@ package fr.unice.polytech.steats.utils;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import fr.unice.polytech.steats.utils.openapi.ApiBodyParam;
+import fr.unice.polytech.steats.utils.openapi.ApiPathParam;
+import fr.unice.polytech.steats.utils.openapi.ApiQueryParam;
+import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -30,7 +37,43 @@ public class AbstractHandler implements HttpHandler {
     }
 
     protected void register() {
+        for (Method method : getClass().getDeclaredMethods()) {
+            if (!method.isAnnotationPresent(ApiRoute.class)) continue;
+            ApiRoute route = method.getAnnotation(ApiRoute.class);
+            ApiRegistry.registerRoute(route.method(), getSubPath() + route.path(), (e, p) -> {
+                try {
+                    handleMethodCall(method, p, HttpUtils.parseQuery(e.getRequestURI().getQuery())).send(e);
+                } catch (Exception ex) {
+                    getLogger().log(Level.SEVERE, "Exception thrown while handling request", ex);
+                    e.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
+                    e.close();
+                }
+            });
+        }
+    }
 
+    private HttpResponse handleMethodCall(Method method, Map<String, String> uriParam, Map<String, String> queryParams) throws InvocationTargetException, IllegalAccessException {
+        Object[] args = new Object[method.getParameterCount()];
+
+        int i = 0;
+        for (Parameter arg : method.getParameters()) {
+            if (arg.isAnnotationPresent(ApiBodyParam.class)) {
+                args[i] = null; // TODO
+            } else if (arg.isAnnotationPresent(ApiPathParam.class))
+                args[i] = uriParam.get(arg.getAnnotation(ApiPathParam.class).name());
+            else if (arg.isAnnotationPresent(ApiQueryParam.class))
+                args[i] = queryParams.get(arg.getAnnotation(ApiQueryParam.class).name());
+            else {
+                getLogger().log(Level.SEVERE, "Undeclared parameter type");
+                return new HttpResponse(HttpUtils.INTERNAL_SERVER_ERROR_CODE, "Internal parameter declaration error");
+            }
+            i++;
+        }
+        if (!(method.invoke(this, args) instanceof HttpResponse response)) {
+            getLogger().log(Level.SEVERE, "Method does not return an HttpResponse");
+            return new HttpResponse(HttpUtils.INTERNAL_SERVER_ERROR_CODE, "Invalid method return type");
+        }
+        return response;
     }
 
     @Override
@@ -66,7 +109,6 @@ public class AbstractHandler implements HttpHandler {
                 : Map.of();
         try {
             route.getHandler().handle(exchange, params);
-
         } catch (IllegalArgumentException | IllegalStateException e) {
             getLogger().log(Level.WARNING, "Illegal request", e);
             HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, e.getMessage());

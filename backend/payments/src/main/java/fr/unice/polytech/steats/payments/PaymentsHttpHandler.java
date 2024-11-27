@@ -1,62 +1,49 @@
 package fr.unice.polytech.steats.payments;
 
-import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.models.Payment;
-import fr.unice.polytech.steats.utils.AbstractManagerHandler;
-import fr.unice.polytech.steats.utils.ApiRegistry;
-import fr.unice.polytech.steats.utils.HttpUtils;
-import fr.unice.polytech.steats.utils.JacksonUtils;
-import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
-import fr.unice.polytech.steats.utils.openapi.ApiRoute;
+import fr.unice.polytech.steats.utils.*;
+import fr.unice.polytech.steats.utils.openapi.*;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 @ApiMasterRoute(name = "Payments", path = "/api/payments")
-public class PaymentsHttpHandler extends AbstractManagerHandler<PaymentManager, Payment> {
+public class PaymentsHttpHandler extends AbstractHandler {
     public PaymentsHttpHandler(String subPath, Logger logger) {
-        super(subPath, Payment.class, logger);
+        super(subPath, logger);
     }
 
-    @Override
-    protected PaymentManager getManager() {
+    private PaymentManager getManager() {
         return PaymentManager.getInstance();
     }
 
-    @Override
-    protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/pay", (exchange, param) -> pay(exchange));
-    }
-
-    @ApiRoute(method = HttpUtils.GET, path = "/", queryParams = {"orderId", "userId"})
-    private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String orderId;
-        String userId;
-        if ((orderId = params.get("orderId")) != null)
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getPaymentsForOrder(orderId));
-        else if ((userId = params.get("userId")) != null)
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getPaymentsOfUser(userId));
-        else HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
-    }
-
-    @ApiRoute(method = HttpUtils.POST, path = "/pay")
-    private void pay(HttpExchange exchange) throws IOException {
-        Map<String, Object> params = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String orderId = params == null ? null : params.get("orderId").toString();
-        if (orderId == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, 0);
-            exchange.getResponseBody().close();
-            return;
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", summary = "Get a payment by its ID")
+    public HttpResponse get(@ApiPathParam(name = "id") String id) throws IOException {
+        try {
+            return new JsonResponse<>(getManager().get(id));
+        } catch (NotFoundException e) {
+            return new HttpResponse(HttpUtils.NOT_FOUND_CODE, "Payment not found");
         }
+    }
+
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all payments")
+    public HttpResponse getAll(@ApiQueryParam(name = "orderId") String orderId, @ApiQueryParam(name = "userId") String userId) throws IOException {
+        if (orderId != null)
+            return new JsonResponse<>(getManager().getPaymentsForOrder(orderId));
+        if (userId != null)
+            return new JsonResponse<>(getManager().getPaymentsOfUser(userId));
+        return new JsonResponse<>(getManager().getAll());
+    }
+
+    @ApiRoute(method = HttpUtils.POST, path = "/pay", summary = "Pay an order")
+    public HttpResponse pay(@ApiBodyParam(name = "orderId") String orderId) throws IOException {
+        if (orderId == null)
+            return new HttpResponse(HttpUtils.BAD_REQUEST_CODE, "Missing order ID");
 
         Optional<Payment> result = PaymentSystem.pay(orderId);
-        if (result.isEmpty()) {
-            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
-            exchange.getResponseBody().close();
-        } else HttpUtils.sendJsonResponse(exchange, HttpUtils.CREATED_CODE, result.get());
+        if (result.isEmpty())
+            return new HttpResponse(HttpUtils.INTERNAL_SERVER_ERROR_CODE, "Payment failed");
+        return new JsonResponse<>(HttpUtils.CREATED_CODE, result.get());
     }
 }
