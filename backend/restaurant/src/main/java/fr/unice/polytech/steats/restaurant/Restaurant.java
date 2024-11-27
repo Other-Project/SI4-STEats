@@ -129,31 +129,44 @@ public class Restaurant {
     }
 
     /**
-     * Check if the restaurant can handle an order at a given time
+     * Check if the restaurant can handle a quantity of menuItems represented by their total preparation time at a given time
      *
-     * @param preparationTime The time it takes to prepare the order
+     * @param preparationTime The time it takes to prepare the additional menuItems
      * @param deliveryTime    The time of delivery
      */
-    public boolean canHandle(Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
+    public boolean canHandlePreparationTime(Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
         if (deliveryTime == null) return true;
-        Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(preparationTime) >= 0 && canAddOrder(deliveryTime, maxCapacity);
+        return getMaxCapacityLeft(deliveryTime).compareTo(preparationTime) >= 0;
     }
 
-    private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) throws IOException {
+    /**
+     * Check if the restaurant add an order at a given time independently of the preparation time
+     *
+     * @param deliveryTime The time of delivery
+     */
+    public boolean canAddOrder(LocalDateTime deliveryTime) throws IOException {
         List<Order> orders = OrderServiceHelper.getOrderByRestaurant(id);
         if (deliveryTime == null || orders.isEmpty()) return true;
-        long averagePreparationTime = getAveragePreparationTime().toMinutes();
+        long averagePreparationTime = getAveragePreparationTime(orders).toMinutes();
         if (averagePreparationTime == 0) return true;
-        long maxNbOfOrder = maxCapacity.toMinutes() / averagePreparationTime;
+        long maxNbOfOrder = getMaxCapacityLeft(deliveryTime).toMinutes() / averagePreparationTime;
         long currentNbOfOrder = orders.stream()
                 .filter(order -> order.status() == Status.INITIALISED)
                 .count();
         return currentNbOfOrder < maxNbOfOrder;
     }
 
-    private Duration getAveragePreparationTime() throws IOException {
-        List<Order> orders = OrderServiceHelper.getOrderByRestaurant(id);
+    /**
+     * Check if the restaurant can handle an order at a given time
+     *
+     * @param preparationTime The time it takes to prepare the additional menuItems
+     * @param deliveryTime    The time of delivery
+     */
+    public boolean canHandle(Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
+        return canHandlePreparationTime(preparationTime, deliveryTime) && canAddOrder(deliveryTime);
+    }
+
+    private Duration getAveragePreparationTime(List<Order> orders) throws IOException {
         List<Duration> lastOrderDurations = orders.reversed().stream()
                 .filter(order -> order.status().compareTo(Status.PAID) >= 0 && order.deliveryTime() != null)
                 .limit(RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION)
