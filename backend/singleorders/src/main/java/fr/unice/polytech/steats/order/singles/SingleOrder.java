@@ -196,27 +196,20 @@ public class SingleOrder implements Order {
     }
 
     /**
-     * Add a menu item to the items of the order
+     * Modify the quantity of a menu item in the order (or add it if it's not already in the order)
      *
-     * @param menuItemId The id of the menu item the user chose to add to the order
-     * @param quantity   The quantity of the menu item the user chose to add to the order
+     * @param menuItemId The id of the menu item to modify in the cart
+     * @param quantity   The quantity of the menu item desired
      */
-    public void addMenuItem(String menuItemId, int quantity) throws IOException {
-        if (status != Status.INITIALISED) throw new IllegalStateException("Can't add an item to an order that has already been paid");
-        MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId);
-        orderedItems.putIfAbsent(menuItemId, 0);
-        orderedItems.merge(menuItem.id(), quantity, Integer::sum);
-        updateDiscounts();
-    }
-
-    /**
-     * Remove a menu item from the items of the order
-     *
-     * @param menuItemId The id of the menu item the user chose to remove from the order
-     */
-    public void removeMenuItem(String menuItemId) throws IOException {
-        if (status != Status.INITIALISED) throw new IllegalStateException("Can't remove an item from an order that has already been paid");
-        if (orderedItems.merge(menuItemId, -1, Integer::sum) <= 0) orderedItems.remove(menuItemId);
+    public void modifyMenuItem(String menuItemId, int quantity) throws IOException {
+        if (status != Status.INITIALISED)
+            throw new IllegalStateException("Can't modify an order that has already been paid");
+        if (quantity < 0) throw new IllegalArgumentException("Quantity must be positive");
+        if (quantity == 0) orderedItems.remove(menuItemId);
+        else {
+            MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId); // Check if the menu item exists
+            orderedItems.put(menuItem.id(), quantity);
+        }
         updateDiscounts();
     }
 

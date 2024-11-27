@@ -35,43 +35,26 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/pay", this::pay);
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/status", this::setStatus);
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/deliveryTime", this::setDeliveryTime);
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/addMenuItem", this::addMenuItem);
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/removeMenuItem", this::removeMenuItem);
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/modifyCartItem", this::modifyCartItem);
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/{id}/removeMenuItem", method = HttpUtils.POST)
-    private void removeMenuItem(HttpExchange exchange, Map<String, String> params) throws IOException {
+    @ApiRoute(path = "/{id}/modifyCartItem", method = HttpUtils.POST, body = {"menuItem", "quantity"}, summary = "Modify or add a menu item in cart")
+    private void modifyCartItem(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
 
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String menuItem = body == null ? null : body.get("menuItem").toString();
-
-        try {
-            SingleOrderManager.getInstance().get(orderId).removeMenuItem(menuItem);
-            exchange.sendResponseHeaders(HttpUtils.OK_CODE, -1);
-        } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-        } catch (IOException e) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-        }
-    }
-
-    @ApiRoute(path = "/{id}/addMenuItem", method = HttpUtils.POST)
-    private void addMenuItem(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String orderId = params.get("id");
-
-        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String menuItem = body == null ? null : body.get("menuItem").toString();
-        String quantity = body == null ? null : body.get("quantity").toString();
+        String menuItem = body.get("menuItem").toString();
+        String quantity = body.get("quantity").toString();
         if (menuItem == null || quantity == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
             return;
         }
 
         try {
-            SingleOrderManager.getInstance().get(orderId).addMenuItem(menuItem, Integer.parseInt(quantity));
-            exchange.sendResponseHeaders(HttpUtils.OK_CODE, -1);
+            SingleOrder order = SingleOrderManager.getInstance().get(orderId);
+            order.modifyMenuItem(menuItem, Integer.parseInt(quantity));
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, order);
         } catch (NotFoundException e) {
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
         } catch (NumberFormatException e) {
@@ -158,7 +141,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
     private void setStatus(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String status = body == null ? null : body.get("status").toString();
+        String status = body.get("status").toString();
 
         if (status == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
@@ -179,7 +162,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
     private void setDeliveryTime(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String deliveryTime = body == null ? null : body.get("deliveryTime").toString();
+        String deliveryTime = body.get("deliveryTime").toString();
 
         if (deliveryTime == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
