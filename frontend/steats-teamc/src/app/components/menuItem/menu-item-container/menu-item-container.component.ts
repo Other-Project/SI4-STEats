@@ -24,25 +24,18 @@ export class MenuItemContainerComponent {
               private orderService: OrderService) {
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.orderService.singleOrder$.subscribe((order) => {
       console.log('Order updated:', order);
     });
     const restaurantId = this.route.snapshot.paramMap.get('restaurantId');
     if (!restaurantId) return;
     if (!this.orderService.getOrderId()) {
-      this.restaurantService.getMenu(restaurantId).subscribe({
-        next: (menu) => {
-          this.menuItems = menu;
-        },
-        error: (error) => {
-          console.error('Error fetching menu', error);
-        }
-      });
+      this.menuItems = await this.restaurantService.getMenu(restaurantId);
     } else {
       const order = this.orderService.getSingleOrderLocal();
       if (order) {
-        this.restaurantService.getAvailableMenu(order.deliveryTime);
+        this.menuItems = await this.restaurantService.getAvailableMenu(order.deliveryTime);
       }
     }
   }

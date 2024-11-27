@@ -5,11 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.OrderServiceHelper;
 import fr.unice.polytech.steats.helpers.ScheduleServiceHelper;
-import fr.unice.polytech.steats.models.MenuItem;
-import fr.unice.polytech.steats.models.Order;
-import fr.unice.polytech.steats.models.Schedule;
-import fr.unice.polytech.steats.models.Status;
-import fr.unice.polytech.steats.models.TypeOfFood;
+import fr.unice.polytech.steats.models.*;
 
 import java.io.IOException;
 import java.time.*;
@@ -223,30 +219,6 @@ public class Restaurant {
             currentInterval.setEnd(LocalTime.of(23, 59, 59));
         if (currentInterval != null) intervals.add(currentInterval);
         return intervals;
-    }
-
-    /**
-     * Add schedules for a period of time
-     *
-     * @param nbPersons The number of working persons for the schedule
-     * @param startDay  The day of the week to start the period
-     * @param startTime The time to start the period
-     * @param endDay    The day of the week to end the period
-     * @param endTime   The time to end the period
-     */
-    public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) throws IOException {
-        DayOfWeek day = startDay;
-        long seconds = Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds();  // round the start time to the nearest schedule
-        if (seconds >= 86400) {
-            seconds = 0;
-            day = day.plus(1);
-        }
-        LocalTime time = LocalTime.ofSecondOfDay(seconds);
-        for (; day != endDay || (!time.plus(getScheduleDuration()).isAfter(endTime) && !time.plus(getScheduleDuration()).equals(LocalTime.MIN)); time = time.plus(getScheduleDuration())) {
-            ScheduleServiceHelper.addSchedule(new Schedule(UUID.randomUUID().toString(), time, getScheduleDuration(), nbPersons, day, getId(), time.plus(getScheduleDuration()), getScheduleDuration().multipliedBy(nbPersons)));
-            if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
-                day = day.plus(1);
-        }
     }
 
     @Override

@@ -14,23 +14,26 @@ export class RestaurantService {
   private restaurantId: string | null = null;
 
   constructor(private http: HttpClient, private orderService: OrderService) {
-
+    const restaurantIdString = localStorage.getItem("restaurantId");
+    if (restaurantIdString)
+      this.restaurantId = JSON.parse(restaurantIdString);
   }
 
   getRestaurants(): Observable<Restaurant[]> {
     return this.http.get<Restaurant[]>(this.apiUrl);
   }
 
-  getMenu(restaurantId: string): Observable<MenuItem[]> {
+  async getMenu(restaurantId: string): Promise<MenuItem[]> {
     this.restaurantId = restaurantId;
-    return this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`);
+    localStorage.setItem("restaurantId", restaurantId);
+    return lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`));
   }
 
   getRestaurantId() {
     return this.restaurantId;
   }
 
-  getAvailableMenu(deliveryTime: Date): Promise<MenuItem[]> {
+  async getAvailableMenu(deliveryTime: Date): Promise<MenuItem[]> {
     return lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${this.restaurantId}/menu?deliveryTime=${deliveryTime}`));
   }
 }

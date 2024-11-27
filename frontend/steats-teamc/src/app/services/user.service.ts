@@ -30,7 +30,6 @@ export class UserService {
   }
 
   logout(): void {
-    console.log("ebhfoinefp")
     localStorage.clear();
     this.user = undefined;
     this.isLoggedInSubject.next(false);
