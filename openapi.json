@@ -161,27 +161,6 @@
         } ]
       }
     },
-    "/api/orders/singles/{id}/removeMenuItem": {
-      "post": {
-        "tags": [
-          "Single Orders"
-        ],
-        "summary": "",
-        "description": "",
-        "parameters": [
-          {
-            "name": "{id}",
-            "in": "path",
-            "description": "",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "string"
-            }
-          }
-        ]
-      }
-    },
     "/api/discounts/restaurant/api/discounts/restaurant": {
       "get": {
         "tags": [
@@ -694,12 +673,12 @@
         ]
       }
     },
-    "/api/orders/singles/{id}/addMenuItem": {
+    "/api/orders/singles/{id}/modifyCartItem": {
       "post": {
         "tags": [
           "Single Orders"
         ],
-        "summary": "",
+        "summary": "Modify or add a menu item in cart",
         "description": "",
         "parameters": [
           {
