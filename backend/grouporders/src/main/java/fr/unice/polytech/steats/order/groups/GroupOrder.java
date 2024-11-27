@@ -5,16 +5,17 @@ import fr.unice.polytech.steats.helpers.RestaurantServiceHelper;
 import fr.unice.polytech.steats.helpers.SingleOrderServiceHelper;
 import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.models.SingleOrder;
-import fr.unice.polytech.steats.utils.Order;
 import fr.unice.polytech.steats.models.Status;
+import fr.unice.polytech.steats.utils.Order;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * A group order is an order that contains multiples single order, each from a different user.
@@ -28,21 +29,24 @@ public class GroupOrder implements Order {
     private final LocalDateTime orderTime;
     private final String groupCode;
     private final String addressId;
-    private Status status = Status.INITIALISED;
     private final String restaurantId;
+    private Status status;
 
     /**
      * @param groupCode    The invitation code for the group order
+     * @param orderTime    The time the group order was made
      * @param deliveryTime The time the group order must be delivered
      * @param addressId    The label of the address where the group order must be delivered
      * @param restaurantId The id of the restaurant in which the group order is made
+     * @param status       The status of the group order
      */
-    private GroupOrder(String groupCode, LocalDateTime deliveryTime, String addressId, String restaurantId) {
-        this.orderTime = LocalDateTime.now();
+    public GroupOrder(String groupCode, LocalDateTime orderTime, LocalDateTime deliveryTime, String addressId, String restaurantId, Status status) {
+        this.orderTime = orderTime;
         this.deliveryTime = deliveryTime;
         this.groupCode = groupCode;
         this.addressId = addressId;
         this.restaurantId = restaurantId;
+        this.status = status;
     }
 
     /**
@@ -51,7 +55,7 @@ public class GroupOrder implements Order {
      * @param restaurantId The id of the restaurant in which the group order is made
      */
     public GroupOrder(@JsonProperty("deliveryTime") LocalDateTime deliveryTime, @JsonProperty("addressId") String addressId, @JsonProperty("restaurantId") String restaurantId) {
-        this(UUID.randomUUID().toString().substring(0, 8), deliveryTime, addressId, restaurantId);
+        this(UUID.randomUUID().toString().substring(0, 8), LocalDateTime.now(), deliveryTime, addressId, restaurantId, Status.INITIALISED);
     }
 
     @Override
@@ -84,8 +88,11 @@ public class GroupOrder implements Order {
     }
 
     @Override
-    public List<String> getItems() throws IOException {
-        return getOrders().stream().map(SingleOrder::items).flatMap(Collection::stream).toList();
+    public Map<String, Integer> getItems() throws IOException {
+        return getOrders().stream()
+                .map(SingleOrder::items)
+                .flatMap(map -> map.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum));
     }
 
     /**

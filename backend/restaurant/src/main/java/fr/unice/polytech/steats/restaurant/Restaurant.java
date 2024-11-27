@@ -5,11 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.unice.polytech.steats.helpers.MenuItemServiceHelper;
 import fr.unice.polytech.steats.helpers.OrderServiceHelper;
 import fr.unice.polytech.steats.helpers.ScheduleServiceHelper;
-import fr.unice.polytech.steats.models.MenuItem;
-import fr.unice.polytech.steats.models.Order;
-import fr.unice.polytech.steats.models.Schedule;
-import fr.unice.polytech.steats.models.Status;
-import fr.unice.polytech.steats.models.TypeOfFood;
+import fr.unice.polytech.steats.models.*;
 
 import java.io.IOException;
 import java.time.*;
@@ -100,22 +96,6 @@ public class Restaurant {
     public Duration getScheduleDuration() {
         return scheduleDuration;
     }
-
-    // TODO : Merge this in discount service
-//    /**
-//     * The discounts that can be applied to an order
-//     *
-//     * @param order The order to check
-//     */
-//    public List<Discount> availableDiscounts(SingleOrder order) {
-//        List<Discount> applicableDiscounts = discounts().stream().filter(discount -> discount.isApplicable(order)).toList();
-//        List<Discount> res = new ArrayList<>(applicableDiscounts.stream().filter(Discount::isStackable).toList());
-//        applicableDiscounts.stream()
-//                .filter(discount -> !discount.isStackable())
-//                .max(Comparator.comparingDouble(discount -> discount.value(order.getSubPrice())))
-//                .ifPresent(res::add);
-//        return res;
-//    }
 
     /**
      * The part of the menu that can be prepared and delivered in time

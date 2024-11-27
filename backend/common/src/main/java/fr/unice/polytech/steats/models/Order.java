@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.models;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public record Order(
         String id,
@@ -11,7 +12,7 @@ public record Order(
         String addressId,
         String restaurantId,
         Status status,
-        List<String> items,
+        Map<String, Integer> items,
         List<String> discounts,
         Duration preparationTime,
         LocalDateTime orderTime,

@@ -1,6 +1,8 @@
 package fr.unice.polytech.steats.openapi;
 
 import fr.unice.polytech.steats.address.AddressHttpHandler;
+import fr.unice.polytech.steats.discounts.applied.AppliedDiscountHttpHandler;
+import fr.unice.polytech.steats.discounts.restaurant.RestaurantDiscountHttpHandler;
 import fr.unice.polytech.steats.menuitem.MenuItemHttpHandler;
 import fr.unice.polytech.steats.order.OrderHttpHandler;
 import fr.unice.polytech.steats.order.groups.GroupOrderHttpHandler;
@@ -26,7 +28,9 @@ public class GenerateOpenApi {
                 ScheduleHttpHandler.class,
                 OrderHttpHandler.class,
                 SingleOrderHttpHandler.class,
-                GroupOrderHttpHandler.class
+                GroupOrderHttpHandler.class,
+                RestaurantDiscountHttpHandler.class,
+                AppliedDiscountHttpHandler.class
         );
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("openapi.json"))) {

@@ -16,7 +16,9 @@ public class GatewayHttpServer extends AbstractHttpServer {
             "/api/restaurants", URI.create("http://localhost:5006"),
             "/api/menu-items", URI.create("http://localhost:5007"),
             "/api/schedules", URI.create("http://localhost:5008"),
-            "/api/orders", URI.create("http://localhost:5010")
+            "/api/discounts/restaurant", URI.create("http://localhost:5009"),
+            "/api/orders", URI.create("http://localhost:5010"),
+            "/api/discounts/applied", URI.create("http://localhost:5011")
     );
 
     protected GatewayHttpServer(int apiPort) throws IOException {

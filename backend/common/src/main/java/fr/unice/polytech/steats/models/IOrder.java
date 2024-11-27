@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @JsonSerialize(as = IOrder.class)
 public interface IOrder {
@@ -26,7 +27,7 @@ public interface IOrder {
     Status status();
 
     @JsonProperty("items")
-    List<String> items();
+    Map<String, Integer> items();
 
     @JsonProperty("discounts")
     List<String> discounts();
