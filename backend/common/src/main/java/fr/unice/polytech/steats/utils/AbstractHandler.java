@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import fr.unice.polytech.steats.utils.openapi.ApiBodyParam;
@@ -8,9 +9,11 @@ import fr.unice.polytech.steats.utils.openapi.ApiQueryParam;
 import fr.unice.polytech.steats.utils.openapi.ApiRoute;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -42,23 +45,45 @@ public class AbstractHandler implements HttpHandler {
             ApiRoute route = method.getAnnotation(ApiRoute.class);
             ApiRegistry.registerRoute(route.method(), getSubPath() + route.path(), (e, p) -> {
                 try {
-                    handleMethodCall(method, p, HttpUtils.parseQuery(e.getRequestURI().getQuery())).send(e);
-                } catch (Exception ex) {
-                    getLogger().log(Level.SEVERE, "Exception thrown while handling request", ex);
-                    e.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
-                    e.close();
+                    handleMethodCall(method, p, HttpUtils.parseQuery(e.getRequestURI().getQuery()), e.getRequestBody()).send(e);
+                } catch (InvocationTargetException ex) {
+                    if (ex.getTargetException() instanceof IOException ioEx)
+                        throw ioEx;
+                    getLogger().log(Level.SEVERE, "Exception thrown by handler method", ex);
+                    HttpUtils.sendJsonResponse(e, HttpUtils.INTERNAL_SERVER_ERROR_CODE, "Method threw an exception");
+                } catch (IllegalAccessException ex) {
+                    getLogger().log(Level.SEVERE, "Exception thrown while calling handler method", ex);
+                    HttpUtils.sendJsonResponse(e, HttpUtils.INTERNAL_SERVER_ERROR_CODE, "Error calling method");
                 }
             });
         }
     }
 
-    private HttpResponse handleMethodCall(Method method, Map<String, String> uriParam, Map<String, String> queryParams) throws InvocationTargetException, IllegalAccessException {
+    private HttpResponse handleMethodCall(Method method, Map<String, String> uriParam, Map<String, String> queryParams, InputStream body) throws InvocationTargetException, IllegalAccessException {
         Object[] args = new Object[method.getParameterCount()];
+        JsonNode bodyJson;
+        try {
+            bodyJson = JacksonUtils.getMapper().readTree(body);
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Invalid JSON body", e);
+            return new HttpResponse(HttpUtils.BAD_REQUEST_CODE, "Invalid JSON body");
+        }
 
         int i = 0;
         for (Parameter arg : method.getParameters()) {
             if (arg.isAnnotationPresent(ApiBodyParam.class)) {
-                args[i] = null; // TODO
+                ApiBodyParam bodyParam = arg.getAnnotation(ApiBodyParam.class);
+                if (bodyJson == null && bodyParam.required()) {
+                    getLogger().log(Level.SEVERE, "Missing required body");
+                    return new HttpResponse(HttpUtils.BAD_REQUEST_CODE, "Missing required body");
+                } else if (bodyJson != null) {
+                    JsonNode node = bodyParam.name().isBlank() ? bodyJson : bodyJson.get(bodyParam.name());
+                    if (node != null) args[i] = JacksonUtils.getMapper().convertValue(node, arg.getType());
+                    else if (bodyParam.required()) {
+                        getLogger().log(Level.SEVERE, "Missing required parameter");
+                        return new HttpResponse(HttpUtils.BAD_REQUEST_CODE, "Missing required parameter");
+                    }
+                }
             } else if (arg.isAnnotationPresent(ApiPathParam.class))
                 args[i] = uriParam.get(arg.getAnnotation(ApiPathParam.class).name());
             else if (arg.isAnnotationPresent(ApiQueryParam.class))
@@ -112,10 +137,12 @@ public class AbstractHandler implements HttpHandler {
         } catch (IllegalArgumentException | IllegalStateException e) {
             getLogger().log(Level.WARNING, "Illegal request", e);
             HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, e.getMessage());
+        } catch (ConnectException e) {
+            getLogger().log(Level.WARNING, "Connection to sub-service failed", e);
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_GATEWAY_CODE, "Connection to sub-service failed");
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Exception thrown while handling request", e);
-            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
-            exchange.close();
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.INTERNAL_SERVER_ERROR_CODE, "An error occurred while processing the request");
         }
     }
 }

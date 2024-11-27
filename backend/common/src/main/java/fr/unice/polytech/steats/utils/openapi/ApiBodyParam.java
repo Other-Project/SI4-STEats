@@ -5,7 +5,7 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ApiBodyParam {
-    String name();
+    String name() default "";
 
     String description() default "";
 
