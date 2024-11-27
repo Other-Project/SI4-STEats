@@ -15,7 +15,7 @@ export class OrderService {
   constructor(private http: HttpClient) {
   }
 
-  groupApiUrl: string = 'http://localhost:5008/api/orders/groups';
+  groupApiUrl: string = 'http://localhost:5005/api/orders/groups';
   singleApiUrl: string = 'http://localhost:5004/api/orders/singles';
 
   async joinGroupOrder(groupCode: string, userId: string): Promise<SingleOrder> {
@@ -35,10 +35,10 @@ export class OrderService {
   }
 
   // maybe this should be in a different service
-  // no notion of quantity
+  // add quantity after merging discount branch
 
-  addMenuItemToOrder(orderId: string, menuItemId: string) {
-    this.http.post<void>(`${this.singleApiUrl}/${orderId}/menuItems`, {menuItemId}).subscribe({
+  addMenuItemToOrder(menuItemId: string, quantity: number) {
+    this.http.post<void>(`${this.singleApiUrl}/${this.orderId}/menuItems`, {menuItemId}).subscribe({
       next: () => console.log('Successfully added menu item to order'),
       error: (error) => console.error('Failed to add menu item to order:', error)
     });

@@ -22,8 +22,10 @@ export class MenuItemContainerComponent {
   }
 
   ngOnInit(): void {
-    const restaurantId = this.route.snapshot.paramMap.get('id');
-    if (restaurantId) {
+    const restaurantId = this.route.snapshot.paramMap.get('restaurantId');
+    const singleOrderId = this.route.snapshot.paramMap.get('single-orderId');
+    if (!restaurantId) return;
+    if (!singleOrderId) {
       this.restaurantService.getMenu(restaurantId).subscribe({
         next: (menu) => {
           this.menuItems = menu;

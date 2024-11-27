@@ -12,4 +12,8 @@
   </mat-form-field>
 
   <button mat-button (click)="createGroupOrder()">Create group order</button>
+
+  <div *ngIf="groupOrderCode">
+    <p>Group Order Code: {{ groupOrderCode }}</p>
+  </div>
 </div>
