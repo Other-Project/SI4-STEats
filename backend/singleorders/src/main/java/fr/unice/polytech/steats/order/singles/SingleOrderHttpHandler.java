@@ -45,7 +45,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         String orderId = params.get("id");
 
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String menuItem = body == null ? null : body.get("menuItem").toString();
+        String menuItem = body == null ? null : body.get("menuItemId").toString();
 
         try {
             SingleOrderManager.getInstance().get(orderId).removeMenuItem(menuItem);

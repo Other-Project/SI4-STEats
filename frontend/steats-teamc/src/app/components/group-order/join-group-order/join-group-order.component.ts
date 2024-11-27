@@ -24,10 +24,7 @@ export class JoinGroupOrderComponent {
     }
     try {
       let singleOrder = await this.orderService.joinGroupOrder(this.groupCode.value, userId);
-      this.orderService.setOrderId(singleOrder.id);
-      this.orderService.setGroupCode(singleOrder.groupCode);
-      this.router.navigate(['/order', singleOrder.id]).then(r => console.log(r));
-      this.popupService.closePopup();
+      await this.router.navigate(['/restaurant', singleOrder.restaurantId]);
     } catch (error) {
       console.error('Failed to join group order:', error);
     }

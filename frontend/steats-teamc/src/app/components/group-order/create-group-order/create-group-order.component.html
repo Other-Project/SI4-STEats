@@ -1,19 +1,20 @@
 <div class="create-group-order-container">
-  <mat-form-field>
-    <mat-label>Delivery Time</mat-label>
-    <input matInput [formControl]="deliveryTime">
-    <mat-error *ngIf="deliveryTime.invalid">Delivery time is required</mat-error>
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-label>Address ID</mat-label>
-    <input matInput [formControl]="addressId">
-    <mat-error *ngIf="addressId.invalid">Address ID is required</mat-error>
-  </mat-form-field>
-
-  <button mat-button (click)="createGroupOrder()">Create group order</button>
-
-  <div *ngIf="groupOrderCode">
-    <p>Group Order Code: {{ groupOrderCode }}</p>
+  <div *ngIf="groupCode; else noGroupOrder">
+    <p>Group Order Code: {{ groupCode }}</p>
   </div>
+  <ng-template #noGroupOrder>
+    <mat-form-field>
+      <mat-label>Delivery Time</mat-label>
+      <input matInput [formControl]="deliveryTime">
+      <mat-error *ngIf="deliveryTime.invalid">Delivery time is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Address ID</mat-label>
+      <input matInput [formControl]="addressId">
+      <mat-error *ngIf="addressId.invalid">Address ID is required</mat-error>
+    </mat-form-field>
+
+    <button mat-button (click)="createGroupOrder()">Create group order</button>
+  </ng-template>
 </div>

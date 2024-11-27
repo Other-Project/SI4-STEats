@@ -18,7 +18,6 @@ import {GroupOrderComponent} from './components/popup/group-order.component';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {MenuItemDialogComponent} from './components/menuItem/menu-item-dialog/menu-item-dialog.component';
-import {SingleOrderComponent} from './components/single-order/single-order/single-order.component';
 
 @NgModule({
   imports: [
@@ -40,7 +39,6 @@ import {SingleOrderComponent} from './components/single-order/single-order/singl
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    SingleOrderComponent,
   ],
   providers: [],
   declarations: [

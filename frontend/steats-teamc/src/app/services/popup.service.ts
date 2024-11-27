@@ -5,6 +5,7 @@ import {CreateOrderComponent} from '../components/popup/create-order/create-orde
 import {LoginComponent} from '../components/popup/login/login.component';
 import {MenuItem} from '../models/menuItem.model';
 import {MenuItemDialogComponent} from '../components/menuItem/menu-item-dialog/menu-item-dialog.component';
+import {ComponentType} from '@angular/cdk/portal';
 
 @Injectable({
   providedIn: 'root',
@@ -15,10 +16,6 @@ export class PopupService {
 
   openGroupPopup() {
     this.dialog.open(GroupOrderComponent);
-  }
-
-  closePopup() {
-    this.dialog.closeAll();
   }
 
   createOrderPopup() {
@@ -34,5 +31,15 @@ export class PopupService {
       width: '250px',
       data: menuItem
     });
+  }
+
+  // use this open Dialog
+
+  openDialog(component: ComponentType<any>, widh: string, data: any) {
+    return this.dialog.open(component, {
+        width: widh,
+        data: data
+      }
+    )
   }
 }
