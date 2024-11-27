@@ -11,6 +11,8 @@ import fr.unice.polytech.steats.payments.PaymentsHttpHandler;
 import fr.unice.polytech.steats.restaurant.RestaurantHttpHandler;
 import fr.unice.polytech.steats.schedule.ScheduleHttpHandler;
 import fr.unice.polytech.steats.users.UserHttpHandler;
+import fr.unice.polytech.steats.utils.JacksonUtils;
+import fr.unice.polytech.steats.utils.openapi.OpenAPI;
 import fr.unice.polytech.steats.utils.openapi.OpenAPIGenerator;
 
 import java.io.BufferedWriter;
@@ -19,7 +21,7 @@ import java.io.IOException;
 
 public class GenerateOpenApi {
     public static void main(String[] args) throws IOException {
-        String json = OpenAPIGenerator.generate(
+        OpenAPI openAPI = OpenAPIGenerator.generate(
                 PaymentsHttpHandler.class,
                 AddressHttpHandler.class,
                 UserHttpHandler.class,
@@ -34,7 +36,7 @@ public class GenerateOpenApi {
         );
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("openapi.json"))) {
-            writer.write(json);
+            writer.write(JacksonUtils.getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(openAPI));
         }
     }
 }

@@ -21,6 +21,6 @@ public class MenuItemHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("menu-items", API_ADDRESS, new MenuItemHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler(new MenuItemHttpHandler(API_ADDRESS, getLogger()));
     }
 }

@@ -21,6 +21,6 @@ public class SingleOrderHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("singles", API_ADDRESS, new SingleOrderHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler(new SingleOrderHttpHandler(API_ADDRESS, getLogger()));
     }
 }

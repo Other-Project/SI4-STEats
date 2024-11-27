@@ -1,8 +1,5 @@
 package fr.unice.polytech.steats.utils.openapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -22,7 +19,7 @@ public class OpenAPIGenerator {
     }
 
 
-    public static String generate(Class<?>... handlers) throws IOException {
+    public static OpenAPI generate(Class<?>... handlers) {
         Map<String, Map<String, OpenAPI.Path>> routes = new HashMap<>();
         Pattern urlParamPattern = Pattern.compile("\\{([^/]+)}");
         Arrays.stream(handlers)
@@ -59,10 +56,6 @@ public class OpenAPIGenerator {
                 });
 
         OpenAPI.Info info = new OpenAPI.Info("STEats", "STEats API", "1.0.0");
-        OpenAPI openAPI = new OpenAPI("3.1.0", info, new OpenAPI.Server[]{new OpenAPI.Server("http://localhost:5000")}, routes);
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(openAPI);
+        return new OpenAPI("3.1.0", info, new OpenAPI.Server[]{new OpenAPI.Server("http://localhost:5000")}, routes);
     }
 }
