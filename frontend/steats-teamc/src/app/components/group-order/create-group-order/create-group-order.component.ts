@@ -1,10 +1,11 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
 import {Router} from '@angular/router';
 import {UserService} from '../../../services/user.service';
 import {RestaurantService} from '../../../services/restaurant.service';
 import {PopupService} from '../../../services/popup.service';
+import {faWarning} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-create-group-order',
@@ -12,6 +13,8 @@ import {PopupService} from '../../../services/popup.service';
   styleUrls: ['./create-group-order.component.scss']
 })
 export class CreateGroupOrderComponent {
+  @Input() public userId: string | null;
+
   public deliveryTime: FormControl<string> = new FormControl('', {
     validators: [Validators.required],
     nonNullable: true
@@ -26,6 +29,7 @@ export class CreateGroupOrderComponent {
     private restaurantService: RestaurantService,
     private popupService: PopupService
   ) {
+    this.userId = this.userService.getUserId();
   }
 
   public async createGroupOrder() {
@@ -51,4 +55,6 @@ export class CreateGroupOrderComponent {
       console.error('Failed to create or join group order:', error);
     }
   }
+
+  protected readonly faWarning = faWarning;
 }

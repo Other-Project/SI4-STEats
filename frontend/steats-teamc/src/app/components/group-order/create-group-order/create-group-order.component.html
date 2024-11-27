@@ -1,4 +1,4 @@
-<div class="create-group-order-container">
+<div *ngIf="userId" class="create-group-order-container">
   <mat-form-field>
     <mat-label>Delivery Time</mat-label>
     <input matInput [formControl]="deliveryTime">
@@ -16,4 +16,10 @@
   <div *ngIf="groupOrderCode">
     <p>Group Order Code: {{ groupOrderCode }}</p>
   </div>
+</div>
+<div *ngIf="!userId" class="create-group-order-container">
+  <fa-icon class="warn-icon" [icon]="faWarning"></fa-icon>
+  <p class="error-message"> You must first be logged in
+    to create a group order !
+  </p>
 </div>

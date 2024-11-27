@@ -1,6 +1,12 @@
-<div class="join-group-order-container">
+<div *ngIf="userId" class="join-group-order-container">
   <mat-form-field>
     <input matInput type="text" [formControl]="groupCode">
   </mat-form-field>
   <button mat-button (click)="joinGroupOrder()" [disabled]="groupCode.value === ''">Join group order</button>
+</div>
+<div *ngIf="!userId" class="join-group-order-container">
+  <fa-icon class="warn-icon" [icon]="faWarning"></fa-icon>
+  <p class="error-message"> You must first be logged in
+    to join a group order !
+  </p>
 </div>
