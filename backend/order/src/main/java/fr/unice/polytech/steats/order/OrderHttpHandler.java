@@ -27,7 +27,7 @@ public class OrderHttpHandler extends AbstractHandler {
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId"})
+    @ApiRoute(path = "/", method = HttpUtils.GET)
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
         List<IOrder> orders = new ArrayList<>();

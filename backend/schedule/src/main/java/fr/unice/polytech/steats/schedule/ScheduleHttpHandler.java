@@ -31,7 +31,7 @@ public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager,
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId", "startTime", "endTime"})
+    @ApiRoute(path = "/", method = HttpUtils.GET)
     private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
         if (query.isEmpty()) {
             super.getAll(exchange);

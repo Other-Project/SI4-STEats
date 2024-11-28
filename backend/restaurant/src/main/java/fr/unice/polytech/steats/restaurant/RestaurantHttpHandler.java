@@ -35,7 +35,7 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/{restaurantId}/canHandle", method = HttpUtils.POST, body = {"preparationTime", "deliveryTime"})
+    @ApiRoute(path = "/{restaurantId}/canHandle", method = HttpUtils.POST)
     private void canHandle(HttpExchange exchange, Map<String, String> param) throws IOException {
         String restaurantId = param.get("restaurantId");
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
@@ -79,7 +79,7 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         }
     }
 
-    @ApiRoute(path = "/{id}/menu", method = HttpUtils.GET, queryParams = {"deliveryTime"})
+    @ApiRoute(path = "/{id}/menu", method = HttpUtils.GET)
     private void getMenu(HttpExchange exchange, Map<String, String> param, Map<String, String> query) throws IOException {
         String restaurantId = param.get("id");
         String deliveryTimeString = query.get("deliveryTime");

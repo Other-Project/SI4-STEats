@@ -33,7 +33,7 @@ public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderMana
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId"})
+    @ApiRoute(path = "/", method = HttpUtils.GET)
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String restaurantId = params.get("restaurantId");
 

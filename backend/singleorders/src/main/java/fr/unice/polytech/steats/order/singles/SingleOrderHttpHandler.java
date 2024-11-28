@@ -39,7 +39,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/{id}/modifyCartItem", method = HttpUtils.POST, body = {"menuItem", "quantity"}, summary = "Modify or add a menu item in cart")
+    @ApiRoute(path = "/{id}/modifyCartItem", method = HttpUtils.POST, summary = "Modify or add a menu item in cart")
     private void modifyCartItem(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
 
@@ -62,7 +62,7 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         }
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"userId", "restaurantId", "groupCode"})
+    @ApiRoute(path = "/", method = HttpUtils.GET)
     private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
         String userId = params.get("userId");
         String restaurantId = params.get("restaurantId");

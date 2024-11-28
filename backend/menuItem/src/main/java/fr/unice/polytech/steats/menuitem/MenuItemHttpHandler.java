@@ -32,7 +32,7 @@ public class MenuItemHttpHandler extends AbstractManagerHandler<MenuItemManager,
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"restaurantId"})
+    @ApiRoute(path = "/", method = HttpUtils.GET)
     private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
         if (query.containsKey("restaurantId")) {
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getByRestaurant(query.get("restaurantId")));

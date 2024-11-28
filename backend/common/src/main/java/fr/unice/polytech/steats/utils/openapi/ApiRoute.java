@@ -24,16 +24,4 @@ public @interface ApiRoute {
      * Description of the route
      */
     String description() default "";
-
-    /**
-     * @deprecated Use {@link ApiQueryParam} instead
-     */
-    @Deprecated(forRemoval = true)
-    String[] queryParams() default {};
-
-    /**
-     * @deprecated Use {@link ApiBodyParam} instead
-     */
-    @Deprecated(forRemoval = true)
-    String[] body() default {};
 }
