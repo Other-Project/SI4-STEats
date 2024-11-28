@@ -56,7 +56,7 @@ public class AbstractHandler implements HttpHandler {
                 .findFirst();
         if (routeInfoOptional.isEmpty()) {
             exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, 0);
-            exchange.getResponseBody().close();
+            exchange.close();
             return;
         }
         RouteInfo route = routeInfoOptional.get();
@@ -66,10 +66,14 @@ public class AbstractHandler implements HttpHandler {
                 : Map.of();
         try {
             route.getHandler().handle(exchange, params);
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            getLogger().log(Level.WARNING, "Illegal request", e);
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, e.getMessage());
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Exception thrown while handling request", e);
             exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, 0);
-            exchange.getResponseBody().close();
+            exchange.close();
         }
     }
 }

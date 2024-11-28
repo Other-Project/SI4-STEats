@@ -3,6 +3,7 @@ package fr.unice.polytech.steats.models;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public record SingleOrder(
         String id,
@@ -12,10 +13,12 @@ public record SingleOrder(
         String addressId,
         String restaurantId,
         Status status,
-        List<String> items,
+        Map<String, Integer> orderedItems,
+        Map<String, Integer> items,
         List<String> discounts,
         Duration preparationTime,
         LocalDateTime orderTime,
+        double subPrice,
         double price
 ) implements IOrder {
 }

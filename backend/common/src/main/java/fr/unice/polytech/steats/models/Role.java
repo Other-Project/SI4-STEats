@@ -26,5 +26,5 @@ public enum Role {
     /**
      * Users that are not faculty members. Ex : High-school student during open house day.
      */
-    EXTERNAL,
+    EXTERNAL
 }
