@@ -26,6 +26,7 @@ public class HttpUtils {
     public static final int OK_CODE = 200;
     public static final int CREATED_CODE = 201;
     public static final int NO_CONTENT_CODE = 204;
+    public static final int MOVED_PERMANENTLY_CODE = 301;
     public static final int BAD_REQUEST_CODE = 400;
     public static final int NOT_FOUND_CODE = 404;
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;

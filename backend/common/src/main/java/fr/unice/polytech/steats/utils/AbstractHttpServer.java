@@ -7,13 +7,13 @@ import fr.unice.polytech.steats.utils.openapi.OpenAPI;
 import fr.unice.polytech.steats.utils.openapi.OpenAPIGenerator;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public abstract class AbstractHttpServer {
     private final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(this.getClass().getName());
@@ -60,16 +60,29 @@ public abstract class AbstractHttpServer {
     }
 
     protected void registerHandlers() {
-        server.createContext("/", (exchange -> HttpUtils.sendJsonResponse(
-                exchange,
-                HttpUtils.OK_CODE,
-                registeredHandlers.entrySet().stream().collect(Collectors.toMap(kv -> kv.getValue().name(), kv -> "http://localhost:" + apiPort + kv.getValue().path()))
-        )));
-        server.createContext("/openapi.json", (exchange -> HttpUtils.sendJsonResponse(
-                exchange,
-                HttpUtils.OK_CODE,
-                openApi
-        )));
+        server.createContext("/", exchange -> {
+            switch (exchange.getRequestURI().getPath()) {
+                case "/" -> {
+                    exchange.getResponseHeaders().set("Location", "/openapi.json");
+                    exchange.sendResponseHeaders(HttpUtils.MOVED_PERMANENTLY_CODE, -1);
+                    exchange.close();
+                }
+                case "/openapi.json" -> HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, openApi);
+                case "/favicon.ico" -> {
+                    try (InputStream faviconStream = getClass().getClassLoader().getResourceAsStream("favicon.ico")) {
+                        if (faviconStream == null) {
+                            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
+                            exchange.close();
+                            return;
+                        }
+                        exchange.sendResponseHeaders(HttpUtils.OK_CODE, 0);
+                        faviconStream.transferTo(exchange.getResponseBody());
+                        exchange.close();
+                    }
+                }
+                default -> HttpUtils.sendJsonResponse(exchange, HttpUtils.NOT_FOUND_CODE, "Not found");
+            }
+        });
     }
 
     protected AbstractHttpServer(int apiPort) throws IOException {
