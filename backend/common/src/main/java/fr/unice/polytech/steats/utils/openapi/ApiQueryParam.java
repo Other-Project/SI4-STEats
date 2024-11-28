@@ -8,4 +8,6 @@ public @interface ApiQueryParam {
     String name();
 
     String description() default "";
+
+    String example() default "";
 }

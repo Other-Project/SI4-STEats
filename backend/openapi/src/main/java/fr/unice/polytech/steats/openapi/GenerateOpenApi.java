@@ -21,7 +21,7 @@ import java.io.IOException;
 
 public class GenerateOpenApi {
     public static void main(String[] args) throws IOException {
-        OpenAPI openAPI = OpenAPIGenerator.generate(
+        OpenAPI openAPI = OpenAPIGenerator.generate(new OpenAPI.Server("http://localhost:5000"),
                 PaymentsHttpHandler.class,
                 AddressHttpHandler.class,
                 UserHttpHandler.class,

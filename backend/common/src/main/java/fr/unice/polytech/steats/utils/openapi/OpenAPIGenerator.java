@@ -17,8 +17,7 @@ public class OpenAPIGenerator {
         return result;
     }
 
-
-    public static OpenAPI generate(Class<?>... handlers) {
+    public static OpenAPI generate(OpenAPI.Server server, Class<?>... handlers) {
         Map<String, Map<String, OpenAPI.Path>> routes = new HashMap<>();
         Arrays.stream(handlers)
                 .filter(handler -> handler.isAnnotationPresent(ApiMasterRoute.class))
@@ -27,15 +26,12 @@ public class OpenAPIGenerator {
                 .forEach(method -> {
                     var handlerAnnotation = method.getDeclaringClass().getAnnotation(ApiMasterRoute.class);
                     var routeAnnotation = method.getAnnotation(ApiRoute.class);
+
                     String urlPath = handlerAnnotation.path() + routeAnnotation.path();
-                    String httpMethod = routeAnnotation.method().toLowerCase(Locale.ROOT);
-
                     routes.putIfAbsent(urlPath, new HashMap<>());
-                    if (routes.get(urlPath).containsKey(httpMethod)) return;
+                    if (routes.get(urlPath).containsKey(routeAnnotation.method().toLowerCase())) return;
 
-
-                    Map<String, OpenAPI.Schema> requestBody = new HashMap<>();
-
+                    Map<String, OpenAPI.Schema> bodyFields = new HashMap<>();
                     OpenAPI.Path.Parameter[] parameters = Arrays.stream(method.getParameters())
                             .map(parameter -> {
                                 if (parameter.isAnnotationPresent(ApiPathParam.class))
@@ -44,35 +40,42 @@ public class OpenAPIGenerator {
                                     return parameterSpec(parameter, parameter.getAnnotation(ApiQueryParam.class));
                                 else if (parameter.isAnnotationPresent(ApiBodyParam.class)) {
                                     var bodyParam = parameter.getAnnotation(ApiBodyParam.class);
-                                    requestBody.put(bodyParam.name(), new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase()));
+                                    bodyFields.put(bodyParam.name(), new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase()));
                                 }
                                 return null;
                             })
                             .filter(Objects::nonNull)
                             .toArray(OpenAPI.Path.Parameter[]::new);
 
+                    OpenAPI.Path.RequestBody requestBody = bodyFields.isEmpty() ? null : new OpenAPI.Path.RequestBody(Map.of(
+                            "application/json", new OpenAPI.Path.RequestBody.Content(new OpenAPI.Schema(bodyFields))
+                    ));
+                    Map<String, OpenAPI.Path.Response> responses = Map.of(
+                            "200", new OpenAPI.Path.Response("Success", Map.of("application/json", new OpenAPI.Path.Response.ResponseContent(new OpenAPI.Schema("object", "object"))))
+                    );
                     OpenAPI.Path path = new OpenAPI.Path(
                             new String[]{handlerAnnotation.name()},
-                            routeAnnotation.summary(),
-                            routeAnnotation.description(),
+                            routeAnnotation.summary().isBlank() ? null : routeAnnotation.summary(),
+                            routeAnnotation.description().isBlank() ? null : routeAnnotation.description(),
                             parameters,
-                            requestBody.isEmpty() ? null : new OpenAPI.Path.RequestBody(Map.of("application/json", new OpenAPI.Path.RequestBody.Content(new OpenAPI.Schema(null, "object", "object", requestBody)))),
-                            Map.of("200", new OpenAPI.Path.Response("Success", Map.of("application/json", new OpenAPI.Path.Response.ResponseContent(new OpenAPI.Schema("object", "object")))))
+                            requestBody,
+                            responses
                     );
-                    routes.get(urlPath).put(routeAnnotation.method().toLowerCase(Locale.ROOT), path);
+                    routes.get(urlPath).put(routeAnnotation.method().toLowerCase(), path);
                 });
 
         OpenAPI.Info info = new OpenAPI.Info("STEats", "STEats API", "1.0.0");
-        return new OpenAPI("3.1.0", info, new OpenAPI.Server[]{new OpenAPI.Server("http://localhost:5000")}, routes);
+        return new OpenAPI("3.1.0", info, new OpenAPI.Server[]{server}, routes);
     }
 
     private static OpenAPI.Path.Parameter parameterSpec(Parameter parameter, ApiPathParam pathParam) {
         return new OpenAPI.Path.Parameter(
                 pathParam.name(),
                 "path",
-                pathParam.description(),
+                pathParam.description().isBlank() ? null : pathParam.description(),
                 true,
-                new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase())
+                new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase()),
+                pathParam.example().isBlank() ? null : pathParam.example()
         );
     }
 
@@ -80,9 +83,10 @@ public class OpenAPIGenerator {
         return new OpenAPI.Path.Parameter(
                 queryParam.name(),
                 "query",
-                queryParam.description(),
+                queryParam.description().isBlank() ? null : queryParam.description(),
                 false,
-                new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase())
+                new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase()),
+                queryParam.example().isBlank() ? null : queryParam.example()
         );
     }
 }

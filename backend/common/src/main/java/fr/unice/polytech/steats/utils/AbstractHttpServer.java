@@ -79,7 +79,9 @@ public abstract class AbstractHttpServer {
         server.setExecutor(Executors.newCachedThreadPool());
 
         logger.info(() -> "Generating OpenAPI documentation");
-        openApi = OpenAPIGenerator.generate(registeredHandlers.keySet().stream().map(HttpHandler::getClass).toArray(Class[]::new));
+        OpenAPI.Server openApiServer = new OpenAPI.Server("http://localhost:" + apiPort);
+        Class<?>[] handlers = registeredHandlers.keySet().stream().map(HttpHandler::getClass).toArray(Class[]::new);
+        openApi = OpenAPIGenerator.generate(openApiServer, handlers);
     }
 
     public void start() {

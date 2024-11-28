@@ -8,4 +8,6 @@ public @interface ApiPathParam {
     String name();
 
     String description() default "";
+
+    String example() default "";
 }

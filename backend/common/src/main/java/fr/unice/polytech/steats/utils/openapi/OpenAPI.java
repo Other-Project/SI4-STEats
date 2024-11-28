@@ -19,7 +19,7 @@ public record OpenAPI(String openapi, Info info, Server[] servers, Map<String, M
                        RequestBody requestBody, Map<String, Response> responses) {
         
         @JsonInclude(JsonInclude.Include.NON_NULL)
-        public record Parameter(String name, String in, String description, boolean required, Schema schema) {
+        public record Parameter(String name, String in, String description, boolean required, Schema schema, String example) {
         }
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -41,6 +41,10 @@ public record OpenAPI(String openapi, Info info, Server[] servers, Map<String, M
     public record Schema(String $ref, String type, String format, Map<String, Schema> properties) {
         public Schema(String type, String format) {
             this(null, type, format, null);
+        }
+
+        public Schema(Map<String, Schema> properties) {
+            this(null, "object", null, properties);
         }
 
         public Schema(String ref) {
