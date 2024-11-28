@@ -1,7 +1,6 @@
 package fr.unice.polytech.steats.utils.openapi;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.*;
 
 public class OpenAPIGenerator {
@@ -18,7 +17,8 @@ public class OpenAPIGenerator {
     }
 
     public static OpenAPI generate(OpenAPI.Server server, Class<?>... handlers) {
-        Map<String, Map<String, OpenAPI.Path>> routes = new HashMap<>();
+        Map<String, Map<String, Path>> routes = new HashMap<>();
+        Map<String, Schema> schemas = new HashMap<>();
         Arrays.stream(handlers)
                 .filter(handler -> handler.isAnnotationPresent(ApiMasterRoute.class))
                 .flatMap(handler -> getMethods(handler).stream())
@@ -31,30 +31,35 @@ public class OpenAPIGenerator {
                     routes.putIfAbsent(urlPath, new HashMap<>());
                     if (routes.get(urlPath).containsKey(routeAnnotation.method().toLowerCase())) return;
 
-                    Map<String, OpenAPI.Schema> bodyFields = new HashMap<>();
-                    OpenAPI.Path.Parameter[] parameters = Arrays.stream(method.getParameters())
+                    Map<String, Schema> bodyFields = new HashMap<>();
+                    List<Parameter> parameters = Arrays.stream(method.getParameters())
                             .map(parameter -> {
                                 if (parameter.isAnnotationPresent(ApiPathParam.class))
-                                    return parameterSpec(parameter, parameter.getAnnotation(ApiPathParam.class));
+                                    return new Parameter(parameter.getType(), parameter.getAnnotation(ApiPathParam.class));
                                 else if (parameter.isAnnotationPresent(ApiQueryParam.class))
-                                    return parameterSpec(parameter, parameter.getAnnotation(ApiQueryParam.class));
+                                    return new Parameter(parameter.getType(), parameter.getAnnotation(ApiQueryParam.class));
                                 else if (parameter.isAnnotationPresent(ApiBodyParam.class)) {
                                     var bodyParam = parameter.getAnnotation(ApiBodyParam.class);
-                                    bodyFields.put(bodyParam.name(), new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase()));
+                                    var schema = new Schema(parameter.getType());
+                                    var schemaRef = schema.shouldBeRef();
+                                    bodyFields.put(bodyParam.name(), schemaRef ? new Schema(parameter.getType().getSimpleName()) : schema);
+                                    if (schemaRef) schemas.putIfAbsent(parameter.getType().getSimpleName(), schema);
                                 }
                                 return null;
                             })
                             .filter(Objects::nonNull)
-                            .toArray(OpenAPI.Path.Parameter[]::new);
+                            .toList();
 
-                    OpenAPI.Path.RequestBody requestBody = bodyFields.isEmpty() ? null : new OpenAPI.Path.RequestBody(Map.of(
-                            "application/json", new OpenAPI.Path.RequestBody.Content(new OpenAPI.Schema(bodyFields))
+                    Path.RequestBody requestBody = bodyFields.isEmpty() ? null : new Path.RequestBody(Map.of(
+                            "application/json", new Path.Content(new Schema(bodyFields))
                     ));
-                    Map<String, OpenAPI.Path.Response> responses = Map.of(
-                            "200", new OpenAPI.Path.Response("Success", Map.of("application/json", new OpenAPI.Path.Response.ResponseContent(new OpenAPI.Schema("object", "object"))))
+                    Schema responseSchema = new Schema(method.getReturnType());
+                    if (responseSchema.shouldBeRef()) schemas.putIfAbsent(method.getReturnType().getSimpleName(), responseSchema);
+                    Map<String, Path.Response> responses = Map.of(
+                            "200", new Path.Response("Success", Map.of("application/json", new Path.Content(responseSchema.shouldBeRef() ? new Schema(method.getReturnType().getSimpleName()) : responseSchema)))
                     );
-                    OpenAPI.Path path = new OpenAPI.Path(
-                            new String[]{handlerAnnotation.name()},
+                    Path path = new Path(
+                            List.of(handlerAnnotation.name()),
                             routeAnnotation.summary().isBlank() ? null : routeAnnotation.summary(),
                             routeAnnotation.description().isBlank() ? null : routeAnnotation.description(),
                             parameters,
@@ -65,28 +70,6 @@ public class OpenAPIGenerator {
                 });
 
         OpenAPI.Info info = new OpenAPI.Info("STEats", "STEats API", "1.0.0");
-        return new OpenAPI("3.1.0", info, new OpenAPI.Server[]{server}, routes);
-    }
-
-    private static OpenAPI.Path.Parameter parameterSpec(Parameter parameter, ApiPathParam pathParam) {
-        return new OpenAPI.Path.Parameter(
-                pathParam.name(),
-                "path",
-                pathParam.description().isBlank() ? null : pathParam.description(),
-                true,
-                new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase()),
-                pathParam.example().isBlank() ? null : pathParam.example()
-        );
-    }
-
-    private static OpenAPI.Path.Parameter parameterSpec(Parameter parameter, ApiQueryParam queryParam) {
-        return new OpenAPI.Path.Parameter(
-                queryParam.name(),
-                "query",
-                queryParam.description().isBlank() ? null : queryParam.description(),
-                false,
-                new OpenAPI.Schema(parameter.getType().getSimpleName().toLowerCase(), parameter.getType().getSimpleName().toLowerCase()),
-                queryParam.example().isBlank() ? null : queryParam.example()
-        );
+        return new OpenAPI("3.1.0", info, List.of(server), routes, new OpenAPI.Schemas(schemas));
     }
 }
