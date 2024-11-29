@@ -61,9 +61,15 @@ export class OrderService {
   // add quantity after merging discount branch
 
   addMenuItemToOrder(menuItemId: string, quantity: number) {
-    this.http.post<void>(`${this.singleApiUrl}/${this.getOrderId()}/addMenuItem`, {menuItemId}).subscribe({
-      next: () => console.log('Successfully added menu item to order'),
-      error: (error) => console.error('Failed to add menu item to order:', error)
+    this.http.post<SingleOrder>(`${this.singleApiUrl}/${this.getOrderId()}/modifyCartItem`, {
+      menuItemId,
+      quantity
+    }).subscribe({
+      next: (order) => {
+        this.singleOrder = order;
+        localStorage.setItem("single-order", JSON.stringify(order));
+        this.singleOrder$.next(order);
+      }
     });
   }
 

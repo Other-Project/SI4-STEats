@@ -25,6 +25,7 @@ public class SingleOrder implements Order {
     private final LocalDateTime orderTime;
     private final Map<String, Integer> orderedItems;
     private final Map<String, Integer> items;
+    private Duration preparationTime = Duration.ZERO;
     private double subPrice;
     private double price;
     private final String addressId;
@@ -208,6 +209,16 @@ public class SingleOrder implements Order {
         if (quantity == 0) orderedItems.remove(menuItemId);
         else {
             MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId); // Check if the menu item exists
+            long previousQuantity = orderedItems.getOrDefault(menuItemId, 0);
+            if (previousQuantity == quantity) return;
+            Duration newPreparationTime;
+            if (previousQuantity > quantity)
+                newPreparationTime = preparationTime.minus(menuItem.preparationTime().multipliedBy(previousQuantity - quantity));
+            else
+                newPreparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(quantity - previousQuantity));
+            if (!RestaurantServiceHelper.canHandlePreparationTime(restaurantId, newPreparationTime, deliveryTime))
+                throw new IllegalArgumentException("The restaurant can't handle " + quantity + " more " + menuItem.name() + " in time");
+            preparationTime = newPreparationTime;
             orderedItems.put(menuItem.id(), quantity);
         }
         updateDiscounts();
@@ -263,10 +274,7 @@ public class SingleOrder implements Order {
      * @implNote The total preparation time of all the items in the order
      */
     @Override
-    public Duration getPreparationTime() throws IOException {
-        Duration preparationTime = Duration.ZERO;
-        for (Map.Entry<String, Integer> item : items.entrySet())
-            preparationTime = preparationTime.plus(MenuItemServiceHelper.getMenuItem(item.getKey()).preparationTime().multipliedBy(item.getValue()));
+    public Duration getPreparationTime() {
         return preparationTime;
     }
 
