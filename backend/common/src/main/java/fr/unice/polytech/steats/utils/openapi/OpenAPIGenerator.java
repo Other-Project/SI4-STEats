@@ -41,6 +41,9 @@ public class OpenAPIGenerator {
                                 else if (parameter.isAnnotationPresent(ApiBodyParam.class)) {
                                     var bodyParam = parameter.getAnnotation(ApiBodyParam.class);
                                     var schema = Schema.getSchema(parameter.getParameterizedType());
+                                    if (bodyFields.containsKey("")) throw new IllegalArgumentException("Multiple unnamed body parameters are forbidden");
+                                    if (bodyParam.name().isBlank() && !bodyFields.isEmpty())
+                                        throw new IllegalArgumentException("When using unnamed body parameter, no other body parameter should be present");
                                     bodyFields.put(bodyParam.name(), schema.refSchema());
                                     schemas.putAll(schema.declaredSchema());
                                 }
@@ -51,12 +54,12 @@ public class OpenAPIGenerator {
 
                     parameters.stream().map(Parameter::schemaToDefine).forEach(schemas::putAll);
                     Path.RequestBody requestBody = bodyFields.isEmpty() ? null : new Path.RequestBody(Map.of(
-                            "application/json", new Path.Content(new Schema(bodyFields, null, null))
+                            "application/json", new Path.Content(bodyFields.containsKey("") ? bodyFields.get("") : new Schema(bodyFields, null, null))
                     ));
                     Schema.SchemaDefinition responseSchema = Schema.getSchema(method.getGenericReturnType());
                     schemas.putAll(responseSchema.declaredSchema());
                     Map<String, Path.Response> responses = Map.of(
-                            "200", new Path.Response("Success", Map.of("application/json", new Path.Content(responseSchema.refSchema())))
+                            "200", new Path.Response("Success", Map.of("application/json", new Path.Content(responseSchema.refSchema()))) // TODO : All success codes are not 200 and error codes are not handled
                     );
                     Path path = new Path(
                             List.of(handlerAnnotation.name()),
