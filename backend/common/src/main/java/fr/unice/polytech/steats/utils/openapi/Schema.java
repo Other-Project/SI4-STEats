@@ -13,6 +13,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays.
+ *
+ * @see <a href="https://tools.ietf.org/html/draft-bhutton-json-schema-00">JSON Schema Specification Draft 2020-12</a>
+ * @see <a href="https://swagger.io/specification/#schema-object">Schema Object (Swagger documentation)</a>
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record Schema(String $ref, String type, String format, String title, Map<String, Schema> properties, Schema items, @JsonProperty("enum") List<String> enumValues) {
     public static final String REF_PREFIX = "#/components/schemas/";
