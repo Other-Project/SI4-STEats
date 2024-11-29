@@ -9,5 +9,7 @@ public @interface ApiBodyParam {
 
     String description() default "";
 
+    String example() default "";
+
     boolean required() default true;
 }

@@ -24,7 +24,7 @@ public class PaymentsHttpHandler extends AbstractHandler {
 
     @ApiRoute(method = HttpUtils.GET, path = "/{id}", summary = "Get a payment by its ID")
     public Payment get(
-            @ApiPathParam(name = "id", description = "Id of the payment") String id
+            @ApiPathParam(name = "id", description = "ID of the payment") String id
     ) throws NotFoundException {
         return getManager().get(id);
     }
