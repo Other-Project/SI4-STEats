@@ -35,12 +35,12 @@ public class OpenAPIGenerator {
                     List<Parameter> parameters = Arrays.stream(method.getParameters())
                             .map(parameter -> {
                                 if (parameter.isAnnotationPresent(ApiPathParam.class))
-                                    return new Parameter(parameter.getType(), parameter.getAnnotation(ApiPathParam.class));
+                                    return new Parameter(parameter.getParameterizedType(), parameter.getAnnotation(ApiPathParam.class));
                                 else if (parameter.isAnnotationPresent(ApiQueryParam.class))
-                                    return new Parameter(parameter.getType(), parameter.getAnnotation(ApiQueryParam.class));
+                                    return new Parameter(parameter.getParameterizedType(), parameter.getAnnotation(ApiQueryParam.class));
                                 else if (parameter.isAnnotationPresent(ApiBodyParam.class)) {
                                     var bodyParam = parameter.getAnnotation(ApiBodyParam.class);
-                                    var schema = Schema.getSchema(parameter.getType());
+                                    var schema = Schema.getSchema(parameter.getParameterizedType());
                                     bodyFields.put(bodyParam.name(), schema.refSchema());
                                     schemas.putAll(schema.declaredSchema());
                                 }
@@ -51,7 +51,7 @@ public class OpenAPIGenerator {
 
                     parameters.stream().map(Parameter::schemaToDefine).forEach(schemas::putAll);
                     Path.RequestBody requestBody = bodyFields.isEmpty() ? null : new Path.RequestBody(Map.of(
-                            "application/json", new Path.Content(new Schema(bodyFields, null))
+                            "application/json", new Path.Content(new Schema(bodyFields, null, null))
                     ));
                     Schema.SchemaDefinition responseSchema = Schema.getSchema(method.getGenericReturnType());
                     schemas.putAll(responseSchema.declaredSchema());

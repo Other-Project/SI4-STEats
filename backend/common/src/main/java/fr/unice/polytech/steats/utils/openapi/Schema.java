@@ -20,23 +20,24 @@ import java.util.stream.Stream;
  * @see <a href="https://swagger.io/specification/#schema-object">Schema Object (Swagger documentation)</a>
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record Schema(String $ref, String type, String format, String title, Map<String, Schema> properties, Schema items, @JsonProperty("enum") List<String> enumValues) {
+public record Schema(String $ref, String type, String format, String title, Map<String, Schema> properties, Schema additionalProperties, Schema items,
+                     @JsonProperty("enum") List<String> enumValues) {
     public static final String REF_PREFIX = "#/components/schemas/";
 
     private Schema(String type, String format) {
-        this(null, type, format, null, null, null, null);
+        this(null, type, format, null, null, null, null, null);
     }
 
-    public Schema(Map<String, Schema> properties, String title) {
-        this(null, "object", null, title, properties, null, null);
+    public Schema(Map<String, Schema> properties, Schema additionalProperties, String title) {
+        this(null, "object", null, title, properties, additionalProperties, null, null);
     }
 
     private Schema(Schema items) {
-        this(null, "array", null, null, null, items, null);
+        this(null, "array", null, null, null, null, items, null);
     }
 
     private Schema(String refClass) {
-        this(REF_PREFIX + refClass, null, null, null, null, null, null);
+        this(REF_PREFIX + refClass, null, null, null, null, null, null, null);
     }
 
     public static SchemaDefinition getSchema(Class<?> type) {
@@ -46,7 +47,7 @@ public record Schema(String $ref, String type, String format, String title, Map<
         }
 
         if (type.isEnum())
-            return new SchemaDefinition(new Schema(null, "string", null, null, null, null, Arrays.stream(type.getEnumConstants()).map(Object::toString).toList()));
+            return new SchemaDefinition(new Schema(null, "string", null, null, null, null, null, Arrays.stream(type.getEnumConstants()).map(Object::toString).toList()));
         if (type == LocalDate.class)
             return new SchemaDefinition(new Schema("string", "date"));
         if (type == LocalDateTime.class)
@@ -73,20 +74,34 @@ public record Schema(String $ref, String type, String format, String title, Map<
             properties.put(field.getName(), fieldSchemaDef.refSchema);
             declaredSchema.add(fieldSchemaDef.declaredSchema);
         }
-        return new SchemaDefinition(type.getName(), new Schema(properties, type.getSimpleName()), declaredSchema);
+        return new SchemaDefinition(type.getName(), new Schema(properties, null, type.getSimpleName()), declaredSchema);
     }
 
     public static SchemaDefinition getSchema(Type type) {
         try {
+            if (type instanceof Class<?> clazz) return getSchema(clazz);
             if (!(type instanceof ParameterizedType parameterizedType)) return getSchema(Class.forName(type.getTypeName()));
+
             String typeName = parameterizedType.getRawType().getTypeName();
+            Type[] genericTypes = parameterizedType.getActualTypeArguments();
+
             if (Objects.equals(typeName, JsonResponse.class.getTypeName()))
-                return getSchema(parameterizedType.getActualTypeArguments()[0]);
-            if (Objects.equals(typeName, List.class.getTypeName())) {
-                var childSchemaDef = getSchema(parameterizedType.getActualTypeArguments()[0]);
-                return new SchemaDefinition(new Schema(childSchemaDef.refSchema), childSchemaDef.declaredSchema);
+                return getSchema(genericTypes[0]); // Just decapsulate the container class
+
+            // List and Set essentially (it is false to consider all objects with 1 generic type as arrays, but it should work for our use case)
+            if (genericTypes.length == 1) {
+                var childSchemaDef = getSchema(genericTypes[0]);
+                return new SchemaDefinition(new Schema(childSchemaDef.refSchema), childSchemaDef.declaredSchema); // List of the generic type
             }
-            return getSchema(Class.forName(typeName));
+
+            // Map (the general case is also false, but it should work for our use case)
+            // Note that the key must be a string, as defined in the specification (https://swagger.io/docs/specification/v3_0/data-models/dictionaries/)
+            if (genericTypes.length == 2 && Objects.equals(genericTypes[0].getTypeName(), String.class.getTypeName())) {
+                var childSchemaDef = getSchema(genericTypes[1]);
+                return new SchemaDefinition(new Schema(null, childSchemaDef.refSchema, null), childSchemaDef.declaredSchema); // Objets with
+            }
+
+            return getSchema(Class.forName(typeName)); // This will likely fail most of the time, but since it isn't handled correctly, we'll just try to get as much as possible
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
@@ -102,7 +117,11 @@ public record Schema(String $ref, String type, String format, String title, Map<
         }
 
         public SchemaDefinition(String name, Schema declaredSchema, Map<String, Schema> childrenSchema) {
-            this(new Schema(name), Stream.concat(Stream.of(Map.entry(name, declaredSchema)), childrenSchema == null ? Stream.empty() : childrenSchema.entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+            this(
+                    new Schema(name),
+                    Stream.concat(Stream.of(Map.entry(name, declaredSchema)), childrenSchema == null ? Stream.empty() : childrenSchema.entrySet().stream())
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+            );
         }
     }
 }
