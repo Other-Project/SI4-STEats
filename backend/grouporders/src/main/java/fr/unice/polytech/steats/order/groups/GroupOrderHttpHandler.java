@@ -1,69 +1,60 @@
 package fr.unice.polytech.steats.order.groups;
 
-import com.sun.net.httpserver.HttpExchange;
-import fr.unice.polytech.steats.utils.AbstractManagerHandler;
-import fr.unice.polytech.steats.utils.ApiRegistry;
+import fr.unice.polytech.steats.utils.AbstractHandler;
+import fr.unice.polytech.steats.utils.HttpResponse;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.NotFoundException;
-import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
-import fr.unice.polytech.steats.utils.openapi.ApiRoute;
+import fr.unice.polytech.steats.utils.openapi.*;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Logger;
 
 @ApiMasterRoute(name = "Group Orders", path = "/api/orders/groups")
-public class GroupOrderHttpHandler extends AbstractManagerHandler<GroupOrderManager, GroupOrder> {
+public class GroupOrderHttpHandler extends AbstractHandler {
     public GroupOrderHttpHandler(String subPath, Logger logger) {
-        super(subPath, GroupOrder.class, logger);
+        super(subPath, logger);
     }
 
-    @Override
-    protected GroupOrderManager getManager() {
+    private GroupOrderManager getManager() {
         return GroupOrderManager.getInstance();
     }
 
-    @Override
-    protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/close", this::close);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}/users", this::getUsers);
-        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
+    @ApiRoute(path = "", method = HttpUtils.GET, summary = "Get all group orders")
+    public List<GroupOrder> getAll(
+            @ApiQueryParam(name = "restaurantId") String restaurantId
+    ) {
+        if (restaurantId != null) return getManager().getOrdersByRestaurant(restaurantId);
+        return getManager().getAll();
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET)
-    private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String restaurantId = params.get("restaurantId");
-
-        if (restaurantId != null) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByRestaurant(restaurantId));
-        } else {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
-        }
+    @ApiRoute(path = "", method = HttpUtils.PUT, summary = "Add a new group order")
+    public HttpResponse add(
+            @ApiBodyParam GroupOrder groupOrder
+    ) {
+        getManager().add(groupOrder);
+        return new HttpResponse(HttpUtils.CREATED_CODE);
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.POST)
-    private void close(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String groupOrderId = params.get("id");
-
-        try {
-            GroupOrderManager.getInstance().get(groupOrderId).closeOrder();
-            exchange.sendResponseHeaders(HttpUtils.NO_CONTENT_CODE, -1);
-            exchange.close();
-        } catch (IllegalStateException e) {
-            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, -1);
-            exchange.close();
-        } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-            exchange.close();
-        }
+    @ApiRoute(path = "/{id}", method = HttpUtils.GET, summary = "Get a group order by its ID")
+    public GroupOrder get(
+            @ApiPathParam(name = "id", description = "ID of the group order to get") String id
+    ) throws NotFoundException {
+        return getManager().get(id);
     }
 
-    @ApiRoute(path = "/{id}/users", method = HttpUtils.GET)
-    private void getUsers(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String groupOrderId = params.get("id");
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getUsers(groupOrderId));
+    @ApiRoute(path = "/{id}/close", method = HttpUtils.POST, summary = "Closes a group order")
+    public HttpResponse close(
+            @ApiPathParam(name = "id", description = "ID of the group order to close") String id
+    ) throws IOException, NotFoundException {
+        GroupOrderManager.getInstance().get(id).closeOrder();
+        return new HttpResponse(HttpUtils.NO_CONTENT_CODE);
+    }
+
+    @ApiRoute(path = "/{id}/users", method = HttpUtils.GET, summary = "Get all users' id of a group order")
+    public List<String> getUsers(
+            @ApiPathParam(name = "id", description = "ID of the group order") String id
+    ) throws IOException {
+        return getManager().getUsers(id);
     }
 }
