@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.utils.openapi;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import fr.unice.polytech.steats.utils.HttpResponse;
 import fr.unice.polytech.steats.utils.JsonResponse;
 
 import java.lang.reflect.Field;
@@ -41,6 +42,8 @@ public record Schema(String $ref, String type, String format, String title, Map<
     }
 
     public static SchemaDefinition getSchema(Class<?> type) {
+        if (type == HttpResponse.class) return new SchemaDefinition(null, Map.of());
+
         if (type.isArray()) {
             var childSchemaDef = getSchema(type.getComponentType());
             return new SchemaDefinition(new Schema(childSchemaDef.refSchema), childSchemaDef.declaredSchema);
