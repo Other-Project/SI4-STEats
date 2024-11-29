@@ -40,23 +40,23 @@ public class OpenAPIGenerator {
                                     return new Parameter(parameter.getType(), parameter.getAnnotation(ApiQueryParam.class));
                                 else if (parameter.isAnnotationPresent(ApiBodyParam.class)) {
                                     var bodyParam = parameter.getAnnotation(ApiBodyParam.class);
-                                    var schema = new Schema(parameter.getType());
-                                    var schemaRef = schema.shouldBeRef();
-                                    bodyFields.put(bodyParam.name(), schemaRef ? new Schema(parameter.getType().getSimpleName()) : schema);
-                                    if (schemaRef) schemas.putIfAbsent(parameter.getType().getSimpleName(), schema);
+                                    var schema = Schema.getSchema(parameter.getType());
+                                    bodyFields.put(bodyParam.name(), schema.refSchema());
+                                    schemas.putAll(schema.declaredSchema());
                                 }
                                 return null;
                             })
                             .filter(Objects::nonNull)
                             .toList();
 
+                    parameters.stream().map(Parameter::schemaToDefine).forEach(schemas::putAll);
                     Path.RequestBody requestBody = bodyFields.isEmpty() ? null : new Path.RequestBody(Map.of(
-                            "application/json", new Path.Content(new Schema(bodyFields))
+                            "application/json", new Path.Content(new Schema(bodyFields, null))
                     ));
-                    Schema responseSchema = new Schema(method.getReturnType());
-                    if (responseSchema.shouldBeRef()) schemas.putIfAbsent(method.getReturnType().getSimpleName(), responseSchema);
+                    Schema.SchemaDefinition responseSchema = Schema.getSchema(method.getGenericReturnType());
+                    schemas.putAll(responseSchema.declaredSchema());
                     Map<String, Path.Response> responses = Map.of(
-                            "200", new Path.Response("Success", Map.of("application/json", new Path.Content(responseSchema.shouldBeRef() ? new Schema(method.getReturnType().getSimpleName()) : responseSchema)))
+                            "200", new Path.Response("Success", Map.of("application/json", new Path.Content(responseSchema.refSchema())))
                     );
                     Path path = new Path(
                             List.of(handlerAnnotation.name()),
