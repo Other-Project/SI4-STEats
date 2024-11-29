@@ -40,8 +40,8 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
     @Override
     public void add(SingleOrder item) {
         try {
-            if (item.getDeliveryTime().isBefore(LocalDateTime.now()))
-                throw new IllegalArgumentException("The delivery time is in the past");
+            if (item.getDeliveryTime().isBefore(LocalDateTime.now().plusHours(2)))
+                throw new IllegalArgumentException("Minimum delivery time is: " + LocalTime.now().plusHours(2));
             if (!RestaurantServiceHelper.canAddOrder(item.getRestaurantId(), item.getDeliveryTime()))
                 throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
             if (AddressServiceHelper.getAddress(item.getAddressId()) == null)

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, lastValueFrom, Observable} from 'rxjs';
 import {Restaurant} from '../models/restaurant.model';
@@ -15,7 +15,7 @@ export class RestaurantService {
 
   public availableMenu$: BehaviorSubject<MenuItem[] | null> = new BehaviorSubject<MenuItem[] | null>(null);
 
-  constructor(private http: HttpClient, private orderService: OrderService) {
+  constructor(private http: HttpClient, private injector: Injector) {
     const restaurantIdString = localStorage.getItem("restaurantId");
     if (restaurantIdString)
       this.restaurantId = JSON.parse(restaurantIdString);
@@ -36,8 +36,12 @@ export class RestaurantService {
   }
 
   async getAvailableMenu(deliveryTime: Date): Promise<MenuItem[]> {
-    const availableMenu = await lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${this.restaurantId}/menu?deliveryTime=${deliveryTime}&orderPreparationTime=${this.orderService.getSingleOrderLocal()?.preparationTime}`));
+    const availableMenu = await lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${this.restaurantId}/menu?deliveryTime=${deliveryTime}&orderPreparationTime=${this.getOrderService().getSingleOrderLocal()?.preparationTime}`));
     this.availableMenu$.next(availableMenu);
     return availableMenu;
+  }
+
+  private getOrderService() {
+    return this.injector.get(OrderService);
   }
 }

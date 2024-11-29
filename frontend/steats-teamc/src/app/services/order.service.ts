@@ -1,8 +1,9 @@
-import {Injectable} from '@angular/core';
+import {Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, lastValueFrom, Observable} from 'rxjs';
 import {GroupOrder} from '../models/groupOrder.model';
 import {SingleOrder} from '../models/singleOrder.model';
+import {RestaurantService} from './restaurant.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class OrderService {
 
   public singleOrder$: BehaviorSubject<SingleOrder | null> = new BehaviorSubject<SingleOrder | null>(null);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private injector: Injector) {
     const singleOrderString = localStorage.getItem("single-order")
     const groupOrderString = localStorage.getItem("group-order")
     if (singleOrderString)
@@ -69,6 +70,7 @@ export class OrderService {
         this.singleOrder = order;
         localStorage.setItem("single-order", JSON.stringify(order));
         this.singleOrder$.next(order);
+        this.getRestaurantService().getAvailableMenu(order.deliveryTime);
       }
     });
   }
@@ -90,5 +92,9 @@ export class OrderService {
 
   getGroupCode(): string {
     return this.groupOrder?.groupCode ?? ''
+  }
+
+  getRestaurantService() {
+    return this.injector.get(RestaurantService);
   }
 }
