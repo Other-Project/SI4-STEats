@@ -39,7 +39,7 @@ public class GroupOrderManager extends AbstractManager<GroupOrder> {
     @Override
     public void add(GroupOrder item) {
         try {
-            if (item.getDeliveryTime().isBefore(LocalDateTime.now()))
+            if (item.getDeliveryTime() != null && item.getDeliveryTime().isBefore(LocalDateTime.now()))
                 throw new IllegalArgumentException("The delivery time is in the past");
             if (AddressServiceHelper.getAddress(item.getAddressId()) == null)
                 throw new IllegalArgumentException("The address doesn't exist");

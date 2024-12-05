@@ -3,6 +3,7 @@ import {PopupService} from '../../services/popup.service';
 import {UserService} from '../../services/user.service';
 import {CartPopupComponent} from '../popup/cart-popup/cart-popup.component';
 import {OrderService} from '../../services/order.service';
+import {CreateGroupOrderComponent} from '../group-order/create-group-order/create-group-order.component';
 
 @Component({
   selector: 'app-navbar',
@@ -13,7 +14,7 @@ export class NavbarComponent {
   isLoggedIn = false;
   hasOrder = false;
 
-  constructor(private popupService: PopupService, private userService: UserService, private orderService: OrderService) {
+  constructor(private readonly popupService: PopupService, private readonly userService: UserService, private readonly orderService: OrderService) {
   }
 
   ngOnInit(): void {
@@ -31,7 +32,10 @@ export class NavbarComponent {
   }
 
   createOrder() {
-    this.popupService.createOrderPopup()
+    this.popupService.open(CreateGroupOrderComponent, {
+      maxHeight: 'none',
+      maxWidth: '10%',
+    }, {})
   }
 
   openLoginPopup() {

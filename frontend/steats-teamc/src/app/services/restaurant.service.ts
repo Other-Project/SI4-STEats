@@ -4,19 +4,19 @@ import {BehaviorSubject, lastValueFrom, Observable} from 'rxjs';
 import {Restaurant} from '../models/restaurant.model';
 import {MenuItem} from '../models/menuItem.model';
 import {OrderService} from './order.service';
+import {apiUrl} from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestaurantService {
-  private apiUrl: string = 'http://localhost:5006/api/restaurants';
-
+  private readonly apiUrl: string = `${apiUrl}/api/restaurants`;
   private restaurantId: string | null = null;
   private menu: MenuItem[] = [];
 
   public availableMenu$: BehaviorSubject<MenuItem[] | null> = new BehaviorSubject<MenuItem[] | null>(null);
 
-  constructor(private http: HttpClient, private injector: Injector) {
+  constructor(private readonly http: HttpClient, private readonly injector: Injector) {
     const restaurantIdString = localStorage.getItem("restaurantId");
     if (restaurantIdString) {
       this.restaurantId = JSON.parse(restaurantIdString);

@@ -4,18 +4,20 @@ import {BehaviorSubject, lastValueFrom, Observable} from 'rxjs';
 import {GroupOrder} from '../models/groupOrder.model';
 import {SingleOrder} from '../models/singleOrder.model';
 import {RestaurantService} from './restaurant.service';
+import {apiUrl} from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
-
+  private readonly groupApiUrl: string = `${apiUrl}/api/orders/groups`;
+  private readonly singleApiUrl: string = `${apiUrl}/api/orders/singles`;
   private groupOrder: GroupOrder | undefined;
   private singleOrder: SingleOrder | undefined;
 
   public singleOrder$: BehaviorSubject<SingleOrder | null> = new BehaviorSubject<SingleOrder | null>(null);
 
-  constructor(private http: HttpClient, private injector: Injector) {
+  constructor(private readonly http: HttpClient, private readonly injector: Injector) {
     const singleOrderString = localStorage.getItem("single-order")
     const groupOrderString = localStorage.getItem("group-order")
     if (singleOrderString) {
@@ -26,9 +28,6 @@ export class OrderService {
     if (groupOrderString)
       this.groupOrder = JSON.parse(groupOrderString);
   }
-
-  groupApiUrl: string = 'http://localhost:5005/api/orders/groups';
-  singleApiUrl: string = 'http://localhost:5004/api/orders/singles';
 
   async joinGroupOrder(groupCode: string, userId: string): Promise<SingleOrder> {
     this.singleOrder = await lastValueFrom(this.http.post<SingleOrder>(`${this.singleApiUrl}`, {userId, groupCode}));
@@ -63,7 +62,7 @@ export class OrderService {
     return undefined;
   }
 
-  async createGroupOrder(restaurantId: string, addressId: string, deliveryTime: string): Promise<GroupOrder> {
+  async createGroupOrder(restaurantId: string, addressId: string, deliveryTime: string | undefined): Promise<GroupOrder> {
     this.groupOrder = await lastValueFrom(this.http.post<GroupOrder>(`${this.groupApiUrl}`, {
       restaurantId,
       addressId,

@@ -1,35 +1,39 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
 import {Router} from '@angular/router';
 import {UserService} from '../../../services/user.service';
 import {RestaurantService} from '../../../services/restaurant.service';
-import {PopupService} from '../../../services/popup.service';
+import {AddressService} from '../../../services/address.service';
+import {Address} from '../../../models/address.model';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-create-group-order',
   templateUrl: './create-group-order.component.html',
-  styleUrls: ['./create-group-order.component.scss']
+  styleUrls: ['./create-group-order.component.scss'],
+  providers: [DatePipe]
 })
-export class CreateGroupOrderComponent {
-  public deliveryTime: FormControl<string> = new FormControl('', {
-    validators: [Validators.required],
-    nonNullable: true
-  });
+export class CreateGroupOrderComponent implements OnInit {
+  public deliveryDate: FormControl<Date | null> = new FormControl(null);
+  public deliveryTime: FormControl<string | null> = new FormControl(null);
   public addressId: FormControl<string> = new FormControl('', {validators: [Validators.required], nonNullable: true});
   public groupCode: string | undefined;
+  public addresses: Address[] = [];
 
   constructor(
-    private orderService: OrderService,
-    private userService: UserService,
-    private router: Router,
-    private restaurantService: RestaurantService,
-    private popupService: PopupService
+    private readonly orderService: OrderService,
+    private readonly userService: UserService,
+    private readonly router: Router,
+    private readonly restaurantService: RestaurantService,
+    private readonly addressService: AddressService,
+    private readonly datePipe: DatePipe
   ) {
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.groupCode = this.orderService.getGroupCode();
+    this.addresses = await this.addressService.getAllAddresses();
   }
 
   public async createGroupOrder() {
@@ -39,8 +43,12 @@ export class CreateGroupOrderComponent {
       return;
     }
     const restaurantId = this.restaurantService.getRestaurantId() ?? '';
+    const deliveryDate = this.datePipe.transform(this.deliveryDate.value, 'yyyy-MM-dd');
+    const deliveryTime = this.deliveryTime.value;
+    const deliveryDateTime = deliveryDate && deliveryTime ? `${deliveryDate}T${deliveryTime}:00` : undefined;
+
     const groupOrderData = {
-      deliveryTime: this.deliveryTime.value,
+      deliveryTime: deliveryDateTime,
       addressId: this.addressId.value,
       restaurantId: restaurantId
     };

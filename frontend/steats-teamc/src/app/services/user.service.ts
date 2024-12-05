@@ -3,16 +3,17 @@ import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {User} from '../models/user.model';
+import {apiUrl} from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:5002/api/users';
+  private readonly apiUrl = `${apiUrl}/api/users`;
   private user: User | undefined;
-  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+  private readonly isLoggedInSubject = new BehaviorSubject<boolean>(false);
 
-  constructor(private http: HttpClient) {
+  constructor(private readonly http: HttpClient) {
     const userString = localStorage.getItem("user");
     if (!userString) return
     this.user = JSON.parse(userString)
