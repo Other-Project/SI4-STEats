@@ -25,9 +25,6 @@ export class MenuItemContainerComponent {
   }
 
   async ngOnInit(): Promise<void> {
-    this.orderService.singleOrder$.subscribe((order) => {
-      console.log('Order updated:', order);
-    });
     this.restaurantService.availableMenu$.subscribe((menu) => {
       if (menu)
         this.menuItems = menu;

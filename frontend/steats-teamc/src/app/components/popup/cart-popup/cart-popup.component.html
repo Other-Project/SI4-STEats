@@ -1,0 +1,35 @@
+<div class="cart-container">
+  <h1 mat-dialog-title>Your Cart</h1>
+  <div class="cart-grid">
+    <div class="placeholder">Placeholder for first column</div>
+    <div *ngIf="order" class="cart-items">
+      <div *ngFor="let item of order.items | keyvalue" class="cart-item">
+        <img [src]="getMenuItemById(item.key)?.imageUrl || 'default-menu.png'" class="item-image" alt="menu">
+        <div class="item-name">
+          {{ getMenuItemById(item.key)?.name }} - {{ getMenuItemById(item.key)?.price | currency }}
+        </div>
+        <div class="item-quantity">
+          <button mat-button (click)="decreaseQuantity(item.key)">-</button>
+          {{ item.value }}
+          <button mat-button (click)="increaseQuantity(item.key)">+</button>
+        </div>
+        <div class="sub-price-item">{{ (getMenuItemById(item.key)?.price || 0) * item.value | currency }}</div>
+      </div>
+    </div>
+    <div class="cart-bottom" *ngIf="order">
+      <div class="cart-summary">
+        <div class="sub-price">Sub Price: {{ order.subPrice | currency }}</div>
+        <div class="total-price">Total Price (after discount): {{ order.price | currency }}</div>
+      </div>
+    </div>
+    <div class="cart-buttons">
+      <button *ngIf="!hasConfirmedOrder" mat-raised-button (click)="confirmOrder()">Confirm</button>
+      <button *ngIf="hasConfirmedOrder" mat-raised-button (click)="payOrder(order?.id)">Pay</button>
+      <button mat-raised-button (click)="close()">Cancel</button>
+    </div>
+  </div>
+  <div *ngIf="!order">
+    <p>Your cart is empty.</p>
+    <button mat-raised-button (click)="close()">Close</button>
+  </div>
+</div>

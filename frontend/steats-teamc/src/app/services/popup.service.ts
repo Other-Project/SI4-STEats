@@ -33,13 +33,12 @@ export class PopupService {
     });
   }
 
-  // use this open Dialog
+  // use this open
 
-  openDialog(component: ComponentType<any>, widh: string, data: any) {
+  open(component: ComponentType<any>, config: any, data: any) {
     return this.dialog.open(component, {
-        width: widh,
-        data: data
-      }
-    )
+      ...config,
+      data
+    });
   }
 }

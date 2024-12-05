@@ -12,13 +12,16 @@ export class RestaurantService {
   private apiUrl: string = 'http://localhost:5006/api/restaurants';
 
   private restaurantId: string | null = null;
+  private menu: MenuItem[] = [];
 
   public availableMenu$: BehaviorSubject<MenuItem[] | null> = new BehaviorSubject<MenuItem[] | null>(null);
 
   constructor(private http: HttpClient, private injector: Injector) {
     const restaurantIdString = localStorage.getItem("restaurantId");
-    if (restaurantIdString)
+    if (restaurantIdString) {
       this.restaurantId = JSON.parse(restaurantIdString);
+      if (this.restaurantId) this.loadMenu(this.restaurantId);
+    }
   }
 
   getRestaurants(): Observable<Restaurant[]> {
@@ -27,8 +30,9 @@ export class RestaurantService {
 
   async getMenu(restaurantId: string): Promise<MenuItem[]> {
     this.restaurantId = restaurantId;
+    this.menu = await lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`));
     localStorage.setItem("restaurantId", restaurantId);
-    return lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`));
+    return this.menu;
   }
 
   getRestaurantId() {
@@ -43,5 +47,13 @@ export class RestaurantService {
 
   private getOrderService() {
     return this.injector.get(OrderService);
+  }
+
+  getMenuItemById(id: string): MenuItem | undefined {
+    return this.menu.find(item => item.id === id);
+  }
+
+  async loadMenu(restaurantId: string) {
+    this.menu = await this.getMenu(restaurantId);
   }
 }

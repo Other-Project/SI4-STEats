@@ -18,8 +18,11 @@ export class OrderService {
   constructor(private http: HttpClient, private injector: Injector) {
     const singleOrderString = localStorage.getItem("single-order")
     const groupOrderString = localStorage.getItem("group-order")
-    if (singleOrderString)
+    if (singleOrderString) {
       this.singleOrder = JSON.parse(singleOrderString);
+      if (this.singleOrder)
+        this.singleOrder$.next(this.singleOrder);
+    }
     if (groupOrderString)
       this.groupOrder = JSON.parse(groupOrderString);
   }
@@ -29,7 +32,11 @@ export class OrderService {
 
   async joinGroupOrder(groupCode: string, userId: string): Promise<SingleOrder> {
     this.singleOrder = await lastValueFrom(this.http.post<SingleOrder>(`${this.singleApiUrl}`, {userId, groupCode}));
-    localStorage.setItem("single-order", JSON.stringify(this.singleOrder));
+    if (this.singleOrder && this.groupOrder) {
+      localStorage.setItem("single-order", JSON.stringify(this.singleOrder));
+      localStorage.setItem("group-order", JSON.stringify(this.groupOrder));
+      this.singleOrder$.next(this.singleOrder);
+    }
     return this.singleOrder;
   }
 
@@ -48,42 +55,45 @@ export class OrderService {
     return this.singleOrder;
   }
 
+  getSingleOrderLocalStorage(): SingleOrder | undefined {
+    const singleOrderString = localStorage.getItem("single-order")
+    if (singleOrderString) {
+      return JSON.parse(singleOrderString);
+    }
+    return undefined;
+  }
+
   async createGroupOrder(restaurantId: string, addressId: string, deliveryTime: string): Promise<GroupOrder> {
     this.groupOrder = await lastValueFrom(this.http.post<GroupOrder>(`${this.groupApiUrl}`, {
       restaurantId,
       addressId,
       deliveryTime
     }));
-    localStorage.setItem("group-order", JSON.stringify(this.groupOrder));
     return this.groupOrder;
   }
 
-  // maybe this should be in a different service
-  // add quantity after merging discount branch
-
-  addMenuItemToOrder(menuItemId: string, quantity: number) {
-    this.http.post<SingleOrder>(`${this.singleApiUrl}/${this.getOrderId()}/modifyCartItem`, {
-      menuItemId,
-      quantity
-    }).subscribe({
-      next: (order) => {
-        this.singleOrder = order;
-        localStorage.setItem("single-order", JSON.stringify(order));
-        this.singleOrder$.next(order);
-        this.getRestaurantService().getAvailableMenu(order.deliveryTime);
-      }
-    });
-  }
-
-  removeMenuItemFromOrder(orderId: string, menuItemId: string) {
-    this.http.delete<void>(`${this.singleApiUrl}/${orderId}/menuItems/${menuItemId}`).subscribe({
-      next: () => console.log('Successfully removed menu item from order'),
-      error: (error) => console.error('Failed to remove menu item from order:', error)
+  changeMenuItemOfOrder(menuItemId: string, quantity: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      this.http.post<SingleOrder>(`${this.singleApiUrl}/${this.getOrderId()}/modifyCartItem`, {
+        menuItemId,
+        quantity
+      }).subscribe({
+        next: (order) => {
+          this.singleOrder = order;
+          localStorage.setItem("single-order", JSON.stringify(order));
+          this.singleOrder$.next(order);
+          this.getRestaurantService().getAvailableMenu(order.deliveryTime);
+          resolve(true);
+        },
+        error: () => {
+          resolve(false);
+        }
+      });
     });
   }
 
   payForOrder(orderId: string): Observable<void> {
-    return this.http.post<void>(`${this.singleApiUrl}/${orderId}/pay`, {});
+    return this.http.post<void>(`${this.singleApiUrl}/${orderId}/pay`, null);
   }
 
   getOrderId(): string {
