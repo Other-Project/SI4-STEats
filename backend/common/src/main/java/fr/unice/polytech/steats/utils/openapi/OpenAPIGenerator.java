@@ -57,9 +57,9 @@ public class OpenAPIGenerator {
                         "application/json", new Path.Content(bodyFields.containsKey("") ? bodyFields.get("") : new Schema(bodyFields, null, null))
                 ));
                 Schema.SchemaDefinition responseSchema = Schema.getSchema(method.getGenericReturnType());
-                schemas.putAll(responseSchema.declaredSchema());
+                if (responseSchema != null) schemas.putAll(responseSchema.declaredSchema());
                 Map<String, Path.Response> responses = Map.of(
-                        "200", new Path.Response("Success", Map.of("application/json", new Path.Content(responseSchema.refSchema()))) // TODO : All success codes are not 200 and error codes are not handled
+                        "200", new Path.Response("Success", responseSchema == null ? null : Map.of("application/json", new Path.Content(responseSchema.refSchema()))) // TODO : All success codes are not 200 and error codes are not handled
                 );
                 Path path = new Path(
                         List.of(handlerAnnotation.name()),

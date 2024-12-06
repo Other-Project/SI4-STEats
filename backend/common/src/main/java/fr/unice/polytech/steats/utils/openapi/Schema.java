@@ -41,11 +41,13 @@ public record Schema(String $ref, String type, String format, String title, Map<
         this(REF_PREFIX + refClass, null, null, null, null, null, null, null);
     }
 
-    public static SchemaDefinition getSchema(Class<?> type) {
+    private static SchemaDefinition getSchema(Class<?> type) {
+        if (type == void.class) return null;
         if (type == HttpResponse.class) return new SchemaDefinition(null, Map.of());
 
         if (type.isArray()) {
             var childSchemaDef = getSchema(type.getComponentType());
+            assert childSchemaDef != null;
             return new SchemaDefinition(new Schema(childSchemaDef.refSchema), childSchemaDef.declaredSchema);
         }
 
