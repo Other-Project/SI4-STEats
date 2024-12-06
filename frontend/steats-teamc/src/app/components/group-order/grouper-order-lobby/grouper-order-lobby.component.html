@@ -1,0 +1,12 @@
+<div class="group-order-lobby">
+  <mat-list *ngIf="singleOrders.length > 0; else noOrders">
+    <mat-list-item *ngFor="let order of singleOrders"
+                   [ngClass]="{'paid': order.status === 'PAID', 'not-paid': order.status !== 'PAID'}">
+      {{ order.userId }}
+    </mat-list-item>
+    <button mat-raised-button color="warn" (click)="closeOrder()">Close Order</button>
+  </mat-list>
+  <ng-template #noOrders>
+    <p class="warning">Not in group order</p>
+  </ng-template>
+</div>

@@ -1,6 +1,14 @@
 <div class="cart-container">
   <h1 mat-dialog-title>Your Cart</h1>
-  <div class="cart-grid">
+  <div *ngIf="isLoading" class="loader">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    <p>Paying...</p>
+  </div>
+  <div *ngIf="isPaymentSuccessful" class="payment-success">
+    <p>Payment Successful</p>
+    <mat-icon>check_circle</mat-icon>
+  </div>
+  <div *ngIf="!isLoading && !isPaymentSuccessful" class="cart-grid">
     <div class="placeholder">Placeholder for first column</div>
     <div *ngIf="order" class="cart-items">
       <div *ngFor="let item of order.items | keyvalue" class="cart-item">
@@ -28,7 +36,7 @@
       <button mat-raised-button (click)="close()">Cancel</button>
     </div>
   </div>
-  <div *ngIf="!order">
+  <div *ngIf="!order && !isLoading && !isPaymentSuccessful">
     <p>Your cart is empty.</p>
     <button mat-raised-button (click)="close()">Close</button>
   </div>

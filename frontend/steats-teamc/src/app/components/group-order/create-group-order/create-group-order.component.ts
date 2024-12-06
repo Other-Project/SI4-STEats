@@ -29,10 +29,12 @@ export class CreateGroupOrderComponent implements OnInit {
     private readonly addressService: AddressService,
     private readonly datePipe: DatePipe
   ) {
+    this.orderService.groupOrder$.subscribe(groupOrder => {
+      this.groupCode = groupOrder?.groupCode;
+    });
   }
 
   async ngOnInit() {
-    this.groupCode = this.orderService.getGroupCode();
     this.addresses = await this.addressService.getAllAddresses();
   }
 
@@ -54,7 +56,7 @@ export class CreateGroupOrderComponent implements OnInit {
     };
     try {
       const groupOrder = await this.orderService.createGroupOrder(groupOrderData.restaurantId, groupOrderData.addressId, groupOrderData.deliveryTime);
-      const singleOrder = await this.orderService.joinGroupOrder(groupOrder.groupCode, userId);
+      await this.orderService.joinGroupOrder(groupOrder.groupCode, userId);
       this.groupCode = groupOrder.groupCode ?? undefined;
       await this.router.navigate(['/restaurant', groupOrderData.restaurantId]);
     } catch (error) {

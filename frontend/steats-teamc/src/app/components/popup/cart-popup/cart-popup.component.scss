@@ -7,6 +7,24 @@
     text-align: center;
   }
 
+  .loader, .payment-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 24px;
+  }
+
+  mat-progress-spinner {
+    margin-bottom: 20px;
+  }
+
+  .payment-success mat-icon {
+    font-size: 48px;
+    color: green;
+  }
+
   .cart-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

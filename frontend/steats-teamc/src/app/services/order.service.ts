@@ -16,6 +16,8 @@ export class OrderService {
   private singleOrder: SingleOrder | undefined;
 
   public singleOrder$: BehaviorSubject<SingleOrder | null> = new BehaviorSubject<SingleOrder | null>(null);
+  public groupOrder$: BehaviorSubject<GroupOrder | null> = new BehaviorSubject<GroupOrder | null>(null);
+  public singleOrders$: BehaviorSubject<SingleOrder[]> = new BehaviorSubject<SingleOrder[]>([]);
 
   constructor(private readonly http: HttpClient, private readonly injector: Injector) {
     const singleOrderString = localStorage.getItem("single-order")
@@ -25,29 +27,35 @@ export class OrderService {
       if (this.singleOrder)
         this.singleOrder$.next(this.singleOrder);
     }
-    if (groupOrderString)
+    if (groupOrderString) {
       this.groupOrder = JSON.parse(groupOrderString);
+      if (this.groupOrder)
+        this.groupOrder$.next(this.groupOrder);
+    }
   }
 
   async joinGroupOrder(groupCode: string, userId: string): Promise<SingleOrder> {
     this.singleOrder = await lastValueFrom(this.http.post<SingleOrder>(`${this.singleApiUrl}`, {userId, groupCode}));
-    if (this.singleOrder && this.groupOrder) {
+    this.groupOrder = await this.getGroupOrder();
+    if (this.singleOrder) {
       localStorage.setItem("single-order", JSON.stringify(this.singleOrder));
-      localStorage.setItem("group-order", JSON.stringify(this.groupOrder));
       this.singleOrder$.next(this.singleOrder);
     }
     return this.singleOrder;
   }
 
-  async getGroupOrder(groupCode: string): Promise<GroupOrder> {
-    this.groupOrder = await lastValueFrom(this.http.get<GroupOrder>(`${this.groupApiUrl}/${groupCode}`))
+  async getGroupOrder(): Promise<GroupOrder> {
+    if (!this.getGroupCode())
+      return {} as GroupOrder;
+    this.groupOrder = await lastValueFrom(this.http.get<GroupOrder>(`${this.groupApiUrl}/${this.getGroupCode()}`));
+    this.groupOrder$.next(this.groupOrder);
+    localStorage.setItem("group-order", JSON.stringify(this.groupOrder));
     return this.groupOrder;
   }
 
-  async getSingleOrder(groupCode: string): Promise<SingleOrder> {
-    this.singleOrder = await lastValueFrom(this.http.get<SingleOrder>(`${this.singleApiUrl}?groupCode=${groupCode}`));
-    this.singleOrder$.next(this.singleOrder);
-    return this.singleOrder;
+  async getSingleOrders() {
+    if (!this.getGroupCode()) return;
+    this.singleOrders$.next(await lastValueFrom(this.http.get<SingleOrder[]>(`${this.singleApiUrl}?groupCode=${this.getGroupCode()}`)));
   }
 
   getSingleOrderLocal(): SingleOrder | undefined {
@@ -99,11 +107,17 @@ export class OrderService {
     return this.singleOrder?.id ?? ''
   }
 
-  getGroupCode(): string {
-    return this.groupOrder?.groupCode ?? ''
+  getGroupCode(): string | undefined {
+    return this.groupOrder?.groupCode ?? this.singleOrder?.groupCode;
   }
 
   getRestaurantService() {
     return this.injector.get(RestaurantService);
+  }
+
+  async closeGroupOrder() {
+    if (!this.getGroupCode())
+      return;
+    return lastValueFrom(this.http.post<void>(`${this.groupApiUrl}/${this.getGroupCode()}/close`, null));
   }
 }

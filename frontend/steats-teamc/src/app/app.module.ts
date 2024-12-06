@@ -26,6 +26,7 @@ import {
   MatDatepickerToggle
 } from '@angular/material/datepicker';
 import {MAT_DATE_LOCALE, MatNativeDateModule} from '@angular/material/core';
+import {GrouperOrderLobbyComponent} from './components/group-order/grouper-order-lobby/grouper-order-lobby.component';
 
 @NgModule({
   imports: [
@@ -54,6 +55,7 @@ import {MAT_DATE_LOCALE, MatNativeDateModule} from '@angular/material/core';
     MatDatepickerInput,
     MatNativeDateModule,
     MatDatepickerModule,
+    GrouperOrderLobbyComponent,
   ],
   providers: [{provide: MAT_DATE_LOCALE, useValue: 'fr'}],
   declarations: [

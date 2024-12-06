@@ -6,6 +6,8 @@ import {MatButton} from '@angular/material/button';
 import {CurrencyPipe, KeyValuePipe, NgForOf, NgIf} from '@angular/common';
 import {MenuItem} from '../../../models/menuItem.model';
 import {RestaurantService} from '../../../services/restaurant.service';
+import {MatIcon} from '@angular/material/icon';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-cart-popup',
@@ -17,18 +19,22 @@ import {RestaurantService} from '../../../services/restaurant.service';
     NgIf,
     KeyValuePipe,
     CurrencyPipe,
-    MatDialogTitle
+    MatDialogTitle,
+    MatIcon,
+    MatProgressSpinner
   ],
   styleUrls: ['./cart-popup.component.scss']
 })
 export class CartPopupComponent implements OnInit {
   order: SingleOrder | null | undefined;
   hasConfirmedOrder = false;
+  isLoading = false;
+  isPaymentSuccessful = false;
 
   constructor(
-    private dialogRef: MatDialogRef<CartPopupComponent>,
-    private orderService: OrderService,
-    private restaurantService: RestaurantService
+    private readonly dialogRef: MatDialogRef<CartPopupComponent>,
+    private readonly orderService: OrderService,
+    private readonly restaurantService: RestaurantService
   ) {
   }
 
@@ -75,15 +81,18 @@ export class CartPopupComponent implements OnInit {
   }
 
   payOrder(id: string | undefined): void {
-    if (id)
-      this.orderService.payForOrder(id).subscribe({
-        next: () => {
-          console.log('Payment successful');
-        },
-        error: (err) => {
-          console.error('Payment failed', err);
-        }
-      });
+    if (!id) return;
+    this.isLoading = true;
+    this.orderService.payForOrder(id).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.isPaymentSuccessful = true;
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Payment failed', err);
+      }
+    });
   }
 
   close(): void {

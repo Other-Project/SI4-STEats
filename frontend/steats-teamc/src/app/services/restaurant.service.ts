@@ -56,4 +56,8 @@ export class RestaurantService {
   async loadMenu(restaurantId: string) {
     this.menu = await this.getMenu(restaurantId);
   }
+
+  setRestaurantId(restaurantId: string) {
+    this.restaurantId = restaurantId;
+  }
 }

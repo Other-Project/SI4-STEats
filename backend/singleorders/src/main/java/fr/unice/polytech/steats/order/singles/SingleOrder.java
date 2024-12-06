@@ -206,21 +206,25 @@ public class SingleOrder implements Order {
         if (status != Status.INITIALISED)
             throw new IllegalStateException("Can't modify an order that has already been paid");
         if (quantity < 0) throw new IllegalArgumentException("Quantity must be positive");
-        if (quantity == 0) orderedItems.remove(menuItemId);
-        else {
-            MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId); // Check if the menu item exists
-            long previousQuantity = orderedItems.getOrDefault(menuItemId, 0);
-            if (previousQuantity == quantity) return;
-            Duration newPreparationTime;
-            if (previousQuantity > quantity)
-                newPreparationTime = preparationTime.minus(menuItem.preparationTime().multipliedBy(previousQuantity - quantity));
-            else
-                newPreparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(quantity - previousQuantity));
+        MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId); // Check if the menu item exists
+        long previousQuantity = orderedItems.getOrDefault(menuItemId, 0);
+        if (previousQuantity == quantity) return;
+
+        Duration newPreparationTime;
+        if (previousQuantity > quantity) {
+            newPreparationTime = preparationTime.minus(menuItem.preparationTime().multipliedBy(previousQuantity - quantity));
+        } else {
+            long quantityDelta = previousQuantity + quantity;
+            newPreparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(quantity - previousQuantity));
             if (!RestaurantServiceHelper.canHandlePreparationTime(restaurantId, newPreparationTime, deliveryTime))
-                throw new IllegalArgumentException("The restaurant can't handle " + quantity + " more " + menuItem.name() + " in time");
-            preparationTime = newPreparationTime;
-            orderedItems.put(menuItem.id(), quantity);
+                throw new IllegalArgumentException("The restaurant can't handle " + (quantityDelta) + " more " + menuItem.name() + " in time");
         }
+        if (quantity == 0)
+            orderedItems.remove(menuItemId);
+        else
+            orderedItems.put(menuItemId, quantity);
+
+        preparationTime = newPreparationTime;
         updateDiscounts();
     }
 
