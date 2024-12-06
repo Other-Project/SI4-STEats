@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * This is the root object of the OpenAPI document.
@@ -17,7 +18,6 @@ import java.util.Map;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record OpenAPI(String openapi, Info info, List<Server> servers, Map<String, Map<String, Path>> paths, Schemas components) {
-
     /**
      * An object representing a Server.
      *
@@ -49,5 +49,23 @@ public record OpenAPI(String openapi, Info info, List<Server> servers, Map<Strin
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record Schemas(Map<String, Schema> schemas) {
+    }
+
+
+    /**
+     * Merge the current OpenAPI with a list of proxied OpenAPIs.
+     *
+     * @param proxiedOpenAPIs The list of OpenAPIs to merge with the current OpenAPI.
+     */
+    public OpenAPI merge(List<OpenAPI> proxiedOpenAPIs) {
+        if (proxiedOpenAPIs.isEmpty()) return this;
+
+        Map<String, Map<String, Path>> mergedPath = new TreeMap<>(paths);
+        Map<String, Schema> mergedComponents = new TreeMap<>(components.schemas());
+        for (var proxiedOpenApi : proxiedOpenAPIs) {
+            mergedPath.putAll(proxiedOpenApi.paths());
+            mergedComponents.putAll(proxiedOpenApi.components().schemas());
+        }
+        return new OpenAPI(openapi, info, servers, mergedPath, new Schemas(mergedComponents));
     }
 }

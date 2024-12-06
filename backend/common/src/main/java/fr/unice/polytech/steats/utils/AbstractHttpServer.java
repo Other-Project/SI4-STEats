@@ -8,9 +8,12 @@ import fr.unice.polytech.steats.utils.openapi.OpenAPIGenerator;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -18,6 +21,7 @@ import java.util.logging.Logger;
 public abstract class AbstractHttpServer {
     private final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(this.getClass().getName());
     private final Map<HttpHandler, ApiMasterRoute> registeredHandlers = new HashMap<>();
+    private final List<URI> proxiedHandlers = new ArrayList<>();
     private final HttpServer server;
     private final int apiPort;
     private final OpenAPI openApi;
@@ -34,29 +38,11 @@ public abstract class AbstractHttpServer {
         registeredHandlers.put(handler, handlerInfo);
     }
 
-    /**
-     * @deprecated Use {@link #registerHandler(HttpHandler)} instead
-     */
-    @Deprecated(forRemoval = true)
-    protected void registerHandler(String name, String subpath, HttpHandler handler) {
-        logger.info(() -> "Registering " + name + " handler at " + subpath);
-        server.createContext(subpath, handler);
-        registeredHandlers.put(handler, new ApiMasterRoute() {
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return null;
-            }
-
-            @Override
-            public String name() {
-                return name;
-            }
-
-            @Override
-            public String path() {
-                return subpath;
-            }
-        });
+    protected void registerGatewayHandler(String path, URI url, Logger logger) {
+        HttpHandler handler = new GatewayHttpHandler(path, url, logger);
+        logger.info(() -> "Registering gateway handler for " + url);
+        server.createContext(path, handler);
+        proxiedHandlers.add(url);
     }
 
     protected void registerHandlers() {
@@ -85,6 +71,15 @@ public abstract class AbstractHttpServer {
         });
     }
 
+    private List<OpenAPI> getProxiedOpenAPIs() throws IOException {
+        List<OpenAPI> openAPIs = new ArrayList<>(proxiedHandlers.size());
+        for (URI uri : proxiedHandlers) {
+            HttpRequest request = HttpRequest.newBuilder().uri(uri.resolve("/openapi.json")).header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON).GET().build();
+            openAPIs.add(JacksonUtils.fromJson(HttpUtils.sendRequest(request).body(), OpenAPI.class));
+        }
+        return openAPIs;
+    }
+
     protected AbstractHttpServer(int apiPort) throws IOException {
         server = HttpServer.create(new InetSocketAddress(apiPort), 0);
         this.apiPort = apiPort;
@@ -94,7 +89,8 @@ public abstract class AbstractHttpServer {
         logger.info(() -> "Generating OpenAPI documentation");
         OpenAPI.Server openApiServer = new OpenAPI.Server("http://localhost:" + apiPort);
         Class<?>[] handlers = registeredHandlers.keySet().stream().map(HttpHandler::getClass).toArray(Class[]::new);
-        openApi = OpenAPIGenerator.generate(openApiServer, handlers);
+        List<OpenAPI> proxiedOpenAPIs = getProxiedOpenAPIs(); // TODO : Differ the call so that the sub-services are started before
+        openApi = OpenAPIGenerator.generate(openApiServer, handlers).merge(proxiedOpenAPIs);
     }
 
     public void start() {
