@@ -39,12 +39,12 @@ public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderMa
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/{id}/modifyCartItem", method = HttpUtils.POST, body = {"menuItem", "quantity"}, summary = "Modify or add a menu item in cart")
+    @ApiRoute(path = "/{id}/modifyCartItem", method = HttpUtils.POST, body = {"menuItemId", "quantity"}, summary = "Modify or add a menu item in cart")
     private void modifyCartItem(HttpExchange exchange, Map<String, String> params) throws IOException {
         String orderId = params.get("id");
 
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String menuItem = body.get("menuItem").toString();
+        String menuItem = body.get("menuItemId").toString();
         String quantity = body.get("quantity").toString();
         if (menuItem == null || quantity == null) {
             exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);

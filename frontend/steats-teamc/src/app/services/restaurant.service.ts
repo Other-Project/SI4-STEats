@@ -1,25 +1,63 @@
-import {Injectable} from '@angular/core';
+import {Injectable, Injector} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, lastValueFrom, Observable} from 'rxjs';
 import {Restaurant} from '../models/restaurant.model';
 import {MenuItem} from '../models/menuItem.model';
+import {OrderService} from './order.service';
+import {apiUrl} from '../app.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestaurantService {
-  private apiUrl: string = 'http://localhost:5006/api/restaurants';
-  private defaultImageUrl: string = 'https://imageproxy.wolt.com/venue/65649f38d750e4643c883f83/b638f152-d345-11ee-b62a-6ec26134f011_fd436250_982e_11ee_9ac5_6ed35a7a8561_bk_hero__1_.jpg';
-  private defaultImageUrl2: string = 'https://www.hachette.fr/sites/default/files/burger-verrecchia.jpg';
+  private readonly apiUrl: string = `${apiUrl}/api/restaurants`;
+  private restaurantId: string | null = null;
+  private menu: MenuItem[] = [];
 
+  public availableMenu$: BehaviorSubject<MenuItem[] | null> = new BehaviorSubject<MenuItem[] | null>(null);
 
-  constructor(private http: HttpClient) {}
+  constructor(private readonly http: HttpClient, private readonly injector: Injector) {
+    const restaurantIdString = localStorage.getItem("restaurantId");
+    if (restaurantIdString) {
+      this.restaurantId = JSON.parse(restaurantIdString);
+      if (this.restaurantId) this.loadMenu(this.restaurantId);
+    }
+  }
 
   getRestaurants(): Observable<Restaurant[]> {
     return this.http.get<Restaurant[]>(this.apiUrl);
   }
 
-  getMenu(restaurantId: string) : Observable<MenuItem[]> {
-    return this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`);
+  async getMenu(restaurantId: string): Promise<MenuItem[]> {
+    this.restaurantId = restaurantId;
+    this.menu = await lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${restaurantId}/menu`));
+    localStorage.setItem("restaurantId", restaurantId);
+    return this.menu;
+  }
+
+  getRestaurantId() {
+    return this.restaurantId;
+  }
+
+  async getAvailableMenu(deliveryTime: Date | undefined): Promise<MenuItem[]> {
+    const availableMenu = await lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${this.restaurantId}/menu?deliveryTime=${deliveryTime}&orderPreparationTime=${this.getOrderService().getSingleOrderLocal()?.preparationTime}`));
+    this.availableMenu$.next(availableMenu);
+    return availableMenu;
+  }
+
+  private getOrderService() {
+    return this.injector.get(OrderService);
+  }
+
+  getMenuItemById(id: string): MenuItem | undefined {
+    return this.menu.find(item => item.id === id);
+  }
+
+  async loadMenu(restaurantId: string) {
+    this.menu = await this.getMenu(restaurantId);
+  }
+
+  setRestaurantId(restaurantId: string) {
+    this.restaurantId = restaurantId;
   }
 }

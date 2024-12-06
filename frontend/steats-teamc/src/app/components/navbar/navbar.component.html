@@ -6,6 +6,9 @@
   <button class="create-order" mat-raised-button (click)="createOrder()">
     Make a order
   </button>
+  <button *ngIf="hasOrder" mat-icon-button (click)="openCartPopup()">
+    <mat-icon>shopping_cart</mat-icon>
+  </button>
   <div>
     <button mat-raised-button *ngIf="!isLoggedIn" (click)="openLoginPopup()">Login</button>
     <button mat-raised-button *ngIf="isLoggedIn" (click)="logout()">Logout</button>

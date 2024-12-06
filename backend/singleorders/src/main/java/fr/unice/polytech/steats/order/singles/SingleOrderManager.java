@@ -40,12 +40,16 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
     @Override
     public void add(SingleOrder item) {
         try {
-            if (!RestaurantServiceHelper.canHandle(item.getRestaurantId(), item.getPreparationTime(), item.getDeliveryTime()))
-                throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
             if (AddressServiceHelper.getAddress(item.getAddressId()) == null)
                 throw new IllegalArgumentException("The address doesn't exist");
             if (UserServiceHelper.getUser(item.getUserId()) == null)
                 throw new IllegalArgumentException("The user doesn't exist");
+            if (item.getGroupCode() == null && item.getDeliveryTime() == null)
+                throw new IllegalArgumentException("The delivery time is mandatory for single orders");
+            if (item.getDeliveryTime() != null && item.getDeliveryTime().isBefore(LocalDateTime.now().plusHours(2)))
+                throw new IllegalArgumentException("Minimum delivery time is: " + LocalTime.now().plusHours(2));
+            if (item.getDeliveryTime() != null && !RestaurantServiceHelper.canAddOrder(item.getRestaurantId(), item.getDeliveryTime()))
+                throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
         } catch (IOException e) {
             throw new IllegalStateException("Bad request" + e.getMessage());
         }

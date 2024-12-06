@@ -31,13 +31,64 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}/opening-times/{dayOfWeek}", this::getOpeningTimes);
         ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange));
         ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{restaurantId}/canHandle", this::canHandle);
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/canHandle", this::canHandle);
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/canAddOrder", this::canAddOrder);
+        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/canHandlePreparationTime", this::canHandlePreparationTime);
         ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
     }
 
-    @ApiRoute(path = "/{restaurantId}/canHandle", method = HttpUtils.POST, body = {"preparationTime", "deliveryTime"})
+    @ApiRoute(path = "/{id}/canHandlePreparationTime", method = HttpUtils.POST, body = {"preparationTime", "deliveryTime"})
+    private void canHandlePreparationTime(HttpExchange exchange, Map<String, String> param) throws IOException {
+        String restaurantId = param.get("id");
+        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
+        Restaurant restaurant;
+        try {
+            restaurant = getManager().get(restaurantId);
+        } catch (NotFoundException e) {
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.NOT_FOUND_CODE, e.getMessage());
+            return;
+        }
+        Duration preparationTime;
+        LocalDateTime deliveryTime;
+        try {
+            String preparationTimeString = body.get("preparationTime").toString();
+            String deliveryTimeString = body.get("deliveryTime").toString();
+            preparationTime = Duration.parse(preparationTimeString);
+            deliveryTime = LocalDateTime.parse(deliveryTimeString);
+        } catch (NullPointerException | DateTimeParseException e) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            exchange.close();
+            return;
+        }
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.canHandlePreparationTime(preparationTime, deliveryTime));
+    }
+
+    @ApiRoute(path = "/{id}/canAddOrder", method = HttpUtils.POST, body = {"deliveryTime"})
+    private void canAddOrder(HttpExchange exchange, Map<String, String> param) throws IOException {
+        String restaurantId = param.get("id");
+        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
+        Restaurant restaurant;
+        try {
+            restaurant = getManager().get(restaurantId);
+        } catch (NotFoundException e) {
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.NOT_FOUND_CODE, e.getMessage());
+            return;
+        }
+        LocalDateTime deliveryTime;
+        try {
+            String deliveryTimeString = body.get("deliveryTime").toString();
+            deliveryTime = LocalDateTime.parse(deliveryTimeString);
+        } catch (NullPointerException | DateTimeParseException e) {
+            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
+            exchange.close();
+            return;
+        }
+        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.canAddOrder(deliveryTime));
+    }
+
+    @ApiRoute(path = "/{id}/canHandle", method = HttpUtils.POST, body = {"preparationTime", "deliveryTime"})
     private void canHandle(HttpExchange exchange, Map<String, String> param) throws IOException {
-        String restaurantId = param.get("restaurantId");
+        String restaurantId = param.get("id");
         Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
         Restaurant restaurant;
         try {
@@ -79,10 +130,11 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         }
     }
 
-    @ApiRoute(path = "/{id}/menu", method = HttpUtils.GET, queryParams = {"deliveryTime"})
+    @ApiRoute(path = "/{id}/menu", method = HttpUtils.GET, queryParams = {"deliveryTime", "orderPreparationTime"})
     private void getMenu(HttpExchange exchange, Map<String, String> param, Map<String, String> query) throws IOException {
         String restaurantId = param.get("id");
         String deliveryTimeString = query.get("deliveryTime");
+        String orderPreparationTimeString = query.get("orderPreparationTime");
         Restaurant restaurant;
         try {
             restaurant = getManager().get(restaurantId);
@@ -92,14 +144,16 @@ public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantMana
         }
         if (deliveryTimeString != null) {
             LocalDateTime deliveryTime;
+            Duration orderPreparationTime;
             try {
                 deliveryTime = LocalDateTime.parse(deliveryTimeString);
+                orderPreparationTime = Duration.parse(orderPreparationTimeString);
             } catch (DateTimeParseException e) {
                 exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
                 exchange.close();
                 return;
             }
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.getAvailableMenu(deliveryTime));
+            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.getAvailableMenu(deliveryTime, orderPreparationTime));
         } else {
             HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.getFullMenu());
         }

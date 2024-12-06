@@ -1,6 +1,11 @@
 <div class="join-group-order-container">
-  <mat-form-field>
-    <input matInput type="text" [formControl]="groupCode">
-  </mat-form-field>
-  <button mat-button (click)="joinGroupOrder()" [disabled]="groupCode.value === ''">Join group order</button>
+  <div *ngIf="groupCode; else noGroupOrder">
+    <p>Group Order Code: {{ groupCode }}</p>
+  </div>
+  <ng-template #noGroupOrder>
+    <mat-form-field>
+      <input matInput type="text" [formControl]="groupForm">
+    </mat-form-field>
+    <button mat-button (click)="joinGroupOrder()" [disabled]="groupForm.value === ''">Join group order</button>
+  </ng-template>
 </div>

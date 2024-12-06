@@ -17,6 +17,16 @@ import {MatInput, MatInputModule} from '@angular/material/input';
 import {GroupOrderComponent} from './components/popup/group-order.component';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
+import {MenuItemDialogComponent} from './components/menuItem/menu-item-dialog/menu-item-dialog.component';
+import {MatOption, MatSelect} from "@angular/material/select";
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerModule,
+  MatDatepickerToggle
+} from '@angular/material/datepicker';
+import {MAT_DATE_LOCALE, MatNativeDateModule} from '@angular/material/core';
+import {GrouperOrderLobbyComponent} from './components/group-order/grouper-order-lobby/grouper-order-lobby.component';
 
 @NgModule({
   imports: [
@@ -38,8 +48,16 @@ import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/mater
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelect,
+    MatOption,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatDatepickerInput,
+    MatNativeDateModule,
+    MatDatepickerModule,
+    GrouperOrderLobbyComponent,
   ],
-  providers: [],
+  providers: [{provide: MAT_DATE_LOCALE, useValue: 'fr'}],
   declarations: [
     NavbarComponent,
     SearchbarComponent,
@@ -48,6 +66,7 @@ import {MatDialogActions, MatDialogContent, MatDialogTitle} from '@angular/mater
     CreateGroupOrderComponent,
     JoinGroupOrderComponent,
     GroupOrderComponent,
+    MenuItemDialogComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [NavbarComponent, SearchbarComponent, RestaurantContainerComponent, CreateGroupOrderComponent, JoinGroupOrderComponent],
