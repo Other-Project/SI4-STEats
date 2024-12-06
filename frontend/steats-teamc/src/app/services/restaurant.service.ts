@@ -39,7 +39,7 @@ export class RestaurantService {
     return this.restaurantId;
   }
 
-  async getAvailableMenu(deliveryTime: Date): Promise<MenuItem[]> {
+  async getAvailableMenu(deliveryTime: Date | undefined): Promise<MenuItem[]> {
     const availableMenu = await lastValueFrom(this.http.get<MenuItem[]>(`${this.apiUrl}/${this.restaurantId}/menu?deliveryTime=${deliveryTime}&orderPreparationTime=${this.getOrderService().getSingleOrderLocal()?.preparationTime}`));
     this.availableMenu$.next(availableMenu);
     return availableMenu;

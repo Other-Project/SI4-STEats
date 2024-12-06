@@ -189,10 +189,10 @@ public class Restaurant {
     }
 
     private Duration getAveragePreparationTime() throws IOException {
-        if (count % RECALC_FREQUENCY != 0) {
-            count++;
+        if (count++ % RECALC_FREQUENCY != 0) {
             return averagePreparationTime;
         }
+        count = 0;
         List<Order> orders = OrderServiceHelper.getOrderByRestaurant(id);
         List<Duration> lastOrderDurations = orders.reversed().stream()
                 .filter(order -> order.status().compareTo(Status.PAID) >= 0 && order.deliveryTime() != null)

@@ -19,9 +19,9 @@ import {NgForOf} from '@angular/common';
 export class MenuItemContainerComponent {
   menuItems: MenuItem[] = [];
 
-  constructor(private route: ActivatedRoute,
-              private restaurantService: RestaurantService,
-              private orderService: OrderService) {
+  constructor(private readonly route: ActivatedRoute,
+              private readonly restaurantService: RestaurantService,
+              private readonly orderService: OrderService) {
   }
 
   async ngOnInit(): Promise<void> {
@@ -31,13 +31,8 @@ export class MenuItemContainerComponent {
     });
     const restaurantId = this.route.snapshot.paramMap.get('restaurantId');
     if (!restaurantId) return;
-    if (!this.orderService.getOrderId()) {
-      this.menuItems = await this.restaurantService.getMenu(restaurantId);
-    } else {
-      const order = this.orderService.getSingleOrderLocal();
-      if (order) {
-        this.menuItems = await this.restaurantService.getAvailableMenu(order.deliveryTime);
-      }
-    }
+    this.menuItems = this.orderService.getOrderId()
+      ? await this.restaurantService.getAvailableMenu(this.orderService.getSingleOrderLocal()?.deliveryTime)
+      : await this.restaurantService.getMenu(restaurantId);
   }
 }

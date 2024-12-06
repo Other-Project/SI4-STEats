@@ -62,12 +62,10 @@ export class OrderService {
     return this.singleOrder;
   }
 
-  getSingleOrderLocalStorage(): SingleOrder | undefined {
+  getSingleOrderLocalStorage() {
     const singleOrderString = localStorage.getItem("single-order")
-    if (singleOrderString) {
+    if (singleOrderString)
       return JSON.parse(singleOrderString);
-    }
-    return undefined;
   }
 
   async createGroupOrder(restaurantId: string, addressId: string, deliveryTime: string | undefined): Promise<GroupOrder> {

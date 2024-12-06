@@ -90,27 +90,15 @@ public class ScheduleManager extends AbstractManager<Schedule> {
     public void demo() {
 
         // Schedule for restaurant 1 open every day from 8:00 to 22:00
-        addScheduleForPeriod(3, DayOfWeek.MONDAY, LocalTime.of(8, 0), DayOfWeek.MONDAY, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
-        addScheduleForPeriod(3, DayOfWeek.TUESDAY, LocalTime.of(8, 0), DayOfWeek.TUESDAY, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
-        addScheduleForPeriod(3, DayOfWeek.WEDNESDAY, LocalTime.of(8, 0), DayOfWeek.WEDNESDAY, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
-        addScheduleForPeriod(3, DayOfWeek.THURSDAY, LocalTime.of(8, 0), DayOfWeek.THURSDAY, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
-        addScheduleForPeriod(3, DayOfWeek.FRIDAY, LocalTime.of(8, 0), DayOfWeek.FRIDAY, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
-        addScheduleForPeriod(3, DayOfWeek.SATURDAY, LocalTime.of(8, 0), DayOfWeek.SATURDAY, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
-        addScheduleForPeriod(3, DayOfWeek.SUNDAY, LocalTime.of(8, 0), DayOfWeek.SUNDAY, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
+        for (DayOfWeek day : DayOfWeek.values()) {
+            addScheduleForPeriod(3, day, LocalTime.of(8, 0), day, LocalTime.of(22, 0), "1", Duration.ofMinutes(30));
+        }
 
         // Schedule for restaurant 2 open every day from 11:00-14:00 and 18:00-23:00
-        addScheduleForPeriod(2, DayOfWeek.MONDAY, LocalTime.of(11, 0), DayOfWeek.MONDAY, LocalTime.of(14, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.MONDAY, LocalTime.of(18, 0), DayOfWeek.MONDAY, LocalTime.of(23, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.TUESDAY, LocalTime.of(11, 0), DayOfWeek.TUESDAY, LocalTime.of(14, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.TUESDAY, LocalTime.of(18, 0), DayOfWeek.TUESDAY, LocalTime.of(23, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.WEDNESDAY, LocalTime.of(11, 0), DayOfWeek.WEDNESDAY, LocalTime.of(14, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.WEDNESDAY, LocalTime.of(18, 0), DayOfWeek.WEDNESDAY, LocalTime.of(23, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.THURSDAY, LocalTime.of(11, 0), DayOfWeek.THURSDAY, LocalTime.of(14, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.THURSDAY, LocalTime.of(18, 0), DayOfWeek.THURSDAY, LocalTime.of(23, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.FRIDAY, LocalTime.of(11, 0), DayOfWeek.FRIDAY, LocalTime.of(14, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.FRIDAY, LocalTime.of(18, 0), DayOfWeek.FRIDAY, LocalTime.of(23, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.SATURDAY, LocalTime.of(11, 0), DayOfWeek.SATURDAY, LocalTime.of(14, 0), "2", Duration.ofMinutes(30));
-        addScheduleForPeriod(2, DayOfWeek.SATURDAY, LocalTime.of(18, 0), DayOfWeek.SATURDAY, LocalTime.of(23, 0), "2", Duration.ofMinutes(30));
+        for (DayOfWeek day : DayOfWeek.values()) {
+            addScheduleForPeriod(2, day, LocalTime.of(11, 0), day, LocalTime.of(14, 0), "2", Duration.ofMinutes(30));
+            addScheduleForPeriod(2, day, LocalTime.of(18, 0), day, LocalTime.of(23, 0), "2", Duration.ofMinutes(30));
+        }
 
         // Schedule for restaurant 3 open weekends from 19:00 to 3:00
         addScheduleForPeriod(1, DayOfWeek.SATURDAY, LocalTime.of(19, 0), DayOfWeek.SUNDAY, LocalTime.of(3, 0), "3", Duration.ofMinutes(30));

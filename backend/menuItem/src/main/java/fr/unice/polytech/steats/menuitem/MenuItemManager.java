@@ -52,6 +52,5 @@ public class MenuItemManager extends AbstractManager<MenuItem> {
         add(new MenuItem("8", "Strawberry ice cream", 5.00, Duration.ofMinutes(5), "1"));
         add(new MenuItem("9", "Mint ice cream", 5.00, Duration.ofMinutes(5), "1"));
         add(new MenuItem("10", "Pistachio ice cream", 5.00, Duration.ofMinutes(5), "1"));
-
     }
 }

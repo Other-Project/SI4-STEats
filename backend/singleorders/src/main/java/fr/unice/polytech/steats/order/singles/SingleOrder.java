@@ -209,21 +209,13 @@ public class SingleOrder implements Order {
         MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId); // Check if the menu item exists
         long previousQuantity = orderedItems.getOrDefault(menuItemId, 0);
         if (previousQuantity == quantity) return;
-
-        Duration newPreparationTime;
-        if (previousQuantity > quantity) {
-            newPreparationTime = preparationTime.minus(menuItem.preparationTime().multipliedBy(previousQuantity - quantity));
-        } else {
-            long quantityDelta = previousQuantity + quantity;
-            newPreparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(quantity - previousQuantity));
-            if (!RestaurantServiceHelper.canHandlePreparationTime(restaurantId, newPreparationTime, deliveryTime))
-                throw new IllegalArgumentException("The restaurant can't handle " + (quantityDelta) + " more " + menuItem.name() + " in time");
-        }
+        Duration newPreparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(quantity - previousQuantity));
+        if (quantity > previousQuantity && !RestaurantServiceHelper.canHandlePreparationTime(restaurantId, newPreparationTime, deliveryTime))
+            throw new IllegalArgumentException("The restaurant can't handle " + (quantity - previousQuantity) + " more " + menuItem.name() + " in time");
         if (quantity == 0)
             orderedItems.remove(menuItemId);
         else
             orderedItems.put(menuItemId, quantity);
-
         preparationTime = newPreparationTime;
         updateDiscounts();
     }

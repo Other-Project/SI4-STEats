@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {GroupOrderComponent} from '../components/popup/group-order.component';
-import {CreateOrderComponent} from '../components/popup/create-order/create-order.component';
 import {LoginComponent} from '../components/popup/login/login.component';
 import {MenuItem} from '../models/menuItem.model';
 import {MenuItemDialogComponent} from '../components/menuItem/menu-item-dialog/menu-item-dialog.component';
@@ -11,15 +10,11 @@ import {ComponentType} from '@angular/cdk/portal';
   providedIn: 'root',
 })
 export class PopupService {
-  constructor(private dialog: MatDialog) {
+  constructor(private readonly dialog: MatDialog) {
   }
 
   openGroupPopup() {
     this.dialog.open(GroupOrderComponent);
-  }
-
-  createOrderPopup() {
-    this.dialog.open(CreateOrderComponent);
   }
 
   openLoginPopup() {
@@ -32,8 +27,6 @@ export class PopupService {
       data: menuItem
     });
   }
-
-  // use this open
 
   open(component: ComponentType<any>, config: any, data: any) {
     return this.dialog.open(component, {
