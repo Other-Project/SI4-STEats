@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class OpenAPIGenerator {
+    private static final List<String> HTTP_METHODS = List.of("get", "put", "post", "patch", "delete");
+
     private OpenAPIGenerator() {
     }
 
@@ -18,8 +20,8 @@ public class OpenAPIGenerator {
 
     @SuppressWarnings("java:S135")
     public static OpenAPI generate(OpenAPI.Server server, Class<?>... handlers) {
-        Map<String, Map<String, Path>> routes = new HashMap<>();
-        Map<String, Schema> schemas = new HashMap<>();
+        Map<String, Map<String, Path>> routes = new TreeMap<>();
+        Map<String, Schema> schemas = new TreeMap<>();
         for (var handler : handlers) {
             if (!handler.isAnnotationPresent(ApiMasterRoute.class)) continue;
             var handlerAnnotation = handler.getAnnotation(ApiMasterRoute.class);
@@ -28,7 +30,7 @@ public class OpenAPIGenerator {
                 var routeAnnotation = method.getAnnotation(ApiRoute.class);
 
                 String urlPath = handlerAnnotation.path() + routeAnnotation.path();
-                routes.putIfAbsent(urlPath, new HashMap<>());
+                routes.putIfAbsent(urlPath, new TreeMap<>(Comparator.comparingInt(HTTP_METHODS::indexOf)));
                 if (routes.get(urlPath).containsKey(routeAnnotation.method().toLowerCase())) continue;
 
                 Map<String, Schema> bodyFields = new HashMap<>();
