@@ -102,7 +102,7 @@ export class OrderService {
   }
 
   getOrderId(): string {
-    return this.singleOrder?.id ?? ''
+    return this.singleOrder?.id ?? '';
   }
 
   getGroupCode(): string | undefined {
