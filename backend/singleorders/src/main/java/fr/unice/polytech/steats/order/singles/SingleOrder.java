@@ -265,8 +265,11 @@ public class SingleOrder implements Order {
     @Override
     public Duration getPreparationTime() throws IOException {
         Duration preparationTime = Duration.ZERO;
-        for (Map.Entry<String, Integer> item : items.entrySet())
-            preparationTime = preparationTime.plus(MenuItemServiceHelper.getMenuItem(item.getKey()).preparationTime().multipliedBy(item.getValue()));
+        for (Map.Entry<String, Integer> item : items.entrySet()) {
+            MenuItem menuItem = MenuItemServiceHelper.getMenuItem(item.getKey());
+            if (menuItem == null) throw new IllegalStateException("Menu item " + item.getKey() + " not found");
+            preparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(item.getValue()));
+        }
         return preparationTime;
     }
 
