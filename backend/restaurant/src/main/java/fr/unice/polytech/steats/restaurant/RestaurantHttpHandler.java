@@ -1,107 +1,74 @@
 package fr.unice.polytech.steats.restaurant;
 
-import com.sun.net.httpserver.HttpExchange;
-import fr.unice.polytech.steats.utils.*;
-import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
-import fr.unice.polytech.steats.utils.openapi.ApiRoute;
+import fr.unice.polytech.steats.models.MenuItem;
+import fr.unice.polytech.steats.utils.AbstractHandler;
+import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.openapi.*;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Logger;
 
 @ApiMasterRoute(name = "Restaurants", path = "/api/restaurants")
-public class RestaurantHttpHandler extends AbstractManagerHandler<RestaurantManager, Restaurant> {
+public class RestaurantHttpHandler extends AbstractHandler {
     public RestaurantHttpHandler(String subPath, Logger logger) {
-        super(subPath, Restaurant.class, logger);
+        super(subPath, logger);
     }
 
-    @Override
-    protected RestaurantManager getManager() {
+    private RestaurantManager getManager() {
         return RestaurantManager.getInstance();
     }
 
-    @Override
-    protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}/menu", (exchange, param) -> getMenu(exchange, param, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}/opening-times/{dayOfWeek}", this::getOpeningTimes);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{restaurantId}/canHandle", this::canHandle);
-        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
+    @ApiRoute(method = HttpUtils.GET, path = "", description = "Get all restaurants")
+    public List<Restaurant> getAll() {
+        return getManager().getAll();
     }
 
-    @ApiRoute(path = "/{restaurantId}/canHandle", method = HttpUtils.POST)
-    private void canHandle(HttpExchange exchange, Map<String, String> param) throws IOException {
-        String restaurantId = param.get("restaurantId");
-        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        Restaurant restaurant;
-        try {
-            restaurant = getManager().get(restaurantId);
-        } catch (NotFoundException e) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.NOT_FOUND_CODE, e.getMessage());
-            return;
-        }
-        Duration preparationTime;
-        LocalDateTime deliveryTime;
-        try {
-            String preparationTimeString = body.get("preparationTime").toString();
-            String deliveryTimeString = body.get("deliveryTime").toString();
-            preparationTime = Duration.parse(preparationTimeString);
-            deliveryTime = LocalDateTime.parse(deliveryTimeString);
-        } catch (NullPointerException | DateTimeParseException e) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.close();
-            return;
-        }
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.canHandle(preparationTime, deliveryTime));
+    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Add a restaurant")
+    public Restaurant add(@ApiBodyParam Restaurant restaurant) {
+        getManager().add(restaurant);
+        return restaurant;
     }
 
-    @ApiRoute(path = "/{id}/opening-times/{dayOfWeek}", method = HttpUtils.GET)
-    private void getOpeningTimes(HttpExchange exchange, Map<String, String> param) throws IOException {
-        String restaurantId = param.get("id");
-        String dayOfWeek = param.get("dayOfWeek");
-        DayOfWeek day;
-        try {
-            day = DayOfWeek.valueOf(dayOfWeek.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, "Invalid day of week");
-            return;
-        }
-        try {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().get(restaurantId).getOpeningTimes(day));
-        } catch (NotFoundException e) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.NOT_FOUND_CODE, e.getMessage());
-        }
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", description = "Get a restaurant")
+    public Restaurant get(@ApiPathParam(name = "id", description = "ID of the restaurant to get") String id) throws NotFoundException {
+        return getManager().get(id);
     }
 
-    @ApiRoute(path = "/{id}/menu", method = HttpUtils.GET)
-    private void getMenu(HttpExchange exchange, Map<String, String> param, Map<String, String> query) throws IOException {
-        String restaurantId = param.get("id");
-        String deliveryTimeString = query.get("deliveryTime");
-        Restaurant restaurant;
-        try {
-            restaurant = getManager().get(restaurantId);
-        } catch (NotFoundException e) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.NOT_FOUND_CODE, e.getMessage());
-            return;
-        }
-        if (deliveryTimeString != null) {
-            LocalDateTime deliveryTime;
-            try {
-                deliveryTime = LocalDateTime.parse(deliveryTimeString);
-            } catch (DateTimeParseException e) {
-                exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-                exchange.close();
-                return;
-            }
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.getAvailableMenu(deliveryTime));
-        } else {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, restaurant.getFullMenu());
-        }
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", description = "Remove a restaurant")
+    public void remove(@ApiPathParam(name = "id", description = "ID of the restaurant to delete") String id) throws NotFoundException {
+        getManager().remove(id);
+    }
+
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}/menu", description = "Get the menu of a restaurant")
+    public List<MenuItem> getMenu(
+            @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
+            @ApiQueryParam(name = "deliveryTime", description = "Only gets the menu available for the given date-time") LocalDateTime deliveryTime
+    ) throws IOException, NotFoundException {
+        Restaurant restaurant = getManager().get(id);
+        if (deliveryTime != null) return restaurant.getAvailableMenu(deliveryTime);
+        return restaurant.getFullMenu();
+    }
+
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandle", description = "Check if a restaurant can handle an order")
+    public boolean canHandle(
+            @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
+            @ApiBodyParam(name = "preparationTime", description = "The time it takes to prepare the order") Duration preparationTime,
+            @ApiBodyParam(name = "deliveryTime", description = "The time of delivery") LocalDateTime deliveryTime
+    ) throws IOException, NotFoundException {
+        Restaurant restaurant = getManager().get(id);
+        return restaurant.canHandle(preparationTime, deliveryTime);
+    }
+
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}/opening-times/{dayOfWeek}", description = "Get the opening times of a restaurant for a given day of the week")
+    public List<OpeningTime> getOpeningTimes(
+            @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
+            @ApiPathParam(name = "dayOfWeek", description = "Day of the week") DayOfWeek dayOfWeek
+    ) throws IOException, NotFoundException {
+        return getManager().get(id).getOpeningTimes(dayOfWeek);
     }
 }

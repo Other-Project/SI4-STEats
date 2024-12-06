@@ -55,8 +55,8 @@ public class SingleOrderHttpHandler extends AbstractHandler {
 
     @ApiRoute(method = HttpUtils.POST, path = "", summary = "Join a group order")
     public JsonResponse<SingleOrder> create(
-            @ApiBodyParam(name = "userId") String userId,
-            @ApiBodyParam(name = "groupCode") String groupCode
+            @ApiBodyParam(name = "userId", description = "ID of the user that wants to order") String userId,
+            @ApiBodyParam(name = "groupCode", description = "Code of the group order to join") String groupCode
     ) throws IOException {
         return create(new SingleOrder(userId, groupCode));
     }
@@ -88,7 +88,7 @@ public class SingleOrderHttpHandler extends AbstractHandler {
     @ApiRoute(method = HttpUtils.POST, path = "/{id}/status", summary = "Set the status of a single order")
     public void setStatus(
             @ApiPathParam(name = "id", description = "ID of the single order") String id,
-            @ApiBodyParam(name = "status") Status status
+            @ApiBodyParam(name = "status", description = "The new status of the order") Status status
     ) throws NotFoundException {
         SingleOrderManager.getInstance().get(id).setStatus(status);
     }
@@ -96,7 +96,7 @@ public class SingleOrderHttpHandler extends AbstractHandler {
     @ApiRoute(method = HttpUtils.POST, path = "/{id}/deliveryTime", summary = "Set the delivery time of a single order")
     public void setDeliveryTime(
             @ApiPathParam(name = "id", description = "ID of the single order") String id,
-            @ApiBodyParam(name = "deliveryTime") LocalDateTime deliveryTime
+            @ApiBodyParam(name = "deliveryTime", description = "The time at which the order should be delivered") LocalDateTime deliveryTime
     ) throws NotFoundException {
         SingleOrderManager.getInstance().get(id).setDeliveryTime(deliveryTime);
     }
