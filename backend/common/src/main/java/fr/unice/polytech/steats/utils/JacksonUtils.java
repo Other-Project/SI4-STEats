@@ -44,7 +44,11 @@ public class JacksonUtils {
     }
 
     public static <T> T fromJson(InputStream json, Class<T> clazz) throws IOException {
-        return fromJson(new String(json.readAllBytes(), StandardCharsets.UTF_8), TypeFactory.defaultInstance().constructType(clazz));
+        return fromJson(new String(json.readAllBytes(), StandardCharsets.UTF_8), clazz);
+    }
+
+    public static <T> T fromJson(String json, Class<T> clazz) throws IOException {
+        return fromJson(json, TypeFactory.defaultInstance().constructType(clazz));
     }
 
     public static <K, V> Map<K, V> mapFromJson(InputStream json) throws IOException {

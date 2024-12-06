@@ -1,6 +1,5 @@
 package fr.unice.polytech.steats.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -61,7 +60,7 @@ public class AbstractHandler implements HttpHandler {
         }
     }
 
-    private HttpResponse handleMethodCall(Method method, Map<String, String> uriParam, Map<String, String> queryParams, InputStream body) throws InvocationTargetException, IllegalAccessException, JsonProcessingException {
+    private HttpResponse handleMethodCall(Method method, Map<String, String> uriParam, Map<String, String> queryParams, InputStream body) throws InvocationTargetException, IllegalAccessException, IOException {
         JsonNode bodyJson;
         try {
             bodyJson = JacksonUtils.getMapper().readTree(body);
@@ -77,7 +76,7 @@ public class AbstractHandler implements HttpHandler {
         return new JsonResponse<>(returnValue);
     }
 
-    private Object getArgument(Parameter arg, Map<String, String> uriParam, Map<String, String> queryParams, JsonNode bodyJson) {
+    private Object getArgument(Parameter arg, Map<String, String> uriParam, Map<String, String> queryParams, JsonNode bodyJson) throws IOException {
         if (arg.isAnnotationPresent(ApiBodyParam.class)) {
             ApiBodyParam bodyParam = arg.getAnnotation(ApiBodyParam.class);
             if (bodyJson == null && bodyParam.required()) throw new IllegalArgumentException("Missing required body");
@@ -88,10 +87,15 @@ public class AbstractHandler implements HttpHandler {
                 throw new IllegalArgumentException("Missing required body parameter " + bodyParam.name());
             return null;
         } else if (arg.isAnnotationPresent(ApiPathParam.class))
-            return uriParam.get(arg.getAnnotation(ApiPathParam.class).name());
+            return readStringAsClass(uriParam.get(arg.getAnnotation(ApiPathParam.class).name()), arg.getType());
         else if (arg.isAnnotationPresent(ApiQueryParam.class))
-            return queryParams.get(arg.getAnnotation(ApiQueryParam.class).name());
+            return readStringAsClass(queryParams.get(arg.getAnnotation(ApiQueryParam.class).name()), arg.getType());
         else throw new IllegalDeclarationException("Undeclared parameter type (" + arg + ")");
+    }
+
+    private <T> T readStringAsClass(String text, Class<T> tClass) throws IOException {
+        if (text == null || text.isBlank()) return null;
+        return JacksonUtils.fromJson("\"" + text + "\"", tClass);
     }
 
     @Override
