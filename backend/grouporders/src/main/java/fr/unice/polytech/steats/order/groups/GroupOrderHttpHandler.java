@@ -28,7 +28,7 @@ public class GroupOrderHttpHandler extends AbstractHandler {
         return getManager().getAll();
     }
 
-    @ApiRoute(path = "", method = HttpUtils.PUT, summary = "Add a new group order")
+    @ApiRoute(path = "", method = HttpUtils.PUT, summary = "Add a new group order", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse add(
             @ApiBodyParam GroupOrder groupOrder
     ) {
@@ -44,11 +44,10 @@ public class GroupOrderHttpHandler extends AbstractHandler {
     }
 
     @ApiRoute(path = "/{id}/close", method = HttpUtils.POST, summary = "Closes a group order")
-    public HttpResponse close(
+    public void close(
             @ApiPathParam(name = "id", description = "ID of the group order to close") String id
     ) throws IOException, NotFoundException {
         GroupOrderManager.getInstance().get(id).closeOrder();
-        return new HttpResponse(HttpUtils.NO_CONTENT_CODE);
     }
 
     @ApiRoute(path = "/{id}/users", method = HttpUtils.GET, summary = "Get all users' id of a group order")

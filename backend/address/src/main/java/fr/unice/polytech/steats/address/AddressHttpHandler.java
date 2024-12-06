@@ -28,7 +28,7 @@ public class AddressHttpHandler extends AbstractHandler {
         return getManager().getAll();
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new address")
+    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new address", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse create(@ApiBodyParam Address address) {
         getManager().add(address);
         return new HttpResponse(HttpUtils.CREATED_CODE);

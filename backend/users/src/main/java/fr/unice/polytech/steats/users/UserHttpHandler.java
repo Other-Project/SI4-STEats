@@ -27,7 +27,7 @@ public class UserHttpHandler extends AbstractHandler {
         return getManager().getAll();
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new user")
+    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new user", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse create(@ApiBodyParam User user) {
         getManager().add(user);
         return new HttpResponse(HttpUtils.CREATED_CODE);

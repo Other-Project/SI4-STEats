@@ -24,4 +24,9 @@ public @interface ApiRoute {
      * Description of the route
      */
     String description() default "";
+
+    /**
+     * Success response status code
+     */
+    int successStatus() default 200;
 }

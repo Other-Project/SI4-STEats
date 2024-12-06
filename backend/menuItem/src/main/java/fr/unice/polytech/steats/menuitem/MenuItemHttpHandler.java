@@ -29,7 +29,7 @@ public class MenuItemHttpHandler extends AbstractHandler {
         return getManager().getAll();
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new menu item")
+    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new menu item", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse create(@ApiBodyParam MenuItem menuItem) {
         getManager().add(menuItem);
         return new HttpResponse(HttpUtils.CREATED_CODE);

@@ -30,7 +30,7 @@ public class ScheduleHttpHandler extends AbstractHandler {
         return getManager().getSchedule(restaurantId, startTime, endTime);
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new schedule")
+    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new schedule", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse create(@ApiBodyParam Schedule schedule) {
         getManager().add(schedule);
         return new HttpResponse(HttpUtils.CREATED_CODE);

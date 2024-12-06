@@ -1,7 +1,13 @@
 package fr.unice.polytech.steats.utils.openapi;
 
+import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.NotFoundException;
+
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OpenAPIGenerator {
     private static final List<String> HTTP_METHODS = List.of("get", "put", "post", "patch", "delete");
@@ -58,18 +64,17 @@ public class OpenAPIGenerator {
                 Path.RequestBody requestBody = bodyFields.isEmpty() ? null : new Path.RequestBody(Map.of(
                         "application/json", new Path.Content(bodyFields.containsKey("") ? bodyFields.get("") : new Schema(bodyFields, null, null))
                 ));
+
                 Schema.SchemaDefinition responseSchema = Schema.getSchema(method.getGenericReturnType());
                 if (responseSchema != null) schemas.putAll(responseSchema.declaredSchema());
-                Map<String, Path.Response> responses = Map.of(
-                        "200", new Path.Response("Success", responseSchema == null ? null : Map.of("application/json", new Path.Content(responseSchema.refSchema()))) // TODO : All success codes are not 200 and error codes are not handled
-                );
+
                 Path path = new Path(
                         List.of(handlerAnnotation.name()),
                         routeAnnotation.summary().isBlank() ? null : routeAnnotation.summary(),
                         routeAnnotation.description().isBlank() ? null : routeAnnotation.description(),
                         parameters,
                         requestBody,
-                        responses
+                        getResponses(method, routeAnnotation, responseSchema)
                 );
                 routes.get(urlPath).put(routeAnnotation.method().toLowerCase(), path);
             }
@@ -77,5 +82,16 @@ public class OpenAPIGenerator {
 
         OpenAPI.Info info = new OpenAPI.Info("STEats", "STEats API", "1.0.0");
         return new OpenAPI("3.1.0", info, List.of(server), routes, new OpenAPI.Schemas(schemas));
+    }
+
+    private static Map<String, Path.Response> getResponses(Method method, ApiRoute routeAnnotation, Schema.SchemaDefinition responseSchema) {
+        return Stream.concat(Stream.of(Map.entry(
+                method.getReturnType() == void.class ? HttpUtils.NO_CONTENT_CODE : routeAnnotation.successStatus(),
+                new Path.Response("Success", responseSchema == null ? null : Map.of("application/json", new Path.Content(responseSchema.refSchema())))
+        )), Arrays.stream(method.getExceptionTypes()).map(exception -> {
+            if (exception == NotFoundException.class) return Map.entry(404, new Path.Response("Not Found", null));
+            if (exception == ConnectException.class) return Map.entry(502, new Path.Response("Connection to sub-service failed", null));
+            return Map.entry(500, new Path.Response("An error occurred while processing the request", null));
+        })).collect(Collectors.toMap(e -> String.valueOf(e.getKey()), Map.Entry::getValue));
     }
 }
