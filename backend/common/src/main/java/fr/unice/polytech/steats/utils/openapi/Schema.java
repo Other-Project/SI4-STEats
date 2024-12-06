@@ -6,10 +6,13 @@ import fr.unice.polytech.steats.utils.HttpResponse;
 import fr.unice.polytech.steats.utils.JsonResponse;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,24 +24,28 @@ import java.util.stream.Stream;
  * @see <a href="https://swagger.io/specification/#schema-object">Schema Object (Swagger documentation)</a>
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record Schema(String $ref, String type, String format, String title, Map<String, Schema> properties, Schema additionalProperties, Schema items,
+public record Schema(String $ref, String type, String format, String pattern, String title, Map<String, Schema> properties, Schema additionalProperties, Schema items,
                      @JsonProperty("enum") List<String> enumValues) {
     public static final String REF_PREFIX = "#/components/schemas/";
 
     private Schema(String type, String format) {
-        this(null, type, format, null, null, null, null, null);
+        this(type, format, null);
+    }
+
+    private Schema(String type, String format, String pattern) {
+        this(null, type, format, pattern, null, null, null, null, null);
     }
 
     public Schema(Map<String, Schema> properties, Schema additionalProperties, String title) {
-        this(null, "object", null, title, properties, additionalProperties, null, null);
+        this(null, "object", null, null, title, properties, additionalProperties, null, null);
     }
 
     private Schema(Schema items) {
-        this(null, "array", null, null, null, null, items, null);
+        this(null, "array", null, null, null, null, null, items, null);
     }
 
     private Schema(String refClass) {
-        this(REF_PREFIX + refClass, null, null, null, null, null, null, null);
+        this(REF_PREFIX + refClass, null, null, null, null, null, null, null, null);
     }
 
     private static SchemaDefinition getSchema(Class<?> type) {
@@ -52,15 +59,21 @@ public record Schema(String $ref, String type, String format, String title, Map<
         }
 
         if (type.isEnum())
-            return new SchemaDefinition(new Schema(null, "string", null, null, null, null, null, Arrays.stream(type.getEnumConstants()).map(Object::toString).toList()));
+            return new SchemaDefinition(new Schema(null, "string", null, null, null, null, null, null, Arrays.stream(type.getEnumConstants()).map(Object::toString).toList()));
         if (type == LocalDate.class)
             return new SchemaDefinition(new Schema("string", "date"));
         if (type == LocalDateTime.class)
             return new SchemaDefinition(new Schema("string", "date-time"));
+        if (type == LocalTime.class)
+            return new SchemaDefinition(new Schema("string", "time", "^(?:[01]\\d|2[0-3]):(?:[0-5]\\d):(?:[0-5]\\d)$"));
+        if (type == Duration.class)
+            return new SchemaDefinition(new Schema("string", null, "^PT((?:[01]\\d|2[0-3])H)?((?:[0-5]\\d)M)?((?:[0-5]\\d)S)?$"));
         if (type == String.class)
             return new SchemaDefinition(new Schema("string", null));
 
 
+        if (type == Byte.class || type == byte.class)
+            return new SchemaDefinition(new Schema("integer", "int8"));
         if (type == Integer.class || type == int.class)
             return new SchemaDefinition(new Schema("integer", "int32"));
         if (type == Long.class || type == long.class)
@@ -75,6 +88,7 @@ public record Schema(String $ref, String type, String format, String title, Map<
         Map<String, Schema> properties = new HashMap<>();
         List<Map<String, Schema>> declaredSchema = new ArrayList<>();
         for (Field field : type.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) continue;
             var fieldSchemaDef = getSchema(field.getGenericType());
             properties.put(field.getName(), fieldSchemaDef.refSchema);
             declaredSchema.add(fieldSchemaDef.declaredSchema);
