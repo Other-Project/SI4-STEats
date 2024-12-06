@@ -1,43 +1,47 @@
 package fr.unice.polytech.steats.menuitem;
 
-import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.models.MenuItem;
-import fr.unice.polytech.steats.utils.AbstractManagerHandler;
-import fr.unice.polytech.steats.utils.ApiRegistry;
+import fr.unice.polytech.steats.utils.AbstractHandler;
+import fr.unice.polytech.steats.utils.HttpResponse;
 import fr.unice.polytech.steats.utils.HttpUtils;
-import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
-import fr.unice.polytech.steats.utils.openapi.ApiRoute;
+import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.openapi.*;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Logger;
 
 @ApiMasterRoute(name = "Menu items", path = "/api/menu-items")
-public class MenuItemHttpHandler extends AbstractManagerHandler<MenuItemManager, MenuItem> {
+public class MenuItemHttpHandler extends AbstractHandler {
 
     protected MenuItemHttpHandler(String subPath, Logger logger) {
-        super(subPath, MenuItem.class, logger);
+        super(subPath, logger);
     }
 
-    @Override
-    protected MenuItemManager getManager() {
+    private MenuItemManager getManager() {
         return MenuItemManager.getInstance();
     }
 
-    @Override
-    protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, params) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
+    @ApiRoute(method = HttpUtils.GET, path = "/", description = "Get all menu items")
+    public List<MenuItem> getAll(
+            @ApiQueryParam(name = "restaurantId", description = "ID of the restaurant where the menu items are served") String restaurantId
+    ) {
+        if (restaurantId != null) return getManager().getByRestaurant(restaurantId);
+        return getManager().getAll();
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET)
-    private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
-        if (query.containsKey("restaurantId")) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getByRestaurant(query.get("restaurantId")));
-        } else {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
-        }
+    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new menu item")
+    public HttpResponse create(@ApiBodyParam MenuItem menuItem) {
+        getManager().add(menuItem);
+        return new HttpResponse(HttpUtils.CREATED_CODE);
+    }
+
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", description = "Get a menu item by its id")
+    public MenuItem get(@ApiPathParam(name = "id", description = "ID of the menu item") String id) throws NotFoundException {
+        return getManager().get(id);
+    }
+
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", description = "Remove a menu item by its id")
+    public void remove(@ApiPathParam(name = "id", description = "ID of the menu item to remove") String id) throws NotFoundException {
+        getManager().remove(id);
     }
 }

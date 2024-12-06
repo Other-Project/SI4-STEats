@@ -1,63 +1,48 @@
 package fr.unice.polytech.steats.schedule;
 
-import com.sun.net.httpserver.HttpExchange;
-import fr.unice.polytech.steats.utils.AbstractManagerHandler;
-import fr.unice.polytech.steats.utils.ApiRegistry;
+import fr.unice.polytech.steats.utils.AbstractHandler;
+import fr.unice.polytech.steats.utils.HttpResponse;
 import fr.unice.polytech.steats.utils.HttpUtils;
-import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
-import fr.unice.polytech.steats.utils.openapi.ApiRoute;
+import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.openapi.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Logger;
 
 @ApiMasterRoute(name = "Schedules", path = "/api/schedules")
-public class ScheduleHttpHandler extends AbstractManagerHandler<ScheduleManager, Schedule> {
+public class ScheduleHttpHandler extends AbstractHandler {
     public ScheduleHttpHandler(String subPath, Logger logger) {
-        super(subPath, Schedule.class, logger);
+        super(subPath, logger);
     }
 
-    @Override
-    protected ScheduleManager getManager() {
+    private ScheduleManager getManager() {
         return ScheduleManager.getInstance();
     }
 
-    @Override
-    protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> add(exchange));
-        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
+    @ApiRoute(method = HttpUtils.GET, path = "", description = "Get all schedules")
+    public List<Schedule> getAll(
+            @ApiQueryParam(name = "restaurantId", description = "ID of the restaurant concerned by the schedule") String restaurantId,
+            @ApiQueryParam(name = "startTime", description = "Start date") LocalDateTime startTime,
+            @ApiQueryParam(name = "endTime", description = "End date") LocalDateTime endTime
+    ) {
+        if (restaurantId == null && startTime == null && endTime == null) return getManager().getAll();
+        return getManager().getSchedule(restaurantId, startTime, endTime);
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.GET)
-    private void getAll(HttpExchange exchange, Map<String, String> query) throws IOException {
-        if (query.isEmpty()) {
-            super.getAll(exchange);
-            return;
-        }
-        String restaurantId = query.get("restaurantId");
-        String startTime = query.get("startTime");
-        String endTime = query.get("endTime");
-        LocalDateTime start = null;
-        LocalDateTime end = null;
-        if (startTime != null) {
-            try {
-                start = LocalDateTime.parse(startTime);
-            } catch (Exception e) {
-                HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, "Invalid start time");
-                return;
-            }
-        }
-        if (endTime != null) {
-            try {
-                end = LocalDateTime.parse(endTime);
-            } catch (Exception e) {
-                HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, "Invalid end time");
-                return;
-            }
-        }
-        HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getSchedule(restaurantId, start, end));
+    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new schedule")
+    public HttpResponse create(@ApiBodyParam Schedule schedule) {
+        getManager().add(schedule);
+        return new HttpResponse(HttpUtils.CREATED_CODE);
+    }
+
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", description = "Get a schedule by its id")
+    public Schedule get(@ApiPathParam(name = "id", description = "ID of the schedule") String id) throws NotFoundException {
+        return getManager().get(id);
+    }
+
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", description = "Remove a schedule by its id")
+    public void remove(@ApiPathParam(name = "id", description = "ID of the schedule to remove") String id) throws NotFoundException {
+        getManager().remove(id);
     }
 }

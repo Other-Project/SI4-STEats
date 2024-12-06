@@ -72,6 +72,7 @@ public class AbstractHandler implements HttpHandler {
         int i = 0;
         for (Parameter arg : method.getParameters()) args[i++] = getArgument(arg, uriParam, queryParams, bodyJson);
         Object returnValue = method.invoke(this, args);
+        if (returnValue == null) return new HttpResponse(HttpUtils.NO_CONTENT_CODE);
         if (returnValue instanceof HttpResponse response) return response;
         return new JsonResponse<>(returnValue);
     }
