@@ -1,9 +1,24 @@
 .create-group-order-container {
-  height: 175px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  max-width: 100%;
+  overflow: hidden;
+
+  mat-form-field {
+    width: 70%;
+
+    input[type="time"] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+
+  button {
+    width: 70%;
+  }
 
   .warn-icon {
     font-size: 2rem;

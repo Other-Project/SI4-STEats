@@ -6,7 +6,7 @@ import fr.unice.polytech.steats.models.Status;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an order taken by a registered user
@@ -59,9 +59,9 @@ public interface Order extends Saleable {
     LocalDateTime getOrderTime();
 
     /**
-     * Get the list of the items id's in the order
+     * Get the ordered items id's and their quantity
      */
-    List<String> getItems() throws IOException;
+    Map<String, Integer> getItems() throws IOException;
 
     /**
      * Set the delivery time of the order

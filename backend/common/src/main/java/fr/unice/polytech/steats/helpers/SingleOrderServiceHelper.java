@@ -3,9 +3,9 @@ package fr.unice.polytech.steats.helpers;
 
 import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.models.SingleOrder;
+import fr.unice.polytech.steats.models.Status;
 import fr.unice.polytech.steats.utils.HttpUtils;
 import fr.unice.polytech.steats.utils.JacksonUtils;
-import fr.unice.polytech.steats.models.Status;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +56,20 @@ public class SingleOrderServiceHelper {
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.listFromJson(response.body(), SingleOrder.class);
+    }
+
+    /**
+     * Get all orders of a user in a specific restaurant with a minimum status.
+     *
+     * @param userId       The id of the user
+     * @param restaurantId The id of the restaurant
+     * @param minStatus    The minimum status of the orders
+     */
+    public static List<SingleOrder> getOrdersByUserInRestaurantPastStatus(String userId, String restaurantId, Status minStatus) throws IOException {
+        // TODO : call the service instead of filtering in the helper
+        return getOrdersByUserInRestaurant(userId, restaurantId).stream()
+                .filter(order -> order.status().compareTo(minStatus) >= 0)
+                .toList();
     }
 
     /**

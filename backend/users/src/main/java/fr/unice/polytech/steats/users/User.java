@@ -53,16 +53,4 @@ public class User {
     public Role getRole() {
         return role;
     }
-
-// TODO: Migrate this
-
-//    /**
-//     * Get the discounts to apply to the next order
-//     *
-//     * @param restaurantId The id of the restaurant where the user wants to order
-//     */
-//    public List<Discount> getDiscountsToApplyNext(String restaurantId) {
-//        List<SingleOrder> orders = getOrders(restaurantId);
-//        return orders.isEmpty() ? Collections.emptyList() : orders.getLast().getDiscountsToApplyNext();
-//    }
 }

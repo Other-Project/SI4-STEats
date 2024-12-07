@@ -21,6 +21,6 @@ public class PaymentsHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("payments", API_ADDRESS, new PaymentsHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler(new PaymentsHttpHandler(API_ADDRESS, getLogger()));
     }
 }

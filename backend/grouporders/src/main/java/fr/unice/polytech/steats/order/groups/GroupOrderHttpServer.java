@@ -21,6 +21,6 @@ public class GroupOrderHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("groups", API_ADDRESS, new GroupOrderHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler(new GroupOrderHttpHandler(API_ADDRESS, getLogger()));
     }
 }

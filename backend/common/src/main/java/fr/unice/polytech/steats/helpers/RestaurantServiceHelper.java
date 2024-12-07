@@ -73,4 +73,37 @@ public class RestaurantServiceHelper {
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
         return JacksonUtils.listFromJson(response.body(), MenuItem.class);
     }
+
+    /**
+     * Check if the restaurant can add an order.
+     *
+     * @param restaurantId The id of the restaurant
+     * @param deliveryTime The delivery time of the order
+     */
+    public static boolean canAddOrder(String restaurantId, LocalDateTime deliveryTime) throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(RESTAURANT_SERVICE_URI.resolve(restaurantId + "/canAddOrder"))
+                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("deliveryTime", deliveryTime))))
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        return JacksonUtils.fromJson(response.body(), Boolean.class);
+    }
+
+    /**
+     * Check if the restaurant can handle a quantity of menuItems represented by their total preparation time at a given time
+     *
+     * @param restaurantId    The id of the restaurant
+     * @param preparationTime The time it takes to prepare the additional menuItems
+     * @param deliveryTime    The time of delivery
+     */
+    public static boolean canHandlePreparationTime(String restaurantId, Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(RESTAURANT_SERVICE_URI.resolve(restaurantId + "/canHandlePreparationTime"))
+                .header(HttpUtils.ACCEPT, HttpUtils.APPLICATION_JSON)
+                .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("deliveryTime", deliveryTime, "preparationTime", preparationTime))))
+                .build();
+        HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
+        return JacksonUtils.fromJson(response.body(), Boolean.class);
+    }
 }

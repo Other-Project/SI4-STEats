@@ -42,10 +42,15 @@ public class MenuItemManager extends AbstractManager<MenuItem> {
     }
 
     public void demo() {
-        add(new MenuItem("1", "Pizza", 10.00, Duration.ofMinutes(15), "1"));
-        add(new MenuItem("2", "Pasta", 12.50, Duration.ofMinutes(4000), "1"));
+        add(new MenuItem("1", "Pizza", 10.00, Duration.ofMinutes(40), "1"));
+        add(new MenuItem("2", "Pasta", 12.50, Duration.ofMinutes(15), "1"));
         add(new MenuItem("3", "Salad", 8.00, Duration.ofMinutes(3), "2"));
         add(new MenuItem("4", "Burger", 15.00, Duration.ofMinutes(10), "3"));
         add(new MenuItem("5", "Sushi", 20.00, Duration.ofMinutes(15), "4"));
+        add(new MenuItem("6", "Chocolate ice cream", 5.00, Duration.ofMinutes(5), "1"));
+        add(new MenuItem("7", "Vanilla ice cream", 5.00, Duration.ofMinutes(5), "1"));
+        add(new MenuItem("8", "Strawberry ice cream", 5.00, Duration.ofMinutes(5), "1"));
+        add(new MenuItem("9", "Mint ice cream", 5.00, Duration.ofMinutes(5), "1"));
+        add(new MenuItem("10", "Pistachio ice cream", 5.00, Duration.ofMinutes(5), "1"));
     }
 }

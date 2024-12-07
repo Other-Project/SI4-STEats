@@ -8,9 +8,11 @@ export interface SingleOrder {
   addressId: string;
   restaurantId: string;
   status: Status;
-  items: string[];
+  orderedItems: { [key: string]: number };
+  items: { [key: string]: number };
   discounts: string[];
   preparationTime: string;
   orderTime: Date;
+  subPrice: number;
   price: number;
 }

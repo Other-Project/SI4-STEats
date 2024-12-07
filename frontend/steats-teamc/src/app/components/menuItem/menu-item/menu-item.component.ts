@@ -17,10 +17,14 @@ export class MenuItemComponent {
   }
 
   openDialog(): void {
+    if (!this.orderService.getSingleOrderLocal()) {
+      alert("You must be logged in");
+      return;
+    }
     const dialogRef = this.popupService.openMenuItemDialog(this.menuItem);
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.orderService.addMenuItemToOrder(this.menuItem.id, result.quantity);
+        this.orderService.changeMenuItemOfOrder(this.menuItem.id, result.quantity);
       }
     });
   }

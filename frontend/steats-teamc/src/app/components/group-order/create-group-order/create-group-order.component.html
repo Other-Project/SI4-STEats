@@ -1,21 +1,32 @@
-<div *ngIf="userId" class="create-group-order-container">
-  <mat-form-field>
-    <mat-label>Delivery Time</mat-label>
-    <input matInput [formControl]="deliveryTime">
-    <mat-error *ngIf="deliveryTime.invalid">Delivery time is required</mat-error>
-  </mat-form-field>
-
-  <mat-form-field>
-    <mat-label>Address ID</mat-label>
-    <input matInput [formControl]="addressId">
-    <mat-error *ngIf="addressId.invalid">Address ID is required</mat-error>
-  </mat-form-field>
-
-  <button mat-button (click)="createGroupOrder()">Create group order</button>
-
-  <div *ngIf="groupOrderCode">
-    <p>Group Order Code: {{ groupOrderCode }}</p>
+<div *ngIf="userId" class="create-group-order-container" #addressContainer>
+  <div *ngIf="groupCode; else noGroupOrder">
+    <p>Group Order Code: {{ groupCode }}</p>
   </div>
+  <ng-template #noGroupOrder>
+    <mat-form-field>
+      <mat-label>Delivery Date</mat-label>
+      <input matInput [matDatepicker]="picker" [formControl]="deliveryDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Delivery Time</mat-label>
+      <input matInput type="time" [formControl]="deliveryTime">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Address</mat-label>
+      <mat-select [formControl]="addressId">
+        <mat-option *ngFor="let address of addresses" [value]="address.label">
+          {{ address.label }} - {{ address.street }}, {{ address.city }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="addressId.invalid">Address is required</mat-error>
+    </mat-form-field>
+
+    <button mat-button (click)="createGroupOrder()">Create group order</button>
+  </ng-template>
 </div>
 <div *ngIf="!userId" class="create-group-order-container">
   <fa-icon class="warn-icon" [icon]="faWarning"></fa-icon>

@@ -1,5 +1,6 @@
 package fr.unice.polytech.steats.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class HttpUtils {
     public static final int OK_CODE = 200;
     public static final int CREATED_CODE = 201;
     public static final int NO_CONTENT_CODE = 204;
+    public static final int MOVED_PERMANENTLY_CODE = 301;
     public static final int BAD_REQUEST_CODE = 400;
     public static final int NOT_FOUND_CODE = 404;
     public static final int INTERNAL_SERVER_ERROR_CODE = 500;
@@ -55,6 +57,21 @@ public class HttpUtils {
     }
 
     /**
+     * Send a raw JSON response.
+     *
+     * @param exchange The HTTP exchange
+     * @param code     The status code
+     * @param jsonText   The JSON string to send
+     */
+    public static void sendRawJsonResponse(HttpExchange exchange, int code, String jsonText) throws IOException {
+        var json = jsonText.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().add(CONTENT_TYPE, APPLICATION_JSON);
+        exchange.sendResponseHeaders(code, json.length);
+        exchange.getResponseBody().write(json);
+        exchange.close();
+    }
+
+    /**
      * Send a JSON response.
      *
      * @param exchange The HTTP exchange
@@ -62,11 +79,18 @@ public class HttpUtils {
      * @param object   The object to send
      */
     public static void sendJsonResponse(HttpExchange exchange, int code, Object object) throws IOException {
-        exchange.getResponseHeaders().add(CONTENT_TYPE, APPLICATION_JSON);
-        var json = JacksonUtils.toJson(object).getBytes(StandardCharsets.UTF_8);
-        exchange.sendResponseHeaders(code, json.length);
-        exchange.getResponseBody().write(json);
-        exchange.close();
+        sendRawJsonResponse(exchange, code, JacksonUtils.toJson(object));
+    }
+
+    /**
+     * Send a JSON response.
+     *
+     * @param exchange The HTTP exchange
+     * @param code     The status code
+     * @param object   The JSON object to send
+     */
+    public static void sendJsonResponse(HttpExchange exchange, int code, JsonNode object) throws IOException {
+        sendRawJsonResponse(exchange, code, JacksonUtils.toJson(object));
     }
 
     /**

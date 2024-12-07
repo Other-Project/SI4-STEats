@@ -21,6 +21,6 @@ public class UserHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("users", API_ADDRESS, new UserHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler(new UserHttpHandler(API_ADDRESS, getLogger()));
     }
 }
