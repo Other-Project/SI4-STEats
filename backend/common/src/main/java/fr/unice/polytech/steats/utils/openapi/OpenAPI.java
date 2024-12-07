@@ -2,6 +2,7 @@ package fr.unice.polytech.steats.utils.openapi;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -57,7 +58,7 @@ public record OpenAPI(String openapi, Info info, List<Server> servers, Map<Strin
      *
      * @param proxiedOpenAPIs The list of OpenAPIs to merge with the current OpenAPI.
      */
-    public OpenAPI merge(List<OpenAPI> proxiedOpenAPIs) {
+    public OpenAPI merge(Collection<OpenAPI> proxiedOpenAPIs) {
         if (proxiedOpenAPIs.isEmpty()) return this;
 
         Map<String, Map<String, Path>> mergedPath = new TreeMap<>(paths);
