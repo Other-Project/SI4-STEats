@@ -64,6 +64,7 @@ public record OpenAPI(String openapi, Info info, List<Server> servers, Map<Strin
         Map<String, Map<String, Path>> mergedPath = new TreeMap<>(paths);
         Map<String, Schema> mergedComponents = new TreeMap<>(components.schemas());
         for (var proxiedOpenApi : proxiedOpenAPIs) {
+            if (proxiedOpenApi == null) continue;
             mergedPath.putAll(proxiedOpenApi.paths());
             mergedComponents.putAll(proxiedOpenApi.components().schemas());
         }
