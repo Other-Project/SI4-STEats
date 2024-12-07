@@ -20,7 +20,7 @@ public class OrderHttpHandler extends AbstractHandler {
         super(subPath, logger);
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "", description = "Get all orders")
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all orders")
     public List<IOrder> getAll(
             @ApiQueryParam(name = "restaurantId", description = "The ID of the restaurant where the order was placed") String restaurantId
     ) throws IOException {

@@ -23,23 +23,23 @@ public class AddressHttpHandler extends AbstractHandler {
         return AddressManager.getInstance();
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "", description = "Get all addresses")
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all addresses")
     public List<Address> getAll() {
         return getManager().getAll();
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new address", successStatus = HttpUtils.CREATED_CODE)
+    @ApiRoute(method = HttpUtils.PUT, path = "", summary = "Create a new address", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse create(@ApiBodyParam Address address) {
         getManager().add(address);
         return new HttpResponse(HttpUtils.CREATED_CODE);
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "/{id}", description = "Get an address by its id")
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", summary = "Get an address by its id")
     public Address get(@ApiPathParam(name = "id", description = "ID of the address") String id) throws NotFoundException {
         return getManager().get(id);
     }
 
-    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", description = "Remove an address by its id")
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", summary = "Remove an address by its id")
     public void remove(@ApiPathParam(name = "id", description = "ID of the address to remove") String id) throws NotFoundException {
         getManager().remove(id);
     }

@@ -23,28 +23,28 @@ public class RestaurantHttpHandler extends AbstractHandler {
         return RestaurantManager.getInstance();
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "", description = "Get all restaurants")
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all restaurants")
     public List<Restaurant> getAll() {
         return getManager().getAll();
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Add a restaurant")
+    @ApiRoute(method = HttpUtils.PUT, path = "", summary = "Add a restaurant")
     public Restaurant add(@ApiBodyParam Restaurant restaurant) {
         getManager().add(restaurant);
         return restaurant;
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "/{id}", description = "Get a restaurant")
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", summary = "Get a restaurant")
     public Restaurant get(@ApiPathParam(name = "id", description = "ID of the restaurant to get") String id) throws NotFoundException {
         return getManager().get(id);
     }
 
-    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", description = "Remove a restaurant")
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", summary = "Remove a restaurant")
     public void remove(@ApiPathParam(name = "id", description = "ID of the restaurant to delete") String id) throws NotFoundException {
         getManager().remove(id);
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "/{id}/menu", description = "Get the menu of a restaurant")
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}/menu", summary = "Get the menu of a restaurant")
     public List<MenuItem> getMenu(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
             @ApiQueryParam(name = "deliveryTime", description = "Only gets the menu available for the given date-time") LocalDateTime deliveryTime,
@@ -55,7 +55,7 @@ public class RestaurantHttpHandler extends AbstractHandler {
         return restaurant.getFullMenu();
     }
 
-    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandlePreparationTime", description = "Can the restaurant handle an order of a given preparation time for a given delivery date-time")
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandlePreparationTime", summary = "Can the restaurant handle an order of a given preparation time for a given delivery date-time")
     public boolean canHandlePreparationTime(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
             @ApiQueryParam(name = "deliveryTime", description = "Time of delivery of the order") LocalDateTime deliveryTime,
@@ -65,7 +65,7 @@ public class RestaurantHttpHandler extends AbstractHandler {
         return restaurant.canHandlePreparationTime(preparationTime, deliveryTime);
     }
 
-    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canAddOrder", description = "")
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canAddOrder", summary = "Can the restaurant add an order for a given delivery date-time")
     public boolean canAddOrder(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
             @ApiQueryParam(name = "deliveryTime", description = "Wanted delivery time") LocalDateTime deliveryTime
@@ -74,7 +74,7 @@ public class RestaurantHttpHandler extends AbstractHandler {
         return restaurant.canAddOrder(deliveryTime);
     }
 
-    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandle", description = "Check if a restaurant can handle an order")
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandle", summary = "Check if a restaurant can handle an order")
     public boolean canHandle(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
             @ApiBodyParam(name = "preparationTime", description = "The time it takes to prepare the order") Duration preparationTime,
@@ -84,7 +84,7 @@ public class RestaurantHttpHandler extends AbstractHandler {
         return restaurant.canHandle(preparationTime, deliveryTime);
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "/{id}/opening-times/{dayOfWeek}", description = "Get the opening times of a restaurant for a given day of the week")
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}/opening-times/{dayOfWeek}", summary = "Get the opening times of a restaurant for a given day of the week")
     public List<OpeningTime> getOpeningTimes(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
             @ApiPathParam(name = "dayOfWeek", description = "Day of the week") DayOfWeek dayOfWeek

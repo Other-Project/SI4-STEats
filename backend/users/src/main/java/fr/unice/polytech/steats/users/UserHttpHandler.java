@@ -22,23 +22,23 @@ public class UserHttpHandler extends AbstractHandler {
         return UserManager.getInstance();
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "", description = "Get all users")
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all users")
     public List<User> getAll() {
         return getManager().getAll();
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new user", successStatus = HttpUtils.CREATED_CODE)
+    @ApiRoute(method = HttpUtils.PUT, path = "", summary = "Create a new user", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse create(@ApiBodyParam User user) {
         getManager().add(user);
         return new HttpResponse(HttpUtils.CREATED_CODE);
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "/{id}", description = "Get a user by its id")
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", summary = "Get a user by its id")
     public User get(@ApiPathParam(name = "id", description = "ID of the user") String id) throws NotFoundException {
         return getManager().get(id);
     }
 
-    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", description = "Remove a user by its id")
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", summary = "Remove a user by its id")
     public void remove(@ApiPathParam(name = "id", description = "ID of the user to remove") String id) throws NotFoundException {
         getManager().remove(id);
     }

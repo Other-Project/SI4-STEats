@@ -20,7 +20,7 @@ public class ScheduleHttpHandler extends AbstractHandler {
         return ScheduleManager.getInstance();
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "", description = "Get all schedules")
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all schedules")
     public List<Schedule> getAll(
             @ApiQueryParam(name = "restaurantId", description = "ID of the restaurant concerned by the schedule") String restaurantId,
             @ApiQueryParam(name = "startTime", description = "Start date") LocalDateTime startTime,
@@ -30,18 +30,18 @@ public class ScheduleHttpHandler extends AbstractHandler {
         return getManager().getSchedule(restaurantId, startTime, endTime);
     }
 
-    @ApiRoute(method = HttpUtils.PUT, path = "", description = "Create a new schedule", successStatus = HttpUtils.CREATED_CODE)
+    @ApiRoute(method = HttpUtils.PUT, path = "", summary = "Create a new schedule", successStatus = HttpUtils.CREATED_CODE)
     public HttpResponse create(@ApiBodyParam Schedule schedule) {
         getManager().add(schedule);
         return new HttpResponse(HttpUtils.CREATED_CODE);
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "/{id}", description = "Get a schedule by its id")
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", summary = "Get a schedule by its id")
     public Schedule get(@ApiPathParam(name = "id", description = "ID of the schedule") String id) throws NotFoundException {
         return getManager().get(id);
     }
 
-    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", description = "Remove a schedule by its id")
+    @ApiRoute(method = HttpUtils.DELETE, path = "/{id}", summary = "Remove a schedule by its id")
     public void remove(@ApiPathParam(name = "id", description = "ID of the schedule to remove") String id) throws NotFoundException {
         getManager().remove(id);
     }
