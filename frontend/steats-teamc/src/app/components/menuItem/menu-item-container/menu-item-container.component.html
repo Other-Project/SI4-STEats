@@ -1,6 +1,5 @@
 <div class="menu-list">
-  <app-menu-item
-    *ngFor="let menuItem of menuItems"
-    [menuItem]="menuItem">
-  </app-menu-item>
+  <div *ngFor="let menuItem of menuItems">
+    <app-menu-item [menuItem]="menuItem"></app-menu-item>
+  </div>
 </div>

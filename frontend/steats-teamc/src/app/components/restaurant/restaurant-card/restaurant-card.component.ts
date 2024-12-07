@@ -10,7 +10,7 @@ import {Restaurant} from '../../../models/restaurant.model';
 export class RestaurantCardComponent {
   @Input() restaurant!: Restaurant;
 
-  constructor(private router: Router) {
+  constructor(private readonly router: Router) {
   }
 
   onCardClick(): void {

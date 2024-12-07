@@ -25,6 +25,7 @@ public class SingleOrder implements Order {
     private final LocalDateTime orderTime;
     private final Map<String, Integer> orderedItems;
     private final Map<String, Integer> items;
+    private Duration preparationTime = Duration.ZERO;
     private double subPrice;
     private double price;
     private final String addressId;
@@ -205,11 +206,17 @@ public class SingleOrder implements Order {
         if (status != Status.INITIALISED)
             throw new IllegalStateException("Can't modify an order that has already been paid");
         if (quantity < 0) throw new IllegalArgumentException("Quantity must be positive");
-        if (quantity == 0) orderedItems.remove(menuItemId);
-        else {
-            MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId); // Check if the menu item exists
-            orderedItems.put(menuItem.id(), quantity);
-        }
+        MenuItem menuItem = MenuItemServiceHelper.getMenuItem(menuItemId); // Check if the menu item exists
+        long previousQuantity = orderedItems.getOrDefault(menuItemId, 0);
+        if (previousQuantity == quantity) return;
+        Duration newPreparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(quantity - previousQuantity));
+        if (quantity > previousQuantity && !RestaurantServiceHelper.canHandlePreparationTime(restaurantId, newPreparationTime, deliveryTime))
+            throw new IllegalArgumentException("The restaurant can't handle " + (quantity - previousQuantity) + " more " + menuItem.name() + " in time");
+        if (quantity == 0)
+            orderedItems.remove(menuItemId);
+        else
+            orderedItems.put(menuItemId, quantity);
+        preparationTime = newPreparationTime;
         updateDiscounts();
     }
 
@@ -263,13 +270,7 @@ public class SingleOrder implements Order {
      * @implNote The total preparation time of all the items in the order
      */
     @Override
-    public Duration getPreparationTime() throws IOException {
-        Duration preparationTime = Duration.ZERO;
-        for (Map.Entry<String, Integer> item : items.entrySet()) {
-            MenuItem menuItem = MenuItemServiceHelper.getMenuItem(item.getKey());
-            if (menuItem == null) throw new IllegalStateException("Menu item " + item.getKey() + " not found");
-            preparationTime = preparationTime.plus(menuItem.preparationTime().multipliedBy(item.getValue()));
-        }
+    public Duration getPreparationTime() {
         return preparationTime;
     }
 

@@ -104,11 +104,11 @@ public class SingleOrderHttpHandler extends AbstractHandler {
     @ApiRoute(method = HttpUtils.POST, path = "/{id}/modifyCartItem", summary = "Add/Modify/Remove a menu item in cart")
     public SingleOrder modifyCartItem(
             @ApiPathParam(name = "id", description = "ID of the single order") String id,
-            @ApiBodyParam(name = "menuItem", description = "The menu item to add/modify/remove form the cart") String menuItem,
+            @ApiBodyParam(name = "menuItemId", description = "The id of the menu item to add/modify/remove form the cart") String menuItemId,
             @ApiBodyParam(name = "quantity", description = "Quantity to set (0 to remove)") int quantity
     ) throws NotFoundException, IOException {
         SingleOrder order = SingleOrderManager.getInstance().get(id);
-        order.modifyMenuItem(menuItem, quantity);
+        order.modifyMenuItem(menuItemId, quantity);
         return order;
     }
 }

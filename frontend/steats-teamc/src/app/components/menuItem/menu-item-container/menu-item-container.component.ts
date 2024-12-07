@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {RestaurantService} from '../../../services/restaurant.service';
 import {MenuItem} from '../../../models/menuItem.model';
+import {OrderService} from '../../../services/order.service';
 import {MenuItemComponent} from '../menu-item/menu-item.component';
 import {NgForOf} from '@angular/common';
 
@@ -18,20 +19,20 @@ import {NgForOf} from '@angular/common';
 export class MenuItemContainerComponent {
   menuItems: MenuItem[] = [];
 
-  constructor(private route: ActivatedRoute, private restaurantService: RestaurantService) {
+  constructor(private readonly route: ActivatedRoute,
+              private readonly restaurantService: RestaurantService,
+              private readonly orderService: OrderService) {
   }
 
-  ngOnInit(): void {
-    const restaurantId = this.route.snapshot.paramMap.get('id');
-    if (restaurantId) {
-      this.restaurantService.getMenu(restaurantId).subscribe({
-        next: (menu) => {
-          this.menuItems = menu;
-        },
-        error: (error) => {
-          console.error('Error fetching menu', error);
-        }
-      });
-    }
+  async ngOnInit(): Promise<void> {
+    this.restaurantService.availableMenu$.subscribe((menu) => {
+      if (menu)
+        this.menuItems = menu;
+    });
+    const restaurantId = this.route.snapshot.paramMap.get('restaurantId');
+    if (!restaurantId) return;
+    this.menuItems = this.orderService.getOrderId()
+      ? await this.restaurantService.getAvailableMenu(this.orderService.getSingleOrderLocal()?.deliveryTime)
+      : await this.restaurantService.getMenu(restaurantId);
   }
 }

@@ -47,11 +47,31 @@ public class RestaurantHttpHandler extends AbstractHandler {
     @ApiRoute(method = HttpUtils.GET, path = "/{id}/menu", description = "Get the menu of a restaurant")
     public List<MenuItem> getMenu(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
-            @ApiQueryParam(name = "deliveryTime", description = "Only gets the menu available for the given date-time") LocalDateTime deliveryTime
+            @ApiQueryParam(name = "deliveryTime", description = "Only gets the menu available for the given date-time") LocalDateTime deliveryTime,
+            @ApiQueryParam(name = "preparationTime", description = "Current order preparation time") Duration preparationTime
     ) throws IOException, NotFoundException {
         Restaurant restaurant = getManager().get(id);
-        if (deliveryTime != null) return restaurant.getAvailableMenu(deliveryTime);
+        if (deliveryTime != null) return restaurant.getAvailableMenu(deliveryTime, preparationTime == null ? Duration.ZERO : preparationTime);
         return restaurant.getFullMenu();
+    }
+
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandlePreparationTime", description = "Can the restaurant handle an order of a given preparation time for a given delivery date-time")
+    public boolean canHandlePreparationTime(
+            @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
+            @ApiQueryParam(name = "deliveryTime", description = "Time of delivery of the order") LocalDateTime deliveryTime,
+            @ApiQueryParam(name = "preparationTime", description = "Order preparation time") Duration preparationTime
+    ) throws IOException, NotFoundException {
+        Restaurant restaurant = getManager().get(id);
+        return restaurant.canHandlePreparationTime(preparationTime, deliveryTime);
+    }
+
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/canAddOrder", description = "")
+    public boolean canAddOrder(
+            @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
+            @ApiQueryParam(name = "deliveryTime", description = "Wanted delivery time") LocalDateTime deliveryTime
+    ) throws IOException, NotFoundException {
+        Restaurant restaurant = getManager().get(id);
+        return restaurant.canAddOrder(deliveryTime);
     }
 
     @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandle", description = "Check if a restaurant can handle an order")

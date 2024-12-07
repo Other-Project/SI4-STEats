@@ -23,8 +23,10 @@ public class Restaurant {
     private final Duration scheduleDuration;
     private static final Duration MAX_PREPARATION_DURATION_BEFORE_DELIVERY = Duration.ofHours(2);
     private static final Duration DELIVERY_TIME_RESTAURANT = Duration.ofMinutes(10);
-
+    private static final int RECALC_FREQUENCY = 10;
     private static final int RELEVANT_NUMBER_OF_ORDER_FOR_MEAN_CALCULATION = 50;
+    private Duration averagePreparationTime = Duration.ofMinutes(20);
+    private int count = 0;
 
     /**
      * Create a restaurant
@@ -80,7 +82,7 @@ public class Restaurant {
      */
     @JsonIgnore
     public List<MenuItem> getFullMenu() throws IOException {
-        return MenuItemServiceHelper.getMenuItemByRestaurantId(getId());
+        return MenuItemServiceHelper.getMenuItemByRestaurantId(id);
     }
 
     /**
@@ -100,36 +102,86 @@ public class Restaurant {
     /**
      * The part of the menu that can be prepared and delivered in time
      *
-     * @param arrivalTime Wanted time of delivery
+     * @param arrivalTime          Wanted time of delivery
+     * @param orderPreparationTime The time it takes to prepare the additional menuItems
      */
-    public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime) throws IOException {
-        List<MenuItem> menu = MenuItemServiceHelper.getMenuItemByRestaurantId(getId());
+    public List<MenuItem> getAvailableMenu(LocalDateTime arrivalTime, Duration orderPreparationTime) throws IOException {
+        List<MenuItem> menu = MenuItemServiceHelper.getMenuItemByRestaurantId(id);
         if (arrivalTime == null) return menu;
         Duration maxCapacity = getMaxCapacityLeft(arrivalTime);
         return menu.stream().filter(menuItem -> {
             assert maxCapacity != null;
-            return !maxCapacity.minus(menuItem.preparationTime()).isNegative();
+            return !maxCapacity.minus(menuItem.preparationTime().plus(orderPreparationTime)).isNegative();
         }).toList();
+    }
+
+    /**
+     * Check if the restaurant can handle a quantity of menuItems represented by their total preparation time at a given time
+     *
+     * @param preparationTime The time it takes to prepare the additional menuItems
+     * @param deliveryTime    The time of delivery
+     */
+    public boolean canHandlePreparationTime(Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
+        if (deliveryTime == null) return true;
+        return getMaxCapacityLeft(deliveryTime).compareTo(preparationTime) >= 0;
+    }
+
+    /**
+     * Check if the restaurant add an order at a given time independently of the preparation time
+     *
+     * @param deliveryTime The time of delivery
+     */
+    public boolean canAddOrder(LocalDateTime deliveryTime) throws IOException {
+        List<Schedule> schedulesBefore2Hours = ScheduleServiceHelper.getScheduleForDeliveryTime(id, deliveryTime, MAX_PREPARATION_DURATION_BEFORE_DELIVERY).stream()
+                .sorted(Comparator.comparing(Schedule::start))
+                .toList();
+        List<Order> orders = OrderServiceHelper.getOrderPastStatus(id, Status.INITIALISED, LocalDateTime.of(deliveryTime.toLocalDate(), schedulesBefore2Hours.getFirst().start()), LocalDateTime.of(deliveryTime.toLocalDate(), schedulesBefore2Hours.getLast().end()));
+        return canAddOrder(deliveryTime, orders);
     }
 
     /**
      * Check if the restaurant can handle an order at a given time
      *
-     * @param preparationTime The time it takes to prepare the order
+     * @param preparationTime The time it takes to prepare the additional menuItems
      * @param deliveryTime    The time of delivery
      */
     public boolean canHandle(Duration preparationTime, LocalDateTime deliveryTime) throws IOException {
-        if (deliveryTime == null) return true;
-        Duration maxCapacity = getMaxCapacityLeft(deliveryTime);
-        return maxCapacity.compareTo(preparationTime) >= 0 && canAddOrder(deliveryTime, maxCapacity);
+        List<Schedule> schedulesBefore2Hours = ScheduleServiceHelper.getScheduleForDeliveryTime(id, deliveryTime, MAX_PREPARATION_DURATION_BEFORE_DELIVERY).stream()
+                .sorted(Comparator.comparing(Schedule::start))
+                .toList();
+        List<Order> order = OrderServiceHelper.getOrderPastStatus(id, Status.PAID, LocalDateTime.of(deliveryTime.toLocalDate(), schedulesBefore2Hours.getFirst().start()), LocalDateTime.of(deliveryTime.toLocalDate(), schedulesBefore2Hours.getLast().end()));
+        return canHandlePreparationTime(preparationTime, deliveryTime, order, schedulesBefore2Hours) && canAddOrder(deliveryTime, order);
     }
 
-    private boolean canAddOrder(LocalDateTime deliveryTime, Duration maxCapacity) throws IOException {
-        List<Order> orders = OrderServiceHelper.getOrderByRestaurant(id);
+    private boolean canHandlePreparationTime(Duration preparationTime, LocalDateTime deliveryTime, List<Order> orders, List<Schedule> schedulesBefore2Hours) {
+        if (deliveryTime == null) return true;
+        return getMaxCapacityLeft(orders, schedulesBefore2Hours).compareTo(preparationTime) >= 0;
+    }
+
+    private Duration getMaxCapacityLeft(List<Order> orders, List<Schedule> schedulesBefore2Hours) {
+        Duration maxCapacity = Duration.ZERO;
+        for (Schedule schedule : schedulesBefore2Hours) {
+            List<Order> ordersInSchedule = orders.stream()
+                    .filter(order -> !schedule.start().isAfter(order.deliveryTime().toLocalTime())
+                            && schedule.end().isAfter(order.deliveryTime().toLocalTime()))
+                    .toList();
+            Duration capacity = capacityLeft(schedule, ordersInSchedule);
+            if (capacity.compareTo(maxCapacity) > 0) maxCapacity = capacity;
+        }
+        return maxCapacity;
+    }
+
+    private Duration capacityLeft(Schedule schedule, List<Order> orders) {
+        Duration totalPreparationTimeOrders = orders.stream()
+                .map(Order::preparationTime)
+                .reduce(Duration.ZERO, Duration::plus);
+        return schedule.totalCapacity().minus(totalPreparationTimeOrders);
+    }
+
+    private boolean canAddOrder(LocalDateTime deliveryTime, List<Order> orders) throws IOException {
         if (deliveryTime == null || orders.isEmpty()) return true;
-        long averagePreparationTime = getAveragePreparationTime().toMinutes();
-        if (averagePreparationTime == 0) return true;
-        long maxNbOfOrder = maxCapacity.toMinutes() / averagePreparationTime;
+        long newAveragePreparationTime = getAveragePreparationTime().toMinutes();
+        long maxNbOfOrder = getMaxCapacityLeft(deliveryTime).toMinutes() / newAveragePreparationTime;
         long currentNbOfOrder = orders.stream()
                 .filter(order -> order.status() == Status.INITIALISED)
                 .count();
@@ -137,6 +189,10 @@ public class Restaurant {
     }
 
     private Duration getAveragePreparationTime() throws IOException {
+        if (count++ % RECALC_FREQUENCY != 0) {
+            return averagePreparationTime;
+        }
+        count = 1;
         List<Order> orders = OrderServiceHelper.getOrderByRestaurant(id);
         List<Duration> lastOrderDurations = orders.reversed().stream()
                 .filter(order -> order.status().compareTo(Status.PAID) >= 0 && order.deliveryTime() != null)
@@ -144,9 +200,10 @@ public class Restaurant {
                 .map(Order::preparationTime)
                 .toList();
         if (lastOrderDurations.isEmpty()) return Duration.ZERO;
-        return lastOrderDurations.stream()
+        averagePreparationTime = lastOrderDurations.stream()
                 .reduce(Duration.ZERO, Duration::plus)
                 .dividedBy(lastOrderDurations.size());
+        return averagePreparationTime;
     }
 
     /**
@@ -174,7 +231,7 @@ public class Restaurant {
 
     private Duration getMaxCapacityLeft(LocalDateTime arrivalTime) throws IOException {
         LocalDateTime deliveryTime = arrivalTime.minus(DELIVERY_TIME_RESTAURANT);
-        Set<Schedule> schedulesBefore2Hours = new HashSet<>(ScheduleServiceHelper.getScheduleForDeliveryTime(getId(), deliveryTime, MAX_PREPARATION_DURATION_BEFORE_DELIVERY));
+        Set<Schedule> schedulesBefore2Hours = new HashSet<>(ScheduleServiceHelper.getScheduleForDeliveryTime(id, deliveryTime, MAX_PREPARATION_DURATION_BEFORE_DELIVERY));
         Duration maxCapacity = Duration.ZERO;
         for (Schedule schedule : schedulesBefore2Hours) {
             Duration capacity = capacityLeft(schedule, deliveryTime.toLocalDate());
@@ -189,7 +246,7 @@ public class Restaurant {
      * @param day The day of the week
      */
     public List<OpeningTime> getOpeningTimes(DayOfWeek day) throws IOException {
-        List<Schedule> scheduleList = ScheduleServiceHelper.getScheduleByRestaurantIdAndWeekday(getId(), day);
+        List<Schedule> scheduleList = ScheduleServiceHelper.getScheduleByRestaurantIdAndWeekday(id, day);
         List<OpeningTime> intervals = new ArrayList<>();
         OpeningTime currentInterval = null;
         for (Schedule schedule : scheduleList) {
@@ -203,30 +260,6 @@ public class Restaurant {
             currentInterval.setEnd(LocalTime.of(23, 59, 59));
         if (currentInterval != null) intervals.add(currentInterval);
         return intervals;
-    }
-
-    /**
-     * Add schedules for a period of time
-     *
-     * @param nbPersons The number of working persons for the schedule
-     * @param startDay  The day of the week to start the period
-     * @param startTime The time to start the period
-     * @param endDay    The day of the week to end the period
-     * @param endTime   The time to end the period
-     */
-    public void addScheduleForPeriod(int nbPersons, DayOfWeek startDay, LocalTime startTime, DayOfWeek endDay, LocalTime endTime) throws IOException {
-        DayOfWeek day = startDay;
-        long seconds = Math.ceilDiv(startTime.toSecondOfDay(), getScheduleDuration().toSeconds()) * getScheduleDuration().toSeconds();  // round the start time to the nearest schedule
-        if (seconds >= 86400) {
-            seconds = 0;
-            day = day.plus(1);
-        }
-        LocalTime time = LocalTime.ofSecondOfDay(seconds);
-        for (; day != endDay || (!time.plus(getScheduleDuration()).isAfter(endTime) && !time.plus(getScheduleDuration()).equals(LocalTime.MIN)); time = time.plus(getScheduleDuration())) {
-            ScheduleServiceHelper.addSchedule(new Schedule(UUID.randomUUID().toString(), time, getScheduleDuration(), nbPersons, day, getId(), time.plus(getScheduleDuration()), getScheduleDuration().multipliedBy(nbPersons)));
-            if (time.equals(LocalTime.of(0, 0).minus(getScheduleDuration())))
-                day = day.plus(1);
-        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 .join-group-order-container {
-  height: 175px;
   display: flex;
+  overflow: hidden;
+  height: auto;
   flex-direction: column;
   justify-content: center;
   align-items: center;

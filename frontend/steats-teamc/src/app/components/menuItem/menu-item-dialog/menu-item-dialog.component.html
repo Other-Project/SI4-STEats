@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>{{ data.name }}</h1>
+<div mat-dialog-content>
+  <img [src]="data.imageUrl" alt="{{ data.name }}" class="menu-image">
+  <p>Price: {{ data.price }}</p>
+  <mat-form-field>
+    <mat-label>Quantity</mat-label>
+    <input matInput [formControl]="quantity" type="number">
+    <mat-error *ngIf="quantity.invalid">Please enter a valid quantity</mat-error>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button (click)="onAddToCart()" [disabled]="quantity.invalid">Add to Cart</button>
+</div>
