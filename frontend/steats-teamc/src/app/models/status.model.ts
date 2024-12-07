@@ -1,5 +1,5 @@
 export type Status =
-  'INITIAL'
+  'INITIALISED'
   | 'PAID'
   | 'IN_PREPARATION'
   | 'READY_FOR_DELIVERY'

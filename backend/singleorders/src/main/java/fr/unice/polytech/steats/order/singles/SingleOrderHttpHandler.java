@@ -54,7 +54,7 @@ public class SingleOrderHttpHandler extends AbstractHandler {
     }
 
     @ApiRoute(method = HttpUtils.POST, path = "", summary = "Join a group order")
-    public JsonResponse<SingleOrder> create(
+    public JsonResponse<SingleOrder> join(
             @ApiBodyParam(name = "userId", description = "ID of the user that wants to order") String userId,
             @ApiBodyParam(name = "groupCode", description = "Code of the group order to join") String groupCode
     ) throws IOException {

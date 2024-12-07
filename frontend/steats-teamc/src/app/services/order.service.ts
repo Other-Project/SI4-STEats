@@ -69,7 +69,7 @@ export class OrderService {
   }
 
   async createGroupOrder(restaurantId: string, addressId: string, deliveryTime: string | undefined): Promise<GroupOrder> {
-    this.groupOrder = await lastValueFrom(this.http.post<GroupOrder>(`${this.groupApiUrl}`, {
+    this.groupOrder = await lastValueFrom(this.http.put<GroupOrder>(`${this.groupApiUrl}`, {
       restaurantId,
       addressId,
       deliveryTime

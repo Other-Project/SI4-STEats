@@ -16,6 +16,8 @@ export class JoinGroupOrderComponent {
   public groupForm: FormControl<string> = new FormControl('', {validators: [Validators.required], nonNullable: true});
   public groupCode: string | undefined;
 
+  @Input() userId: string | null;
+
   constructor(private readonly orderService: OrderService, private readonly restaurantService: RestaurantService, private readonly userService: UserService, private readonly router: Router) {
     this.orderService.groupOrder$.subscribe(groupOrder => {
       this.groupCode = groupOrder?.groupCode;
