@@ -1,8 +1,10 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
 import {UserService} from '../../../services/user.service';
 import {Router} from '@angular/router';
+import {addWarning} from "@angular-devkit/build-angular/src/utils/webpack-diagnostics";
+import {faWarning} from '@fortawesome/free-solid-svg-icons';
 import {RestaurantService} from '../../../services/restaurant.service';
 
 @Component({
@@ -14,10 +16,13 @@ export class JoinGroupOrderComponent {
   public groupForm: FormControl<string> = new FormControl('', {validators: [Validators.required], nonNullable: true});
   public groupCode: string | undefined;
 
+  @Input() userId: string | null;
+
   constructor(private readonly orderService: OrderService, private readonly restaurantService: RestaurantService, private readonly userService: UserService, private readonly router: Router) {
     this.orderService.groupOrder$.subscribe(groupOrder => {
       this.groupCode = groupOrder?.groupCode;
     });
+    this.userId = this.userService.getUserId();
   }
 
   public async joinGroupOrder() {
@@ -34,4 +39,7 @@ export class JoinGroupOrderComponent {
       console.error('Failed to join group order:', error);
     }
   }
+
+    protected readonly addWarning = addWarning;
+  protected readonly faWarning = faWarning;
 }

@@ -58,8 +58,8 @@ public class RestaurantHttpHandler extends AbstractHandler {
     @ApiRoute(method = HttpUtils.POST, path = "/{id}/canHandlePreparationTime", summary = "Can the restaurant handle an order of a given preparation time for a given delivery date-time")
     public boolean canHandlePreparationTime(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
-            @ApiQueryParam(name = "deliveryTime", description = "Time of delivery of the order") LocalDateTime deliveryTime,
-            @ApiQueryParam(name = "preparationTime", description = "Order preparation time") Duration preparationTime
+            @ApiBodyParam(name = "deliveryTime", description = "Time of delivery of the order") LocalDateTime deliveryTime,
+            @ApiBodyParam(name = "preparationTime", description = "Order preparation time") Duration preparationTime
     ) throws IOException, NotFoundException {
         Restaurant restaurant = getManager().get(id);
         return restaurant.canHandlePreparationTime(preparationTime, deliveryTime);
@@ -68,7 +68,7 @@ public class RestaurantHttpHandler extends AbstractHandler {
     @ApiRoute(method = HttpUtils.POST, path = "/{id}/canAddOrder", summary = "Can the restaurant add an order for a given delivery date-time")
     public boolean canAddOrder(
             @ApiPathParam(name = "id", description = "ID of the restaurant") String id,
-            @ApiQueryParam(name = "deliveryTime", description = "Wanted delivery time") LocalDateTime deliveryTime
+            @ApiBodyParam(name = "deliveryTime", description = "Wanted delivery time") LocalDateTime deliveryTime
     ) throws IOException, NotFoundException {
         Restaurant restaurant = getManager().get(id);
         return restaurant.canAddOrder(deliveryTime);

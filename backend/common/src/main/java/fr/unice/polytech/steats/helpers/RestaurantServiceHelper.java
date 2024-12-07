@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -87,7 +88,11 @@ public class RestaurantServiceHelper {
                 .POST(HttpRequest.BodyPublishers.ofString(JacksonUtils.toJson(Map.of("deliveryTime", deliveryTime))))
                 .build();
         HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
-        return JacksonUtils.fromJson(response.body(), Boolean.class);
+        try (InputStream is = response.body()) {
+            if (response.statusCode() >= 400)
+                throw new IOException(new String(is.readAllBytes(), StandardCharsets.UTF_8));
+            return JacksonUtils.fromJson(is, Boolean.class);
+        }
     }
 
     /**

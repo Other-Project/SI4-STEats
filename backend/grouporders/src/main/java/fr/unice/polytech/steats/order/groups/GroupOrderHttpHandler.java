@@ -1,8 +1,9 @@
 package fr.unice.polytech.steats.order.groups;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.unice.polytech.steats.utils.AbstractHandler;
-import fr.unice.polytech.steats.utils.HttpResponse;
 import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.JsonResponse;
 import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.utils.openapi.*;
 
@@ -29,11 +30,11 @@ public class GroupOrderHttpHandler extends AbstractHandler {
     }
 
     @ApiRoute(path = "", method = HttpUtils.PUT, summary = "Add a new group order", successStatus = HttpUtils.CREATED_CODE)
-    public HttpResponse add(
+    public JsonResponse<GroupOrder> add(
             @ApiBodyParam GroupOrder groupOrder
-    ) {
+    ) throws JsonProcessingException {
         getManager().add(groupOrder);
-        return new HttpResponse(HttpUtils.CREATED_CODE);
+        return new JsonResponse<>(HttpUtils.CREATED_CODE, groupOrder);
     }
 
     @ApiRoute(path = "/{id}", method = HttpUtils.GET, summary = "Get a group order by its ID")

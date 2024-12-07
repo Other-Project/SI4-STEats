@@ -1,9 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {OrderService} from '../../../services/order.service';
 import {Router} from '@angular/router';
 import {UserService} from '../../../services/user.service';
 import {RestaurantService} from '../../../services/restaurant.service';
+import {PopupService} from '../../../services/popup.service';
+import {faWarning} from '@fortawesome/free-solid-svg-icons';
 import {AddressService} from '../../../services/address.service';
 import {Address} from '../../../models/address.model';
 import {DatePipe} from '@angular/common';
@@ -15,6 +17,7 @@ import {DatePipe} from '@angular/common';
   providers: [DatePipe]
 })
 export class CreateGroupOrderComponent implements OnInit {
+  @Input() public userId: string | null;
   public deliveryDate: FormControl<Date | null> = new FormControl(null);
   public deliveryTime: FormControl<string | null> = new FormControl(null);
   public addressId: FormControl<string> = new FormControl('', {validators: [Validators.required], nonNullable: true});
@@ -32,6 +35,7 @@ export class CreateGroupOrderComponent implements OnInit {
     this.orderService.groupOrder$.subscribe(groupOrder => {
       this.groupCode = groupOrder?.groupCode;
     });
+    this.userId = this.userService.getUserId();
   }
 
   async ngOnInit() {
@@ -63,4 +67,6 @@ export class CreateGroupOrderComponent implements OnInit {
       console.error('Failed to create or join group order:', error);
     }
   }
+
+  protected readonly faWarning = faWarning;
 }

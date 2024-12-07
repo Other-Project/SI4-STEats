@@ -51,7 +51,7 @@ public class SingleOrderManager extends AbstractManager<SingleOrder> {
             if (item.getDeliveryTime() != null && !RestaurantServiceHelper.canAddOrder(item.getRestaurantId(), item.getDeliveryTime()))
                 throw new IllegalArgumentException("The restaurant can't handle the order at this delivery time");
         } catch (IOException e) {
-            throw new IllegalStateException("Bad request" + e.getMessage());
+            throw new IllegalStateException("Bad request", e);
         }
         super.add(item.getId(), item);
     }

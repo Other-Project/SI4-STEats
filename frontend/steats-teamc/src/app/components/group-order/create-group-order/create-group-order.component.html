@@ -1,4 +1,4 @@
-<div class="create-group-order-container" #addressContainer>
+<div *ngIf="userId" class="create-group-order-container" #addressContainer>
   <div *ngIf="groupCode; else noGroupOrder">
     <p>Group Order Code: {{ groupCode }}</p>
   </div>
@@ -27,4 +27,10 @@
 
     <button mat-button (click)="createGroupOrder()">Create group order</button>
   </ng-template>
+</div>
+<div *ngIf="!userId" class="create-group-order-container">
+  <fa-icon class="warn-icon" [icon]="faWarning"></fa-icon>
+  <p class="error-message"> You must first be logged in
+    to create a group order !
+  </p>
 </div>

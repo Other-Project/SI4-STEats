@@ -21,7 +21,7 @@ public class MenuItemHttpHandler extends AbstractHandler {
         return MenuItemManager.getInstance();
     }
 
-    @ApiRoute(method = HttpUtils.GET, path = "/", summary = "Get all menu items")
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all menu items")
     public List<MenuItem> getAll(
             @ApiQueryParam(name = "restaurantId", description = "ID of the restaurant where the menu items are served") String restaurantId
     ) {
