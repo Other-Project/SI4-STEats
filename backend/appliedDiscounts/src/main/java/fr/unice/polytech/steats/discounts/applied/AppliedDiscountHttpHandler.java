@@ -1,8 +1,10 @@
 package fr.unice.polytech.steats.discounts.applied;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.unice.polytech.steats.models.AppliedDiscount;
 import fr.unice.polytech.steats.utils.AbstractHandler;
 import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.JsonResponse;
 import fr.unice.polytech.steats.utils.NotFoundException;
 import fr.unice.polytech.steats.utils.openapi.*;
 
@@ -44,17 +46,17 @@ public class AppliedDiscountHttpHandler extends AbstractHandler {
     }
 
     @ApiRoute(method = HttpUtils.POST, path = "", summary = "Save a list of applied discounts")
-    public AppliedDiscount[] create(
+    public JsonResponse<AppliedDiscount[]> create(
             @ApiBodyParam(name = "userId", description = "ID of the user that has unlocked the discounts") String userId,
             @ApiBodyParam(name = "unlockOrderId", description = "ID of the order that has unlocked the discounts") String unlockOrderId,
             @ApiBodyParam(name = "discounts", description = "A list of key-value pairs of the ID of the unlocked discount and the order it have been applied to (can be null)", example = "[{\"ab89e6\": \"1\"}, {\"da56c8\": \"null\"}]")
             List<AbstractMap.SimpleEntry<String, String>> discounts
-    ) {
+    ) throws JsonProcessingException {
         AppliedDiscount[] discountList = new AppliedDiscount[discounts.size()];
         int i = 0;
         for (AbstractMap.SimpleEntry<String, String> discountEntry : discounts)
             discountList[i++] = new AppliedDiscount(discountEntry.getKey(), userId, unlockOrderId, discountEntry.getValue());
         getManager().add(discountList);
-        return discountList;
+        return new JsonResponse<>(HttpUtils.CREATED_CODE, discountList);
     }
 }
