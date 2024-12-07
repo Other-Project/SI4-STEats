@@ -21,6 +21,6 @@ public class AppliedDiscountHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("applied", API_ADDRESS, new AppliedDiscountHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler(new AppliedDiscountHttpHandler(API_ADDRESS, getLogger()));
     }
 }

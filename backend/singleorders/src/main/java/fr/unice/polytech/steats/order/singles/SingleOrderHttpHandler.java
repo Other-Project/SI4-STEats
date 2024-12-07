@@ -1,181 +1,114 @@
 package fr.unice.polytech.steats.order.singles;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.HttpExchange;
 import fr.unice.polytech.steats.models.Payment;
 import fr.unice.polytech.steats.models.Status;
-import fr.unice.polytech.steats.utils.*;
-import fr.unice.polytech.steats.utils.openapi.ApiMasterRoute;
-import fr.unice.polytech.steats.utils.openapi.ApiRoute;
+import fr.unice.polytech.steats.utils.AbstractHandler;
+import fr.unice.polytech.steats.utils.HttpUtils;
+import fr.unice.polytech.steats.utils.JsonResponse;
+import fr.unice.polytech.steats.utils.NotFoundException;
+import fr.unice.polytech.steats.utils.openapi.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.logging.Logger;
 
 @ApiMasterRoute(name = "Single Orders", path = "/api/orders/singles")
-public class SingleOrderHttpHandler extends AbstractManagerHandler<SingleOrderManager, SingleOrder> {
-    private final ObjectMapper objectMapper = JacksonUtils.getMapper();
+public class SingleOrderHttpHandler extends AbstractHandler {
 
     public SingleOrderHttpHandler(String subPath, Logger logger) {
-        super(subPath, SingleOrder.class, logger);
+        super(subPath, logger);
     }
 
-    @Override
-    protected SingleOrderManager getManager() {
+    private SingleOrderManager getManager() {
         return SingleOrderManager.getInstance();
     }
 
-    @Override
-    protected void register() {
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath() + "/{id}", super::get);
-        ApiRegistry.registerRoute(HttpUtils.GET, getSubPath(), (exchange, param) -> getAll(exchange, HttpUtils.parseQuery(exchange.getRequestURI().getQuery())));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath(), (exchange, param) -> create(exchange));
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/pay", this::pay);
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/status", this::setStatus);
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/deliveryTime", this::setDeliveryTime);
-        ApiRegistry.registerRoute(HttpUtils.POST, getSubPath() + "/{id}/modifyCartItem", this::modifyCartItem);
-        ApiRegistry.registerRoute(HttpUtils.DELETE, getSubPath() + "/{id}", super::remove);
-    }
-
-    @ApiRoute(path = "/{id}/modifyCartItem", method = HttpUtils.POST, body = {"menuItemId", "quantity"}, summary = "Modify or add a menu item in cart")
-    private void modifyCartItem(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String orderId = params.get("id");
-
-        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String menuItem = body.get("menuItemId").toString();
-        String quantity = body.get("quantity").toString();
-        if (menuItem == null || quantity == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            return;
-        }
-
-        try {
-            SingleOrder order = SingleOrderManager.getInstance().get(orderId);
-            order.modifyMenuItem(menuItem, Integer.parseInt(quantity));
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, order);
-        } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-        } catch (NumberFormatException e) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.BAD_REQUEST_CODE, "Quantity must be an integer");
-        }
-    }
-
-    @ApiRoute(path = "/", method = HttpUtils.GET, queryParams = {"userId", "restaurantId", "groupCode"})
-    private void getAll(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String userId = params.get("userId");
-        String restaurantId = params.get("restaurantId");
-        String groupCode = params.get("groupCode");
-
+    @ApiRoute(method = HttpUtils.GET, path = "", summary = "Get all single orders")
+    public List<SingleOrder> getAll(
+            @ApiQueryParam(name = "userId") String userId,
+            @ApiQueryParam(name = "restaurantId") String restaurantId,
+            @ApiQueryParam(name = "groupCode") String groupCode
+    ) {
         if (userId != null && restaurantId != null && groupCode != null) {
             if (groupCode.isEmpty()) groupCode = null;
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUserInRestaurant(userId, restaurantId, groupCode));
+            return getManager().getOrdersByUserInRestaurant(userId, restaurantId, groupCode);
         } else if (userId != null && groupCode != null) {
             if (groupCode.isEmpty()) groupCode = null;
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUser(userId, groupCode));
+            return getManager().getOrdersByUser(userId, groupCode);
         } else if (restaurantId != null && groupCode != null) {
             if (groupCode.isEmpty()) groupCode = null;
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByRestaurant(restaurantId, groupCode));
-        } else if (userId != null && restaurantId != null) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUserInRestaurant(userId, restaurantId));
-        } else if (userId != null) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByUser(userId));
-        } else if (restaurantId != null) {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByRestaurant(restaurantId));
-        } else if (groupCode != null) {
+            return getManager().getOrdersByRestaurant(restaurantId, groupCode);
+        }
+        if (userId != null && restaurantId != null)
+            return getManager().getOrdersByUserInRestaurant(userId, restaurantId);
+        if (userId != null)
+            return getManager().getOrdersByUser(userId);
+        if (restaurantId != null)
+            return getManager().getOrdersByRestaurant(restaurantId);
+        if (groupCode != null) {
             if (groupCode.isEmpty()) groupCode = null;
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getOrdersByGroup(groupCode));
-        } else {
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.OK_CODE, getManager().getAll());
+            return getManager().getOrdersByGroup(groupCode);
         }
+        return getManager().getAll();
     }
 
-    @ApiRoute(path = "/{id}/pay", method = HttpUtils.POST)
-    private void pay(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String orderId = params.get("id");
-        Payment payment = null;
-        try {
-            payment = SingleOrderManager.getInstance().get(orderId).pay();
-        } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-            exchange.close();
-        }
-        if (payment == null) {
-            exchange.sendResponseHeaders(HttpUtils.INTERNAL_SERVER_ERROR_CODE, -1);
-            exchange.close();
-        } else HttpUtils.sendJsonResponse(exchange, HttpUtils.CREATED_CODE, payment);
+    @ApiRoute(method = HttpUtils.POST, path = "", summary = "Join a group order")
+    public JsonResponse<SingleOrder> create(
+            @ApiBodyParam(name = "userId", description = "ID of the user that wants to order") String userId,
+            @ApiBodyParam(name = "groupCode", description = "Code of the group order to join") String groupCode
+    ) throws IOException {
+        return create(new SingleOrder(userId, groupCode));
     }
 
-    @ApiRoute(path = "/", method = HttpUtils.POST)
-    private void create(HttpExchange exchange) throws IOException {
-        try {
-            exchange.getResponseHeaders().add(HttpUtils.CONTENT_TYPE, HttpUtils.APPLICATION_JSON);
-            JsonNode jsonNode = objectMapper.readTree(exchange.getRequestBody());
-
-            String userId = jsonNode.get("userId").asText();
-            String groupCode = jsonNode.has("groupCode") ? jsonNode.get("groupCode").asText() : null;
-
-            SingleOrder singleOrder;
-
-            if (groupCode != null) {
-                singleOrder = new SingleOrder(userId, groupCode);
-            } else {
-                singleOrder = objectMapper.treeToValue(jsonNode, SingleOrder.class);
-            }
-
-            if (!singleOrder.checkGroupOrder()) {
-                exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-                exchange.close();
-                return;
-            }
-            getManager().add(singleOrder);
-            HttpUtils.sendJsonResponse(exchange, HttpUtils.CREATED_CODE, singleOrder);
-        } catch (IOException e) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-        }
-        exchange.getResponseBody().close();
+    @ApiRoute(method = HttpUtils.PUT, path = "", summary = "Create a single order")
+    public JsonResponse<SingleOrder> create(@ApiBodyParam SingleOrder singleOrder) throws IOException {
+        if (!singleOrder.checkGroupOrder())
+            throw new IllegalArgumentException("The delivery time, the address or the restaurant differs from what's defined in the group order");
+        getManager().add(singleOrder);
+        return new JsonResponse<>(HttpUtils.CREATED_CODE, singleOrder);
     }
 
-    @ApiRoute(path = "/{id}/status", method = HttpUtils.POST)
-    private void setStatus(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String orderId = params.get("id");
-        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String status = body.get("status").toString();
-
-        if (status == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.getResponseBody().close();
-            return;
-        }
-
-        try {
-            SingleOrderManager.getInstance().get(orderId).setStatus(Status.valueOf(status));
-        } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-        }
-        exchange.sendResponseHeaders(HttpUtils.OK_CODE, -1);
-        exchange.getResponseBody().close();
+    @ApiRoute(method = HttpUtils.GET, path = "/{id}", summary = "Get a single order by its ID")
+    public SingleOrder get(
+            @ApiPathParam(name = "id", description = "ID of the single order") String id
+    ) throws NotFoundException {
+        return getManager().get(id);
     }
 
-    @ApiRoute(path = "/{id}/deliveryTime", method = HttpUtils.POST)
-    private void setDeliveryTime(HttpExchange exchange, Map<String, String> params) throws IOException {
-        String orderId = params.get("id");
-        Map<String, Object> body = JacksonUtils.mapFromJson(exchange.getRequestBody());
-        String deliveryTime = body.get("deliveryTime").toString();
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/pay", summary = "Pay a single order")
+    public Payment pay(
+            @ApiPathParam(name = "id", description = "ID of the single order") String id
+    ) throws IOException, NotFoundException {
+        Payment payment = SingleOrderManager.getInstance().get(id).pay();
+        if (payment == null) throw new IOException("Payment failed");
+        return payment;
+    }
 
-        if (deliveryTime == null) {
-            exchange.sendResponseHeaders(HttpUtils.BAD_REQUEST_CODE, -1);
-            exchange.getResponseBody().close();
-            return;
-        }
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/status", summary = "Set the status of a single order")
+    public void setStatus(
+            @ApiPathParam(name = "id", description = "ID of the single order") String id,
+            @ApiBodyParam(name = "status", description = "The new status of the order") Status status
+    ) throws NotFoundException {
+        SingleOrderManager.getInstance().get(id).setStatus(status);
+    }
 
-        try {
-            SingleOrderManager.getInstance().get(orderId).setDeliveryTime(LocalDateTime.parse(deliveryTime));
-        } catch (NotFoundException e) {
-            exchange.sendResponseHeaders(HttpUtils.NOT_FOUND_CODE, -1);
-        }
-        exchange.sendResponseHeaders(HttpUtils.OK_CODE, -1);
-        exchange.getResponseBody().close();
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/deliveryTime", summary = "Set the delivery time of a single order")
+    public void setDeliveryTime(
+            @ApiPathParam(name = "id", description = "ID of the single order") String id,
+            @ApiBodyParam(name = "deliveryTime", description = "The time at which the order should be delivered") LocalDateTime deliveryTime
+    ) throws NotFoundException {
+        SingleOrderManager.getInstance().get(id).setDeliveryTime(deliveryTime);
+    }
+
+    @ApiRoute(method = HttpUtils.POST, path = "/{id}/modifyCartItem", summary = "Add/Modify/Remove a menu item in cart")
+    public SingleOrder modifyCartItem(
+            @ApiPathParam(name = "id", description = "ID of the single order") String id,
+            @ApiBodyParam(name = "menuItemId", description = "The id of the menu item to add/modify/remove form the cart") String menuItemId,
+            @ApiBodyParam(name = "quantity", description = "Quantity to set (0 to remove)") int quantity
+    ) throws NotFoundException, IOException {
+        SingleOrder order = SingleOrderManager.getInstance().get(id);
+        order.modifyMenuItem(menuItemId, quantity);
+        return order;
     }
 }

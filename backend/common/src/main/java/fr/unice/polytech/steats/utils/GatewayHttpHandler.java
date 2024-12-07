@@ -51,10 +51,9 @@ public class GatewayHttpHandler extends AbstractHandler {
         try {
             HttpResponse<InputStream> response = HttpUtils.sendRequest(request);
             try (InputStream body = response.body()) {
-                var bodyBytes = body.readAllBytes();
                 exchange.getResponseHeaders().putAll(response.headers().map());
-                exchange.sendResponseHeaders(response.statusCode(), bodyBytes.length);
-                exchange.getResponseBody().write(bodyBytes);
+                exchange.sendResponseHeaders(response.statusCode(), response.headers().firstValueAsLong("content-length").orElse(0));
+                body.transferTo(exchange.getResponseBody());
             }
             exchange.close();
         } catch (IOException e) {

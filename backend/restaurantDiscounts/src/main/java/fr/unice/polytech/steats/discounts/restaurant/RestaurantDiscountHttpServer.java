@@ -21,6 +21,6 @@ public class RestaurantDiscountHttpServer extends AbstractHttpServer {
     @Override
     protected void registerHandlers() {
         super.registerHandlers();
-        registerHandler("restaurant", API_ADDRESS, new RestaurantDiscountHttpHandler(API_ADDRESS, getLogger()));
+        registerHandler(new RestaurantDiscountHttpHandler(API_ADDRESS, getLogger()));
     }
 }
